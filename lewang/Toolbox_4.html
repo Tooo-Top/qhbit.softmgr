@@ -1,0 +1,117 @@
+<!doctype html>
+<html class="no-js" lang="zh-cn">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+<meta name="renderer" content="webkit">
+<title>工具箱_用户登录</title>
+
+<link href="css/css.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="js/jquery.js"></script>
+<script language="javascript">
+<!--
+function showmenu(){menu.style.visibility = "visible";	}
+function hidmenu(){menu.style.visibility = "hidden";}
+document.onclick = hidmenu;
+-->
+</script>
+
+</head>
+<body>
+<div class="main">
+  <div class="header">
+    <div class="user">
+      <div class="userimg"><!--会员头像 --><a href="#"><img src="images/tou.jpg" width="200" height="200"></a></div>
+      <div class="usertxt"><span class="ties">乐网</span><span class="login"><a href="PersonalCenter_1.html">登录账号</a></span></div>
+    </div>
+    <div class="Software">
+      <ul>
+        <li><a href="Encyclopedia.html"><span class="dq"></span>软件大全</a></li>
+        <li><a href="Upgrade.html"><span class="sj"></span>软件升级</a></li>
+        <li><a href="Uninstall.html"><span class="xz"></span>软件卸载</a></li> 
+        <li><a href="Toolbox.html"><span class="gj"></span>工具箱</a></li> 
+        <!--<li><a href="PersonalCenter.html"><span class="gr"></span>个人中心</a></li>  --> 
+    </ul>
+    </div><div class="ext" style="position:relative;">
+      <ul>
+       <li><a href="#" class="gw"></a></li>       <li><a href="javascript:showmenu()" class="gd"></a></li>
+ <div id="menu">
+<a href="http://www.hao123.com/">反馈建议</a>
+<a href="http://www.hao123.com/">设置中心</a>
+<a href="http://www.hao123.com/">检测更新</a>
+<a href="http://www.hao123.com/">使用指南</a>
+<a href="http://www.hao123.com/">帮助中心</a>
+<a href="http://www.hao123.com/">关于我们</a>
+</div>
+       <li><a href="#" class="yc"></a></li>
+       <li class="hover"><a href="#" class="fd"></a></li>
+       <li><a href="#" class="gb"></a></li>
+    </ul>
+   </div>
+  </div>
+  <div>
+  
+<div class="Central">
+  <div class="Toolbox">
+<div class="Toolbox_left">
+ <div class="chaxun"><a href="Toolbox.html"><img src="images/cha_1.png" width="232" height="232"></a></div>
+ <div class="tijian">
+ <p class="ts1">您的电脑上次体检是在49分钟前 </p>
+ <p class="ts2">如果系统存在垃圾，运行速度会变慢建议您每天坚持体检，提升系统运行速度和效率。 </p>
+    </div>
+      <div class="renwu"><a href="PersonalCenter.html">任务设置</a></div>
+      <div class="liping"><span>第一次使用清理获得40积分! 每天清理可获得更多积分兑换你想要的礼品</span></div>
+</div>
+    <div class="Toolbox_right">
+      <div class="xiangdao">
+        <input name="submit" type="submit" class="yhxd" value="系统优化向导">
+      </div>
+
+     <div class="Register">
+       <div class="sebn">
+        <a href="#" class="yuew"><img src="images/tou.jpg" width="60" height="60"></a>  
+           <div class="weidenglu"><p><a href="#">点击登陆乐网帐号</a></p>
+           <p>未登陆无法在云端保存设置</p>
+           </div>
+        </div>
+        <div class="Reg" id="sfew">
+        <ul><form action="" method="get">
+        <li><span>用户名* </span><input name="Username" type="text" class="reger" value=""></li>
+        <li><span>密码*</span><input name="Password" type="password" class="reger" value=""></li>
+        <li><span>重复密码*</span><input name="Repeatpassword" type="password" class="reger" value=""></li>
+        <li><span>手机号码&nbsp;</span> <input name="Number" type="text" class="reger" value=""></li>  
+        <li><span>邮箱*</span><input name="" type="text" class="reger" value=""></li>     
+        <li><small class="shens">*号标记为必填</small> <em style="margin-top:5px;"><input type="checkbox" value='1' /><label></label></em><em><a href="#">同意用户注册协议</a></em></li> 
+        <li class="sing"><input name="submit" type="submit" class="regzu" value="提交">  <input name="submit" class="regzu"  type="reset" value="返回"></li>     
+        <li class="kdss"><i>填写电话验证后即可兑换礼品~</i></li>
+        </form>
+        </ul>
+        </div>
+      </div>
+      
+      </div>
+    </div>
+    </div> 
+</div>
+  <script type="text/javascript">
+$(function(){
+	$('#sfew').hcheckbox();
+	$('#radiolist').hradio();
+	$('#btnOK').click(function(){
+		var checkedValues = new Array();
+		$('#sfew :checkbox').each(function(){
+			if($(this).is(':checked'))
+			{
+				checkedValues.push($(this).val());
+			}
+		});
+
+		alert(checkedValues.join(','));
+		alert($('#radiolist :checked').val());
+	})
+});
+  </script> 
+<script type="text/javascript" src="js/jquery-hcheckbox.js"></script>	
+</div>
+</body>
+</html>

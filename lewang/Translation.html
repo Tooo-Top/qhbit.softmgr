@@ -1,0 +1,137 @@
+<!doctype html>
+<html class="no-js" lang="zh-cn">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+<meta name="renderer" content="webkit">
+<title>弹窗</title>
+
+<link href="css/css.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="js/jquery.js"></script>
+<script language="javascript">
+<!--
+function showmenu(){menu.style.visibility = "visible";	}
+function hidmenu(){menu.style.visibility = "hidden";}
+document.onclick = hidmenu;
+-->
+</script>
+
+</head>
+<body>
+<div class="main">
+<!--弹窗开始 -->
+<div class="Trans">
+  <div class="smeg">
+  <div class="dosd"><a href="#">x</a></div>
+    <div class="ans"  id="sfew1">
+      <span><em><input name="subBox" type="checkbox" value='1' /><label></label></em><em>全选</em></span>
+      <span><input name="submit" type="submit" class="poes" value=""></span>
+    </div>
+  </div>
+  <div class="gtse">
+  <div class="sdneng"><span class="sj1">正在下载</span><span>下载完成</span></div> 
+  <div class="puey" id="sfew">
+    <ul>
+      
+      <li>
+        <span class="mk1"><input name="subBox" type="checkbox" value='1' /><label></label></span>
+        <span class="mk2"><a href="#" class="softimg"><img src="images/ioc.png" width="36" height="36"></a></span>
+        <span class="mk3">腾讯QQ</span>
+        <span class="mk4">99%</span>
+ <!--软件卸载进度条--><div class="tandi" style="width:50%;"></div>  <!--软件卸载进度条 -->
+        </li>
+      <li>
+        <span class="mk1"><input name="subBox" type="checkbox" value='1' /><label></label></span>
+        <span class="mk2"><a href="#" class="softimg"><img src="images/ioc.png" width="36" height="36"></a></span>
+        <span class="mk3">腾讯QQ</span>
+        <span class="mk4">99%</span>
+        </li>
+      <li>
+        <span class="mk1"><input name="subBox" type="checkbox" value='1' /><label></label></span>
+        <span class="mk2"><a href="#" class="softimg"><img src="images/ioc.png" width="36" height="36"></a></span>
+        <span class="mk3">腾讯QQ</span>
+        <span class="mk4">99%</span>
+ <!--软件卸载进度条--><div class="tandi" style="width:50%;"></div>  <!--软件卸载进度条 -->
+        </li>
+      <li>
+        <span class="mk1"><input name="subBox" type="checkbox" value='1' /><label></label></span>
+        <span class="mk2"><a href="#" class="softimg"><img src="images/ioc.png" width="36" height="36"></a></span>
+        <span class="mk3">腾讯QQ</span>
+        <span class="mk4">99%</span>
+        </li>
+      <li>
+        <span class="mk1"><input name="subBox" type="checkbox" value='1' /><label></label></span>
+        <span class="mk2"><a href="#" class="softimg"><img src="images/ioc.png" width="36" height="36"></a></span>
+        <span class="mk3">腾讯QQ</span>
+        <span class="mk4">99%</span>
+ <!--软件卸载进度条--><div class="tandi" style="width:50%;"></div>  <!--软件卸载进度条 -->
+        </li>
+      <li>
+        <span class="mk1"><input name="subBox" type="checkbox" value='1' /><label></label></span>
+        <span class="mk2"><a href="#" class="softimg"><img src="images/ioc.png" width="36" height="36"></a></span>
+        <span class="mk3">腾讯QQ</span>
+        <span class="mk4">99%</span>
+        </li> 
+           
+      </ul>
+  </div>
+  </div>
+<div class="sidgne"><span><a href="#"><em class="dakai"></em>打开目录</a></span><span><a href="#"><em class="qinkong"></em>清空记录</a></span></div>
+</div>
+<script src="js/jquery14.js"></script> 
+ <script type="text/javascript"> 
+$(function() { 
+$("#CheckAll").click(function() { 
+var flag = $(this).attr("checked"); 
+$("[name=subBox]:checkbox").each(function() { 
+$(this).attr("checked", flag); 
+}) 
+}) 
+}) 
+</script> 
+
+
+
+<div class="Trans">
+  <div class="smeg">
+  <div class="dosd"><a href="#">x</a></div>
+    <div class="ans"  id="sfew2">
+      <span><em><input name="subBox" type="checkbox" value='1' /><label></label></em><em>全选</em></span>
+      <span><input name="submit" type="submit" class="poes" value=""></span>
+    </div>
+  </div>
+  <div class="gtse">
+  <div class="sdneng"><span class="sj1">正在下载</span><span>下载完成</span></div> 
+  <div class="ieng"><a href="#"><img src="images/ieng.png" width="152" height="152"></a></div>
+  </div>
+<div class="sidgne"><span><a href="#"><em class="dakai"></em>打开目录</a></span><span><a href="#"><em class="qinkong"></em>清空记录</a></span></div>
+</div>
+
+
+
+  <script type="text/javascript">
+$(function(){
+	$('#sfew').hcheckbox();
+	$('#sfew1').hcheckbox();
+	$('#sfew2').hcheckbox();
+	$('#sfew3').hcheckbox();
+	$('#radiolist').hradio();
+	$('#btnOK').click(function(){
+		var checkedValues = new Array();
+		$('#sfew :checkbox').each(function(){
+			if($(this).is(':checked'))
+			{
+				checkedValues.push($(this).val());
+			}
+		});
+
+		alert(checkedValues.join(','));
+		alert($('#radiolist :checked').val());
+	})
+});
+  </script> 
+<script type="text/javascript" src="js/jquery-hcheckbox.js"></script>	
+<!--弹窗开始 -->
+</div>
+</body>
+</html>
