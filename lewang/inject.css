@@ -3,3 +3,7 @@ a:focus,
 input[type=text],
 input[type=button],
 input[type=submit] {outline:none;}
+
+body{
+	-webkit-user-select: none;
+}
