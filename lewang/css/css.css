@@ -6,8 +6,7 @@
 	margin:0px;
 }
 html{
-	background:#FFF;
-	background:#000;
+        background:transparent;
 }
 body{
 	font:12px Verdana,Arial,Tahoma;
@@ -43,7 +42,7 @@ input,select,button{
     -webkit-border-radius:5px;
     -o-border-radius:5px;
     border-radius:5px; border: 1px solid #dadada; 
-		background:#000;}
+                background:transparent;}
 	
 #menu{background-color:#fff;width:80px;font-size:9pt;visibility:hidden; right:55px; top:20px;position:absolute; width:115px; background-color:#FFF; z-index:200;border: 1px solid #dedede;
     -moz-border-radius: 3px;      /* Gecko browsers */
