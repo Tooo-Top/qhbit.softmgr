@@ -2,7 +2,7 @@
 #define WIDGET_H
 
 #include <QtGui>
-#include <QtDeclarative>
+#include <QWidget>
 #include <QPixmap>
 
 class Widget : public QWidget
@@ -19,9 +19,8 @@ public:
 protected:
     void paintEvent(QPaintEvent *e);
     void showEvent(QShowEvent *e);
-    
 private:
-    QDeclarativeView* m_pQmlContainer;
+//    QDeclarativeView* m_pQmlContainer;
     QPixmap m_shadow;
 };
 
