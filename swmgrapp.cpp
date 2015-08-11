@@ -478,9 +478,9 @@ void SwmgrApp::requestSoftCategoryList() {
 //    objParameter;
     QJsonArray jsArray;
     foreach (CommonItem item,_DataModel.getSoftCategory().values()) {
-        QJsonValue objParameter;
+        QJsonObject objParameter;
         foreach(QString key,item.keys()) {
-            objParameter[key] = item[item];
+            objParameter[key] = item.value(key);
         }
 
         jsArray.append(objParameter);
