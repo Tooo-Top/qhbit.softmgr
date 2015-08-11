@@ -102,7 +102,7 @@ protected:
 	UserInfo _user;
 signals:
 	void sigInstaller(QJsonObject installer);
-    void putSoftCategory(QJsonValue swCategory);
+    void putSoftCategory(QVariantList swCategory);
 protected slots:
     // task
     void addInstaller(QJsonObject installer);
@@ -111,7 +111,7 @@ protected slots:
     void monitorProf();
     void launchInstall();
 
-    void dumpInfo(QJsonValue swCategory);
+    void dumpInfo(QVariantList swCategory);
 public slots:
     void requestSoftCategoryList();
     // UI

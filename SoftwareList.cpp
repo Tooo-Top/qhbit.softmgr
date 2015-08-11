@@ -50,8 +50,8 @@ QString packageItems[nPackageItemCount] = {
 bool SoftwareList::LoadSoftwareCategory(QString szCategoryFile, mapSoftwareCategory &mapCategory) {
 	QByteArray fileBuf;
 	QJsonArray jsArray;
-	QJsonDocument doc;
 	QJsonObject jsObj;
+	QJsonDocument doc;
 
 	if (!QFile::exists(szCategoryFile)) {
 		return false;
@@ -60,13 +60,15 @@ bool SoftwareList::LoadSoftwareCategory(QString szCategoryFile, mapSoftwareCateg
 	QFile loadFile(szCategoryFile);
 	if (loadFile.open(QIODevice::ReadOnly)) {
 		fileBuf = loadFile.readAll();
-		doc = QJsonDocument::fromJson(fileBuf);
+		qDebug() << fileBuf;
+		QJsonParseError err;
+		doc = QJsonDocument::fromJson(fileBuf,&err);
 		loadFile.close();
 	}
 	else {
 		return false;
 	}
-	if (!doc.isEmpty() || !doc.isObject()) {
+	if (doc.isEmpty() || !doc.isObject()) {
 		return false;
 	}
 	jsObj = doc.object();
@@ -106,7 +108,7 @@ bool SoftwareList::LoadCategorySoftwareList(QString szCategoryListFile, QString 
 	else {
 		return false;
 	}
-	if (!doc.isEmpty() || !doc.isObject()) {
+	if (doc.isEmpty() || !doc.isObject()) {
 		return false;
 	}
 	jsObj = doc.object();
@@ -154,7 +156,7 @@ bool SoftwareList::LoadArrayOfSoftwareList(QString szSoftListFile, lstSoftwarePa
 	else {
 		return false;
 	}
-	if (!doc.isEmpty() || !doc.isObject()) {
+	if (doc.isEmpty() || !doc.isObject()) {
 		return false;
 	}
 	jsObj = doc.object();
@@ -198,7 +200,9 @@ bool SoftwareList::AddItemToConfArray(QString szConfFile, QJsonObject &jsItem) {
 		doc = QJsonDocument::fromJson(fileBuf);
 		if (!doc.isEmpty() && doc.isArray()) {
 			jsArray = doc.array();
-			return false;
+		}
+		else {
+			loadFile.resize(0);
 		}
 		// check save to file
 		if (!jsArray.contains(QJsonValue(jsItem))) {
@@ -270,7 +274,7 @@ void SoftwareList::getSettingFromFile(QString szFile, QJsonObject &setting) {
 		doc = QJsonDocument::fromJson(fileBuf);
 		saveFile.close();
 	}
-	if (!doc.isEmpty() || !doc.isObject()) {
+	if (doc.isEmpty() || !doc.isObject()) {
 		return;
 	}
 	setting = doc.object();

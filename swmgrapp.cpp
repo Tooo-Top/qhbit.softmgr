@@ -161,7 +161,7 @@ void SwmgrApp::InitSlots() {
 	QObject::connect(this, SIGNAL(sigInstaller(QJsonObject)), SLOT(addInstaller(QJsonObject)));
 	QObject::connect(pollDownloadTaskObject, SIGNAL(timeout()), this,SLOT(downloadPoll()));
     QObject::connect(wndWebkit,SIGNAL(loadFinished(bool)),this,SLOT(docLoadFinish(bool)));
-    QObject::connect(this,SIGNAL(putSoftCategory(QJsonValue)),SLOT(dumpInfo(QJsonValue)));
+    QObject::connect(this, SIGNAL(putSoftCategory(QVariantList)), SLOT(dumpInfo(QVariantList)));
 }
 
 void SwmgrApp::InitTray() {
@@ -175,6 +175,7 @@ void SwmgrApp::InitWnd() {
     wndWebkit->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowSystemMenuHint | Qt::WindowMinimizeButtonHint);
     wndWebkit->setFixedSize(992, 613);
     wndWebkit->setUrl(QUrl::fromUserInput("D:/workspace/trunk/lewang/Index.html"));
+    wndWebkit->page()->mainFrame()->addToJavaScriptWindowObject("DYBC",this);
     wndWebkit->show();
 }
 
@@ -271,7 +272,7 @@ void SwmgrApp::showMiniWnd() {
 
 void SwmgrApp::docLoadFinish(bool ok) {
     if (ok) {
-        wndWebkit->page()->mainFrame()->addToJavaScriptWindowObject("DYBC",this);
+//        wndWebkit->page()->mainFrame()->addToJavaScriptWindowObject("DYBC",this);
     }
 }
 
@@ -475,25 +476,19 @@ void SwmgrApp::downloadPoll()
 
 //==== for UI interface
 void SwmgrApp::requestSoftCategoryList() {
-//    QJsonValue objParameter(QJsonValue::Array);
-//    objParameter;
     QJsonArray jsArray;
-    QJsonObject objParameter;
-    objParameter["id"]=QString("00001");
-    jsArray.append(objParameter);
-/*    foreach (CommonItem item,_DataModel.getSoftCategory().values()) {
+    foreach (CommonItem item,_DataModel.getSoftCategory().values()) {
         QJsonObject objParameter;
         foreach(QString key,item.keys()) {
             objParameter[key] = item.value(key);
         }
 
         jsArray.append(objParameter);
-    }*/
-    emit putSoftCategory(QJsonValue(jsArray));
+    }
+
+    emit putSoftCategory(jsArray.toVariantList());
 }
 
-void SwmgrApp::dumpInfo(QJsonValue swCategory) {
-    QJsonDocument doc;
-    doc.setObject(swCategory.toObject());
-    qDebug()<<doc.toJson();
+void SwmgrApp::dumpInfo(QVariantList swCategory) {
+	qDebug() << swCategory;
 }
