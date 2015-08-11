@@ -3,14 +3,21 @@
 #include <QApplication>
 #include <QUrl>
 #include <QSystemSemaphore>
-
+#include "global.h"
 #include "swmgrapp.h"
 #include "globalsingleton.h"
 #include "ConfOperation.h"
 
+QString GLOBAL::_DY_DIR_RUNNERSELF = ' ';
+
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+
+    GLOBAL::_DY_DIR_RUNNERSELF = QApplication::applicationDirPath();
+    qDebug() << "_DY_DIR_RUNNERSELF:" << GLOBAL::_DY_DIR_RUNNERSELF << endl;
+
+
 	QStringList lstCmd = a.arguments();
 	QJsonObject jsonLaunchObject;
 	bool bInstallMode = false;
@@ -81,9 +88,9 @@ int main(int argc, char *argv[])
 	}
 
 	if (!SwmgrApp::Instance()->InitAppEnv()){
-		std::cout << "Initial error!" << std::endl;
+        std::cout << "Initial error!" << std::endl;
 		return 1;
 	}
 
-	return a.exec();
+    return a.exec();
 }

@@ -11,7 +11,7 @@
 #include <QWebView>
 #include <QWebPage>
 #include <QWebFrame>
-
+#include "global.h"
 #include "widget.h"
 #include "DownWrapper.h"
 

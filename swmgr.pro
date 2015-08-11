@@ -263,7 +263,8 @@ HEADERS += widget.h \
     curl/lib/warnless.h \
     curl/lib/wildcard.h \
     curl/lib/x509asn1.h \
-    curl/lib/amigaos.h
+    curl/lib/amigaos.h \
+    global.h
 
 #FORMS   +=
 
