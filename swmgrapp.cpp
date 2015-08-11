@@ -96,7 +96,7 @@ BOOL SwmgrApp::InitAppEnv() {
 	StartPoll();
 //	_user.RegistUser("xiehc", "password", "xiehechong@sina.com");
 	_user.UserLogin("xiehc", "password");
-//    _window->load(QUrl::fromUserInput("D:\\workspace\\lewang\\index.html"));
+//    _window->load(QUrl::fromUserInput("D:/workspace/trunk/lewang/Index.html"));
 //    _window->show();
 
 	return TRUE;
@@ -139,6 +139,7 @@ void SwmgrApp::InitObjects() {
 	srvLaunchInst = new QLocalServer(this);
 	pollDownloadTaskObject = new QTimer(this);
     wndWebkit = new QWebView();
+    QWebSettings::globalSettings()->setAttribute(QWebSettings::DeveloperExtrasEnabled,true);
 }
 
 void SwmgrApp::InitIcons() {
@@ -172,9 +173,7 @@ void SwmgrApp::InitWnd() {
 	//wndFull = new Widget(NULL);
     wndWebkit->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowSystemMenuHint | Qt::WindowMinimizeButtonHint);
     wndWebkit->setFixedSize(992, 613);
-    //wndWebkit->setWindowOpacity(0);
-    wndWebkit->setWindowOpacity(0);
-    wndWebkit->setUrl(QUrl::fromUserInput("qrc:/index.html"));
+    wndWebkit->setUrl(QUrl::fromUserInput("D:/workspace/trunk/lewang/Index.html"));
     wndWebkit->show();
 }
 
@@ -473,3 +472,18 @@ void SwmgrApp::downloadPoll()
 	}
 }
 
+//==== for UI interface
+void SwmgrApp::requestSoftCategoryList() {
+//    QJsonValue objParameter(QJsonValue::Array);
+//    objParameter;
+    QJsonArray jsArray;
+    foreach (CommonItem item,_DataModel.getSoftCategory().values()) {
+        QJsonValue objParameter;
+        foreach(QString key,item.keys()) {
+            objParameter[key] = item[item];
+        }
+
+        jsArray.append(objParameter);
+    }
+    emit putSoftCategory(QJsonValue(jsArray));
+}
