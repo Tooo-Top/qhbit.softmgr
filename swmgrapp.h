@@ -111,6 +111,7 @@ protected slots:
     void monitorProf();
     void launchInstall();
 
+    void dumpInfo(QJsonValue swCategory);
 public slots:
     void requestSoftCategoryList();
     // UI

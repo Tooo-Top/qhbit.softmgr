@@ -161,6 +161,7 @@ void SwmgrApp::InitSlots() {
 	QObject::connect(this, SIGNAL(sigInstaller(QJsonObject)), SLOT(addInstaller(QJsonObject)));
 	QObject::connect(pollDownloadTaskObject, SIGNAL(timeout()), this,SLOT(downloadPoll()));
     QObject::connect(wndWebkit,SIGNAL(loadFinished(bool)),this,SLOT(docLoadFinish(bool)));
+    QObject::connect(this,SIGNAL(putSoftCategory(QJsonValue)),SLOT(dumpInfo(QJsonValue)));
 }
 
 void SwmgrApp::InitTray() {
@@ -477,13 +478,22 @@ void SwmgrApp::requestSoftCategoryList() {
 //    QJsonValue objParameter(QJsonValue::Array);
 //    objParameter;
     QJsonArray jsArray;
-    foreach (CommonItem item,_DataModel.getSoftCategory().values()) {
+    QJsonObject objParameter;
+    objParameter["id"]=QString("00001");
+    jsArray.append(objParameter);
+/*    foreach (CommonItem item,_DataModel.getSoftCategory().values()) {
         QJsonObject objParameter;
         foreach(QString key,item.keys()) {
             objParameter[key] = item.value(key);
         }
 
         jsArray.append(objParameter);
-    }
+    }*/
     emit putSoftCategory(QJsonValue(jsArray));
+}
+
+void SwmgrApp::dumpInfo(QJsonValue swCategory) {
+    QJsonDocument doc;
+    doc.setObject(swCategory.toObject());
+    qDebug()<<doc.toJson();
 }
