@@ -25,9 +25,10 @@ category_callback = function (data) {
 
 $(function () {
     connectSlots();
-    $('#ct').click(function () {
+    //$('#ct').click(function () {
+		//处理分类
         DYBC.requestSoftCategoryList();
-    });
+    //});
 
 });
 
