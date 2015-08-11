@@ -1,0 +1,5 @@
+/**去除链接虚线**/
+a:focus,
+input[type=text],
+input[type=button],
+input[type=submit] {outline:none;}
