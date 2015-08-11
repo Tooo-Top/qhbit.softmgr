@@ -174,8 +174,10 @@ void SwmgrApp::InitWnd() {
 	//wndFull = new Widget(NULL);
     wndWebkit->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowSystemMenuHint | Qt::WindowMinimizeButtonHint);
     wndWebkit->setFixedSize(992, 613);
-    wndWebkit->setUrl(QUrl::fromUserInput("D:/workspace/trunk/lewang/Index.html"));
+    wndWebkit->setUrl(QUrl::fromUserInput("D:/iws/xiaobai.softmgr/trunk/lewang/Index.html"));
     wndWebkit->page()->mainFrame()->addToJavaScriptWindowObject("DYBC",this);
+    wndWebkit->page()->mainFrame()->setScrollBarPolicy(Qt::Horizontal,Qt::ScrollBarAlwaysOff);
+    wndWebkit->page()->mainFrame()->setScrollBarPolicy(Qt::Vertical,Qt::ScrollBarAlwaysOff);
     wndWebkit->show();
 }
 
