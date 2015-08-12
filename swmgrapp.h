@@ -132,12 +132,15 @@ signals:
     void updateCategoryListForID(QString szCategoryID,QVariantList swCategory); //for someone category list
     void updatePackageInfoByID(QVariantMap swObject); //for someone package info
 
-    void updateDownloadProgress(QString szCategoryID,QString szPackageID,float fPercent);//down load progress
-
     //about user
     void updateRegisteUser(QVariant userinfo);
     void updateLoginUser(QVariant userinfo);
     void updateModifyUserInfo(QVariant userinfo);
+
+    //soft package operation
+    void updateRunningTasks(QVariantList swCategory);// all package status
+    void updateTaskInfo(QVariantMap swPackageInfo);  // someone task status
+    void updateDownloadProgress(QString szCategoryID,QString szPackageID,float fPercent);//down load progress
 public slots:
     //about software
     void requestSoftCategoryList();
