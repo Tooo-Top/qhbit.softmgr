@@ -139,6 +139,7 @@ void SwmgrApp::InitObjects() {
 	srvLaunchInst = new QLocalServer(this);
 	pollDownloadTaskObject = new QTimer(this);
     wndWebkit = new QWebView();
+//    wndMain = new MainWnd();
     QWebSettings::globalSettings()->setAttribute(QWebSettings::DeveloperExtrasEnabled,true);
 }
 
@@ -161,7 +162,10 @@ void SwmgrApp::InitSlots() {
 	QObject::connect(this, SIGNAL(sigInstaller(QJsonObject)), SLOT(addInstaller(QJsonObject)));
 	QObject::connect(pollDownloadTaskObject, SIGNAL(timeout()), this,SLOT(downloadPoll()));
     QObject::connect(wndWebkit,SIGNAL(loadFinished(bool)),this,SLOT(docLoadFinish(bool)));
-    QObject::connect(this, SIGNAL(putSoftCategory(QVariantList)), SLOT(dumpInfo(QVariantList)));
+//	QObject::connect(wndMain, SIGNAL(loadFinished(bool)), this, SLOT(docLoadFinish(bool)));
+//    QObject::connect(wndWebkit->page()->mainFrame(), SIGNAL(javaScriptWindowObjectCleared()),this,SLOT(initWebViewHost()));
+//    QObject::connect(wndMain->page()->mainFrame(), SIGNAL(javaScriptWindowObjectCleared()),this,SLOT(initWebViewHost()));
+	QObject::connect(this, SIGNAL(putSoftCategory(QVariantList)), SLOT(dumpInfo(QVariantList)));
 }
 
 void SwmgrApp::InitTray() {
@@ -174,16 +178,17 @@ void SwmgrApp::InitWnd() {
 	//wndFull = new Widget(NULL);
     wndWebkit->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowSystemMenuHint | Qt::WindowMinimizeButtonHint);
     wndWebkit->setFixedSize(992, 613);
-    //wndWebkit->setUrl(QUrl::fromUserInput("D:/iws/xiaobai.softmgr/trunk/lewang/Index.html"));
+    wndWebkit->setMouseTracking(true);
+    wndWebkit->setUrl(QUrl::fromUserInput("D:/workspace/trunk/lewang/Index.html"));
+//    wndWebkit->page()->mainFrame()->addToJavaScriptWindowObject("DYBC",this);
+	QObject::connect(wndWebkit->page()->mainFrame(), SIGNAL(javaScriptWindowObjectCleared()), this, SLOT(initWebViewHost()));
 
-    QString homePage = GLOBAL::_DY_DIR_RUNNERSELF+"/lewang/Index.html";
-    qDebug()<< "homePage:" << homePage <<endl;
-    wndWebkit->setUrl(QUrl::fromUserInput(homePage));
-
-    wndWebkit->page()->mainFrame()->addToJavaScriptWindowObject("DYBC",this);
-    wndWebkit->page()->mainFrame()->setScrollBarPolicy(Qt::Horizontal,Qt::ScrollBarAlwaysOff);
-    wndWebkit->page()->mainFrame()->setScrollBarPolicy(Qt::Vertical,Qt::ScrollBarAlwaysOff);
     wndWebkit->show();
+//    wndMain->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowSystemMenuHint | Qt::WindowMinimizeButtonHint);
+//    wndMain->setFixedSize(992, 613);
+//    wndMain->setUrl(QUrl::fromUserInput("D:/workspace/trunk/lewang/Index.html"));
+//    wndMain->page()->mainFrame()->addToJavaScriptWindowObject("DYBC",this);
+//    wndMain->show();
 }
 
 void SwmgrApp::InitNoticeServer() {
@@ -277,10 +282,19 @@ void SwmgrApp::showMiniWnd() {
 	// show mini widget
 }
 
+void SwmgrApp::initWebViewHost() {
+	qDebug() << "SwmgrApp::initWebViewHost()";
+    wndWebkit->page()->mainFrame()->addToJavaScriptWindowObject("DYBC",this);
+}
+
 void SwmgrApp::docLoadFinish(bool ok) {
     if (ok) {
-//        wndWebkit->page()->mainFrame()->addToJavaScriptWindowObject("DYBC",this);
-    }
+//       QObject::connect(wndWebkit->page()->mainFrame(), SIGNAL(javaScriptWindowObjectCleared()),this,SLOT(initWebViewHost()));
+
+        //wndWebkit->triggerPageAction(QWebPage::SelectAll,false);
+//        wndWebkit->page()->mainFrame()->evaluateJavaScript("document.documentElement.style.webkitUserSelect='none';");
+//        wndMain->page()->mainFrame()->evaluateJavaScript("document.documentElement.style.webkitUserSelect='none';");
+	}
 }
 
 void SwmgrApp::monitorProf() {
@@ -497,5 +511,5 @@ void SwmgrApp::requestSoftCategoryList() {
 }
 
 void SwmgrApp::dumpInfo(QVariantList swCategory) {
-    //qDebug() << swCategory;
+//	qDebug() << swCategory;
 }

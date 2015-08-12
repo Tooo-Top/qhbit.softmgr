@@ -21,6 +21,7 @@
 #include "PackageRunner.h"
 
 #include "UserInfo.h"
+#include "MainWnd.h"
 
 class SwmgrApp : public QObject
 {
@@ -85,6 +86,7 @@ protected:
 //	QWidget *wndFloat;
 //	QWidget *wndMini;
     QWebView *wndWebkit;
+    MainWnd *wndMain;
 	// -----------------------
 	QLocalServer *srvLaunchInst;
 	QTimer *pollDownloadTaskObject;
@@ -110,6 +112,8 @@ protected slots:
     // operation
     void monitorProf();
     void launchInstall();
+    void initWebViewHost();
+    void docLoadFinish(bool);
 
     void dumpInfo(QVariantList swCategory);
 public slots:
@@ -118,7 +122,6 @@ public slots:
     void appquit();
     void showFullWnd();
     void showMiniWnd();
-    void docLoadFinish(bool);
 
 };
 

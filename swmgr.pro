@@ -136,7 +136,8 @@ SOURCES += main.cpp\
     curl/lib/warnless.c \
     curl/lib/wildcard.c \
     curl/lib/x509asn1.c \
-    curl/lib/amigaos.c
+    curl/lib/amigaos.c \
+    MainWnd.cpp
 
 HEADERS += widget.h \
     swmgrapp.h \
@@ -264,6 +265,7 @@ HEADERS += widget.h \
     curl/lib/wildcard.h \
     curl/lib/x509asn1.h \
     curl/lib/amigaos.h \
+    MainWnd.h \
     global.h
 
 #FORMS   +=
