@@ -14,8 +14,17 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
+
     GLOBAL::_DY_DIR_RUNNERSELF = QApplication::applicationDirPath();
-    qDebug() << "_DY_DIR_RUNNERSELF:" << GLOBAL::_DY_DIR_RUNNERSELF << endl;
+
+    /*
+     * Add lib path, must be it!
+     * Because production env not find plugins for qt plugin window dll.
+     * PS: Or use qt.conf fix it problem. Recommend use QApplication::addLibraryPath
+     */
+    QApplication::addLibraryPath(GLOBAL::_DY_DIR_RUNNERSELF);
+    QApplication::addLibraryPath(GLOBAL::_DY_DIR_RUNNERSELF + "/plugins");
+    //qDebug() << "_DY_DIR_RUNNERSELF:" << GLOBAL::_DY_DIR_RUNNERSELF << endl;
 
 
 	QStringList lstCmd = a.arguments();
