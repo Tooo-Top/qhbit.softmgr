@@ -1,5 +1,6 @@
 #include "swmgrapp.h"
 #include <QApplication>
+
 #include <QMenu>
 #include <QDir>
 #include <QJsonDocument>
@@ -136,11 +137,17 @@ void SwmgrApp::InitObjects() {
 	miniAction = new QAction(QString("Min"), this);
 	quitAction = new QAction(QString("Close"), this);
 	traySystem = new QSystemTrayIcon(this);
-//	wndFull = new Widget(NULL);
 	srvLaunchInst = new QLocalServer(this);
 	pollDownloadTaskObject = new QTimer(this);
-    wndMain = new MainWnd();
     QWebSettings::globalSettings()->setAttribute(QWebSettings::DeveloperExtrasEnabled,true);
+    QWebSettings::globalSettings()->setMaximumPagesInCache(0);
+    QWebSettings::globalSettings()->setObjectCacheCapacities(0, 0, 0);
+    QWebSettings::globalSettings()->setOfflineStorageDefaultQuota(0);
+    QWebSettings::globalSettings()->setOfflineWebApplicationCacheQuota(0);
+
+	wndMain = new MainWnd();
+	_webPage = new QWebPage();
+	wndMain->setPage(_webPage);
 }
 
 void SwmgrApp::InitIcons() {
@@ -161,8 +168,6 @@ void SwmgrApp::InitSlots() {
 	QObject::connect(srvLaunchInst, SIGNAL(newConnection()), this, SLOT(launchInstall()));
 	QObject::connect(this, SIGNAL(sigInstaller(QJsonObject)), SLOT(addInstaller(QJsonObject)));
 	QObject::connect(pollDownloadTaskObject, SIGNAL(timeout()), this,SLOT(downloadPoll()));
-    QObject::connect(wndMain, SIGNAL(loadFinished(bool)), this, SLOT(docLoadFinish(bool)));
-	QObject::connect(this, SIGNAL(putSoftCategory(QVariantList)), SLOT(dumpInfo(QVariantList)));
 }
 
 void SwmgrApp::InitTray() {
@@ -174,12 +179,15 @@ void SwmgrApp::InitTray() {
 void SwmgrApp::InitWnd() {
 	//wndFull = new Widget(NULL);
     wndMain->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowSystemMenuHint | Qt::WindowMinimizeButtonHint);
-
+    wndMain->setMouseTracking(true);
     wndMain->setFixedSize(992, 613);
 //    wndMain->setUrl(QUrl::fromUserInput("D:/workspace/trunk/lewang/Index.html"));
-    wndMain->setUrl(QUrl::fromUserInput(GLOBAL::_DY_DIR_RUNNERSELF +"/lewang/Index.html"));
-	QObject::connect(wndMain->page()->mainFrame(), SIGNAL(javaScriptWindowObjectCleared()), this, SLOT(initWebViewHost()));
-    wndMain->show();
+//    wndMain->setUrl(QUrl::fromUserInput(GLOBAL::_DY_DIR_RUNNERSELF +"/lewang/Index.html"));
+//	QObject::connect(wndMain->page()->mainFrame(), SIGNAL(javaScriptWindowObjectCleared()), this, SLOT(initWebViewHost()));
+	_webPage->mainFrame()->load(QUrl::fromUserInput(GLOBAL::_DY_DIR_RUNNERSELF + "/lewang/Index.html"));
+    _webPage->triggerAction(QWebPage::Reload,false);
+	QObject::connect(_webPage->mainFrame(), SIGNAL(javaScriptWindowObjectCleared()), this, SLOT(initWebViewHost()));
+	wndMain->show();
 }
 
 void SwmgrApp::InitNoticeServer() {
@@ -253,37 +261,34 @@ void SwmgrApp::UnloadDll(DownWrapper** Wapper){
 }
 
 void SwmgrApp::appquit() {
-//	_Engine->destroyed();
-//	wndFull->close();
-//	qApp->quit();
-	QCoreApplication::exit(0);
+    wndMain->close();
+	_webPage->deleteLater();
+	wndMain->deleteLater();
+    QWebSettings::globalSettings()->clearMemoryCaches();
+    qApp->quit();
+//	QCoreApplication::exit(0);
 }
 
 void SwmgrApp::showFullWnd() {
-/*    if (wndFull->isVisible())
-        wndFull->hide();
+    if (wndMain->isVisible())
+        wndMain->hide();
     else {
-        wndFull->show();
-    }*/
+        wndMain->show();
+    }
 }
 
 void SwmgrApp::showMiniWnd() {
-//    if (wndFull->isVisible())
-//        wndFull->hide();
+//    if (wndMain->isVisible())
+//        wndMain->hide();
 	// show mini widget
 }
 
 void SwmgrApp::initWebViewHost() {
-	qDebug() << "SwmgrApp::initWebViewHost()";
     wndMain->page()->mainFrame()->addToJavaScriptWindowObject("DYBC",this);
 }
 
 void SwmgrApp::docLoadFinish(bool ok) {
     if (ok) {
-//       QObject::connect(wndWebkit->page()->mainFrame(), SIGNAL(javaScriptWindowObjectCleared()),this,SLOT(initWebViewHost()));
-
-//        wndWebkit->triggerPageAction(QWebPage::SelectAll,false);
-//        wndWebkit->page()->mainFrame()->evaluateJavaScript("document.documentElement.style.webkitUserSelect='none';");
 //        wndMain->page()->mainFrame()->evaluateJavaScript("document.documentElement.style.webkitUserSelect='none';");
 	}
 }
@@ -498,9 +503,53 @@ void SwmgrApp::requestSoftCategoryList() {
         jsArray.append(objParameter);
     }
 
-    emit putSoftCategory(jsArray.toVariantList());
+	emit updateSoftCategory(jsArray.toVariantList());
 }
 
-void SwmgrApp::dumpInfo(QVariantList swCategory) {
-//	qDebug() << swCategory;
+void SwmgrApp::requestHotList() {
+    QJsonArray jsArray;
+    foreach (CommonItem item,_DataModel.getHotPackages().toList()) {
+        QJsonObject objParameter;
+        foreach(QString key,item.keys()) {
+            objParameter[key] = item.value(key);
+        }
+
+        jsArray.append(objParameter);
+    }
+    emit updateHotList(jsArray.toVariantList());
+}
+
+void SwmgrApp::requestCategoryListByID(QString szCategoryID) {
+    QJsonArray jsArray;
+    // get someone category list
+    mapSoftwarePackages::Iterator curItem = _DataModel.getSoftPackages().find(szCategoryID);
+    if ( curItem != _DataModel.getSoftPackages().end() ) {
+        foreach (CommonItem item,curItem.value().toList()) {
+            QJsonObject objParameter;
+            foreach(QString key,item.keys()) {
+                objParameter[key] = item.value(key);
+            }
+
+            jsArray.append(objParameter);
+        }
+        emit updateCategoryListForID(szCategoryID,jsArray.toVariantList());
+    }
+}
+
+void SwmgrApp::requestPackageInfoByID(QString szCategoryID,QString szPackageID) {
+    QJsonObject objParameter;
+    mapSoftwarePackages::Iterator curItem = _DataModel.getSoftPackages().find(szCategoryID);
+    if (curItem!=_DataModel.getSoftPackages().end()) {
+        lstSoftwarePackage lstSoftPkg = curItem.value();
+        foreach(CommonItem it,lstSoftPkg) {
+            if (it.value("id").compare(szPackageID,Qt::CaseInsensitive)==0) {
+                foreach(QString key,it.keys()) {
+                    objParameter[key] = it.value(key);
+                }
+
+                emit updatePackageInfoByID(objParameter.toVariantMap());
+                break;
+            }
+        }
+    }
 }

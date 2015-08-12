@@ -3,16 +3,22 @@
 #include <Shlwapi.h>
 #pragma comment(lib,"shlwapi.lib") 
 #include <QObject>
+#include <QTimer>
 #include <QAction>
 #include <QSystemTrayIcon>
 #include <QProcessEnvironment>
 #include <QLocalServer>
 #include <QLocalSocket>
+
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QJsonValue>
+
 #include <QWebView>
 #include <QWebPage>
 #include <QWebFrame>
 #include "global.h"
-#include "widget.h"
 #include "DownWrapper.h"
 
 #include "ConfOperation.h"
@@ -81,11 +87,10 @@ protected:
     QAction *miniAction;
     // -----------------------
     QIcon   *appTrayIcon;
+
     // -----------------------
-//  Widget  *wndFull;
-//	QWidget *wndFloat;
-//	QWidget *wndMini;
     MainWnd *wndMain;
+    QWebPage *_webPage;
 	// -----------------------
 	QLocalServer *srvLaunchInst;
 	QTimer *pollDownloadTaskObject;
@@ -103,25 +108,57 @@ protected:
 	UserInfo _user;
 signals:
 	void sigInstaller(QJsonObject installer);
-    void putSoftCategory(QVariantList swCategory);
+protected slots:
+    void addInstaller(QJsonObject installer);
+
 protected slots:
     // task
-    void addInstaller(QJsonObject installer);
     void downloadPoll();
     // operation
     void monitorProf();
     void launchInstall();
     void initWebViewHost();
     void docLoadFinish(bool);
-
-    void dumpInfo(QVariantList swCategory);
 public slots:
-    void requestSoftCategoryList();
-    // UI
+    // system control ex:show close hide
     void appquit();
     void showFullWnd();
     void showMiniWnd();
 
+// For UI interface begin
+signals:
+    void updateSoftCategory(QVariantList swCategory);//for software category
+    void updateHotList(QVariantList swCategory);  //for Hot list
+    void updateCategoryListForID(QString szCategoryID,QVariantList swCategory); //for someone category list
+    void updatePackageInfoByID(QVariantMap swObject); //for someone package info
+
+    void updateDownloadProgress(QString szCategoryID,QString szPackageID,float fPercent);//down load progress
+
+    //about user
+    void updateRegisteUser(QVariant userinfo);
+    void updateLoginUser(QVariant userinfo);
+    void updateModifyUserInfo(QVariant userinfo);
+public slots:
+    //about software
+    void requestSoftCategoryList();
+    void requestHotList();
+    void requestCategoryListByID(QString szCategoryID);
+    void requestPackageInfoByID(QString szCategoryID,QString szPackageID);
+
+    //about user
+    void requestRegisteUser(QString username,QString password,QString email){}
+    void requestLoginUser(QString username,QString password){}
+    void requestModifyUserInfo(QVariant userinfo){}
+
+    //soft package operation
+    void requestStartInstallPackage(QString szCategoryID,QString szPackageID,bool autoInstall){} // software package download and install ( auto install ??)
+    void requestBatStartInstallPackage(QVariantList lstPackage){}  // bat install
+    void requestPausePackage(QString szCategoryID,QString szPackageID){} //pause someone package
+    void requestResumePackage(QString szCategoryID,QString szPackageID){} //resume someone package
+    void requestAllResumePackage(){} //resume all package
+    void requestStopDownloadPackage(QString szCategoryID,QString szPackageID){}
+
+    // For UI interface end
 };
 
 #endif // SWMGRAPP_H

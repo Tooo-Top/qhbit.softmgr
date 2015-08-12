@@ -15,7 +15,6 @@ INCLUDEPATH += curl/include curl/lib
 LIBS += Wldap32.lib ws2_32.lib
 
 SOURCES += main.cpp\
-    widget.cpp \
     swmgrapp.cpp \
     globalsingleton.cpp \
     ConfOperation.cpp \
@@ -139,7 +138,7 @@ SOURCES += main.cpp\
     curl/lib/amigaos.c \
     MainWnd.cpp
 
-HEADERS += widget.h \
+HEADERS += \
     swmgrapp.h \
     globalsingleton.h \
     DownWrapper.h \

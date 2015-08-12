@@ -1,6 +1,7 @@
 <RCC>
     <qresource prefix="/">
-        <file>Encyclopedia.html</file>
+        <file>xbmgr.ico</file>
+	<file>Encyclopedia.html</file>
         <file>index.html</file>
         <file>PersonalCenter.html</file>
         <file>PersonalCenter_1.html</file>

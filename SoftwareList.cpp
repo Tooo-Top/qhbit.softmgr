@@ -60,7 +60,6 @@ bool SoftwareList::LoadSoftwareCategory(QString szCategoryFile, mapSoftwareCateg
 	QFile loadFile(szCategoryFile);
 	if (loadFile.open(QIODevice::ReadOnly)) {
 		fileBuf = loadFile.readAll();
-		qDebug() << fileBuf;
 		QJsonParseError err;
 		doc = QJsonDocument::fromJson(fileBuf,&err);
 		loadFile.close();

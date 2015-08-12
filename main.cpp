@@ -1,8 +1,8 @@
-#include "widget.h"
 #include <iostream>
 #include <QApplication>
 #include <QUrl>
 #include <QSystemSemaphore>
+#include <QJsonDocument>
 #include "global.h"
 #include "swmgrapp.h"
 #include "globalsingleton.h"
@@ -13,7 +13,6 @@ QString GLOBAL::_DY_DIR_RUNNERSELF = ' ';
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-
 
     GLOBAL::_DY_DIR_RUNNERSELF = QApplication::applicationDirPath();
 

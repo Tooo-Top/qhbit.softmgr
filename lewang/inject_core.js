@@ -5,7 +5,7 @@ var connected = false;
 function connectSlots() {
     if (!connected) {
         connected = true;
-        DYBC.putSoftCategory.connect(this, category_callback);
+        DYBC.updateSoftCategory.connect(this, category_callback);
     }
 }
 //! <!--  [ connect slots ] -->
