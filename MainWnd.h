@@ -11,12 +11,9 @@ class MainWnd : public QWebView
 public:
     explicit MainWnd(QWidget *parent = 0);
 protected:
-/*    void mousePressEvent(QMouseEvent * event);
-    void mouseMoveEvent(QMouseEvent * event);
-    void mouseReleaseEvent(QMouseEvent * event);*/
     virtual bool nativeEvent(const QByteArray & eventType, void * message, long * result);
 protected:
-//    QPoint _pos;
+
 signals:
 
 public slots:

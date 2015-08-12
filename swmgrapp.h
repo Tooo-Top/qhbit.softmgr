@@ -85,7 +85,6 @@ protected:
 //  Widget  *wndFull;
 //	QWidget *wndFloat;
 //	QWidget *wndMini;
-    QWebView *wndWebkit;
     MainWnd *wndMain;
 	// -----------------------
 	QLocalServer *srvLaunchInst;
