@@ -24,7 +24,11 @@ function connectSlots() {
 
 /*更新分类数据*/
 updateSoftCategory_callback = function (data) {
-    console.log(data);
+    //console.log(data);
+    var myTemplate = Handlebars.compile($("#xbSwmgrCategory-template").html());
+    $('#xbSwmgrCategory').html(myTemplate(data));
+
+/*
     var list = '';
     $(data).each(function (k, v) {
         console.log(k,v);
@@ -32,6 +36,7 @@ updateSoftCategory_callback = function (data) {
         //DYBC.requestCategoryListByID(v.id);
     });
     $('#xbSwmgrCategory').html(list);
+*/
 
 };
 
@@ -86,17 +91,25 @@ updateModifyUserInfo_callback = function (result) {
 };
 
 
-//
+(function ($){
+    $.getUrlParam = function (name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+        var r = window.location.search.substr(1).match(reg);
+        if (r != null) return unescape(r[2]); return null;
+    }
+})(jQuery);
+
+//init
 $(function () {
     /*初始化信号槽*/
     connectSlots();
 
     /*请求更新分类*/
-    DYBC.requestSoftCategoryList();
+    //DYBC.requestSoftCategoryList();
 
     //用hotCategory填充首页软件清单
     //DYBC.requestHotList();
-    DYBC.requestCategoryListByID('1');
+    //DYBC.requestCategoryListByID('1');
 
 
 /*

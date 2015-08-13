@@ -17,38 +17,13 @@ document.onclick = hidmenu;
 </head>
 <body>
 <div class="main">
-  <div class="header">
-    <div class="user">
-      <div class="userimg"><!--会员头像 --><a href="#"><img src="images/tou.jpg" width="200" height="200"></a></div>
-      <div class="usertxt"><span class="ties">乐网</span><span class="login"><a href="PersonalCenter_1.html">登录账号</a></span></div>
-    </div>
-    <div class="Software">
-      <ul>
-        <li><a href="Encyclopedia.html"><span class="dq"></span>软件大全</a></li>
-        <li><a href="Upgrade.html"><span class="sj"></span>软件升级</a></li>
-        <li><a href="Uninstall.html"><span class="xz"></span>软件卸载</a></li> 
-        <li><a href="Toolbox.html"><span class="gj"></span>工具箱</a></li> 
-        <!--<li><a href="PersonalCenter.html"><span class="gr"></span>个人中心</a></li>  --> 
-    </ul>
-    </div><div class="ext" style="position:relative;">
-      <ul>
-       <li><a href="#" class="gw"></a></li>       <li><a href="javascript:showmenu()" class="gd"></a></li>
- <div id="menu">
-<a href="http://www.hao123.com/">反馈建议</a>
-<a href="http://www.hao123.com/">设置中心</a>
-<a href="http://www.hao123.com/">检测更新</a>
-<a href="http://www.hao123.com/">使用指南</a>
-<a href="http://www.hao123.com/">帮助中心</a>
-<a href="http://www.hao123.com/">关于我们</a>
-</div>
-       <li><a href="#" class="yc"></a></li>
-       <li class="hover"><a href="#" class="fd"></a></li>
-       <li><a href="#" class="gb" onclick="DYBC.appquit();"></a></li>
-    </ul>
-   </div>
-  </div>
-  
-  
+<div id="success"></div>
+<script>
+$("#success").load("header.html");
+$.ajaxSetup({
+cache: false //关闭AJAX相应的缓存
+});
+  </script>  
 <div class="Central">
   <div class="Uninstall" style="position:relative;">
    <!--  <div class="cenew1" >
