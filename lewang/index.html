@@ -1,473 +1,158 @@
 <!doctype html>
 <html class="no-js" lang="zh-cn">
 <head>
-<meta charset="utf-8">
-<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
-<meta name="renderer" content="webkit">
-<title>乐网</title>
-<link href="css/css.css" rel="stylesheet" type="text/css">
-<link href="inject.css" rel="stylesheet" type="text/css">
-<script type="text/javascript" src="js/jquery.js"></script>
-<script language="javascript">
-<!--
-function showmenu(){menu.style.visibility = "visible";	}
-function hidmenu(){menu.style.visibility = "hidden";}
-document.onclick = hidmenu;
--->
-</script>
-<script type="text/javascript" src="js/mune.js"></script>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="renderer" content="webkit">
+    <title>乐网</title>
+    <link href="css/css.css" rel="stylesheet" type="text/css">
+    <link href="inject.css" rel="stylesheet" type="text/css">
+
 </head>
 <body>
 <div class="main">
-  <div class="header">
-    <div class="user">
-      <div class="userimg"><!--会员头像 --><a href="#"><img src="images/tou.jpg" width="200" height="200"></a></div>
-      <div class="usertxt"><span class="ties">乐网</span><span class="login"><a href="PersonalCenter_1.html">登录账号</a></span></div>
-    </div>
-    <div class="Software">
-      <ul>
-        <li><a href="Encyclopedia.html"><span class="dq"></span>软件大全</a></li>
-        <li><a href="Upgrade.html"><span class="sj"></span>软件升级</a></li>
-        <li><a href="Uninstall.html"><span class="xz"></span>软件卸载</a></li> 
-        <li><a href="Toolbox.html"><span class="gj"></span>工具箱</a></li> 
-        <!--<li><a href="PersonalCenter.html"><span class="gr"></span>个人中心</a></li>  --> 
-    </ul>
-    </div>
-    <div class="ext" style="position:relative;">
-      <ul>
-       <li><a href="#" class="gw"></a></li>
-       <li><a href="javascript:showmenu()" class="gd"></a></li>
- <div id="menu">
-<a href="http://www.hao123.com/">反馈建议</a>
-<a href="http://www.hao123.com/">设置中心</a>
-<a href="http://www.hao123.com/">检测更新</a>
-<a href="http://www.hao123.com/">使用指南</a>
-<a href="http://www.hao123.com/">帮助中心</a>
-<a href="http://www.hao123.com/">关于我们</a>
-</div>
-       <li><a href="#" class="yc"></a></li>
-       <li class="hover"><a href="#" class="fd"></a></li>
-       <li><a href="#" onclick="DYBC.appquit();" class="gb"></a></li>
-    </ul>
-   </div>
-
-  </div>
-<div class="Central2">
-  <div class="container">
-    <div class="bd" id="scroll_bd">
-	  <div class="top" id="bd">
-	    <div id="ul">
-          <div id="firstpane" class="menu_list">
-	       <h3 class="menu_head"><i class="lan"></i>精选软件</h3>
-	       <div style="display:block" class="menu_body">
-		    <a href="#" class="z1">装机必备</a>
-		    <a href="#" class="z2">运行库</a>
-	       </div>
-	       <h3 class="menu_head current"><i class="bai"></i>软件宝库</h3>
-	      <div style="display:block" class="menu_body" id="xbSwmgrCategory">{CATEGORIES}</div>
-      </div>
-   </div>
-</div>	
-<div class="scroll" id="scroll">
-<p id="p"></p>
-</div>
-</div>
-</div>
-<div class="Centriht">
-  <div class="intro">
-    <div class="Dress">装机必备共<b>36</b>款软件，已安装<b>1</b>款 <a href="#">显示已安装软件</a></div>
-      <form  name="formsearch" action="search.php">
-        <div class="search">
-           <input name="q" type="text" class="search-keyword" id="search-keyword" value="search" onfocus="if(this.value=='search'){this.value='';}"  onblur="if(this.value==''){this.value='search';}" />
-          <button type="submit" class="search-submit">搜索</button>
+    <div class="header">
+        <div class="user">
+            <div class="userimg"><!--会员头像 --><a href="#"><img src="images/tou.jpg" width="200" height="200"></a></div>
+            <div class="usertxt"><span class="ties">乐网</span><span class="login"><a
+                    href="PersonalCenter_1.html">登录账号</a></span></div>
         </div>
-        </form>
-  </div>
-  <div class="sette">
-   <div class="Necessary">
-    <ul>
-      <li><a href="#" class="hover">装机必备</a></li>
-      <li><a href="#">影音必备</a></li>
-      <li><a href="#">游戏必备</a></li>
-      <li><a href="#">上网必备</a></li>
-      <li><a href="#">系统必备</a></li>
-      <li><a href="#">办公必备</a></li>
-      </ul>
-  </div>
-<div class="yijian"><a href="#" class="chon">一键重装</a><a href="#" class="gds">更多</a></div>
-</div> 
-<script type="text/javascript">
-$(function(){
-	$(".Softlist ul li").hover(function(){
-		$(this).find(".siegs").show();
-	},function(){
-		$(this).find(".siegs").hide();
-	});
+        <div class="Software">
+            <ul>
+                <li><a href="index.html"><span class="dq"></span>软件大全</a></li>
+                <li><a href="Upgrade.html"><span class="sj"></span>软件升级</a></li>
+                <li><a href="Uninstall.html"><span class="xz"></span>软件卸载</a></li>
+                <li><a href="Toolbox.html"><span class="gj"></span>工具箱</a></li>
+                <!--<li><a href="PersonalCenter.html"><span class="gr"></span>个人中心</a></li>  -->
+            </ul>
+        </div>
+        <div class="ext" style="position:relative;">
+            <ul>
+                <li><a href="#" class="gw"></a></li>
+                <li><a href="javascript:showmenu()" class="gd"></a></li>
+                <div id="menu">
+                    <a href="http://www.hao123.com/">反馈建议</a>
+                    <a href="http://www.hao123.com/">设置中心</a>
+                    <a href="http://www.hao123.com/">检测更新</a>
+                    <a href="http://www.hao123.com/">使用指南</a>
+                    <a href="http://www.hao123.com/">帮助中心</a>
+                    <a href="http://www.hao123.com/">关于我们</a>
+                </div>
+                <li><a href="#" class="yc"></a></li>
+                <li class="hover"><a href="#" class="fd"></a></li>
+                <li><a href="#" onclick="DYBC.appquit();" class="gb"></a></li>
+            </ul>
+        </div>
+
+    </div>
+    <div class="Central2">
+        <div class="container">
+            <div class="bd" id="scroll_bd">
+                <div class="top" id="bd">
+                    <div id="ul">
+                        <div id="firstpane" class="menu_list">
+                            <h3 class="menu_head"><i class="lan"></i>精选软件</h3>
+
+                            <div style="display:block" class="menu_body">
+                                <a href="#" class="z1">装机必备</a>
+                                <a href="#" class="z2">运行库</a>
+                            </div>
+                            <h3 class="menu_head current"><i class="bai"></i>软件宝库</h3>
+
+                            <div style="display:block" class="menu_body" id="xbSwmgrCategory">{CATEGORIES}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="scroll" id="scroll">
+                    <p id="p"></p>
+                </div>
+            </div>
+        </div>
+        <div class="Centriht">
+            <div class="intro">
+                <div class="Dress">装机必备共<b>36</b>款软件，已安装<b>1</b>款 <a href="#">显示已安装软件</a></div>
+                <form name="formsearch" action="search.php">
+                    <div class="search">
+                        <input name="q" type="text" class="search-keyword" id="search-keyword" value="search"
+                               onfocus="if(this.value=='search'){this.value='';}"
+                               onblur="if(this.value==''){this.value='search';}"/>
+                        <button type="submit" class="search-submit">搜索</button>
+                    </div>
+                </form>
+            </div>
+            <div class="sette">
+                <div class="Necessary">
+                    <ul>
+                        <li><a href="#" class="hover">装机必备</a></li>
+                        <li><a href="#">影音必备</a></li>
+                        <li><a href="#">游戏必备</a></li>
+                        <li><a href="#">上网必备</a></li>
+                        <li><a href="#">系统必备</a></li>
+                        <li><a href="#">办公必备</a></li>
+                    </ul>
+                </div>
+                <div class="yijian"><a href="#" class="chon">一键重装</a><a href="#" class="gds">更多</a></div>
+            </div>
+            <script type="text/javascript">
+            </script>
+            <style>
+
+            </style>
+            <div class="softid" id="scroll_set">
+                <div class="topid" id="softid">
+                    <div class="Softlist" id="ulid">
+                        <script id="packageList-template" type="text/x-handlebars-template">
+                            {{#each this}}
+                            <li>
+                                <a href="#" class="softimg"><img src="{{iconUrl}}" width="46" height="46"></a>
+                                <a href="#" class="tiwq">{{name}}</a><p><span class="xin2"></span></p>
+                                <div class="siegs">
+                                    <span class="lv"><b>{{name}} {{versionName}}</b><p>{{brief}}</p></span>
+                                    <a href="#" class="lvde">一键安装</a>
+                                </div>
+                            </li>
+                            {{/each}}
+                        </script>
+
+                        <ul id="packageList"></ul>
+
+                    </div>
+                </div>
+                <div class="scro" id="scro">
+                    <p id="pks"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <span class="banben">当前软件版本v1.4.50</span>
+        <span class="ico">ICO <a href="#" id="ct">软件管理官网</a></span>
+    </div>
+
+</div>
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript" src="js/handlebars-v3.0.3.js"></script>
+<script type="text/javascript" src="inject_core.js"></script>
+
+<script type="text/javascript" src="js/mune.js"></script>
+<script language="javascript">
+function showmenu() {
+    menu.style.visibility = "visible";
+}
+function hidmenu() {
+    menu.style.visibility = "hidden";
+}
+document.onclick = hidmenu;
+
+$(function () {
+    $(".Softlist ul li").hover(function () {
+        $(this).find(".siegs").show();
+    }, function () {
+        $(this).find(".siegs").hide();
+    });
 });
 </script>
-<style>
 
-</style>
-<div class="softid" id="scroll_set">
-  <div class="topid" id="softid">
-	<div class="Softlist" id="ulid">
-      <ul>
-      <li><a href="#" class="softimg"><img src="images/tou.jpg" width="46" height="46"></a> <a href="#" class="tiwq">微信桌面版</a><p><span class="shengji">可升级</span></p>
-      <div class="siegs">
-      <span class="eryu"><b>微信桌面版</b>
-      <p>免费的即时通信平台，带来更多沟通乐趣</p>
-      </span>
-      <a href="#" class="cheng">去升级</a>
-      </div>
-      
-      </li>
-      <li><a href="#" class="softimg"><img src="images/tou.jpg" width="46" height="46"></a> <a href="#" class="tiwq">微信桌面版</a><p><span class="anzhuang">已安装</span></p>
-      <div class="siegs">
-      <span class="iehs"><b>微信桌面版</b>
-      <p>免费的即时通信平台，带来更多沟通乐趣</p>
-      </span>
-      <a href="#" class="yian">已安装更高版本</a>
-      </div>
-      </li>
-      <li><a href="#" class="softimg"><img src="images/tou.jpg" width="46" height="46"></a> <a href="#" class="tiwq">微信桌面版</a><p><span class="xin1"></span></p>
-      <div class="siegs">
-      <span class="lv"><b>qq7.5qq7.5qq7.5qq7.5qq7.5</b>
-      <p>免费的即时通信平台，带来更多沟通乐趣</p>
-      </span>
-      <a href="#" class="lvde">一键安装</a>
-      </div>
-      </li>
-      <li><a href="#" class="softimg"><img src="images/tou.jpg" width="46" height="46"></a> <a href="#" class="tiwq">微信桌面版</a><p><span class="xin2"></span></p>
-       <div class="siegs">
-      <span class="lv"><b>qq7.5qq7.5qq7.5qq7.5qq7.5</b>
-      <p>免费的即时通信平台，带来更多沟通乐趣</p>
-      </span>
-      <a href="#" class="lvde">一键安装</a>
-      </div>
-      </li>
-      <li><a href="#" class="softimg"><img src="images/tou.jpg" width="46" height="46"></a> <a href="#" class="tiwq">微信桌面版</a><p><span class="xin3"></span></p>
-           <div class="siegs">
-      <span class="lv"><b>qq7.5qq7.5qq7.5qq7.5qq7.5</b>
-      <p>免费的即时通信平台，带来更多沟通乐趣</p>
-      </span>
-      <a href="#" class="lvde">一键安装</a>
-      </div>
-      </li>
-      <li><a href="#" class="softimg"><img src="images/tou.jpg" width="46" height="46"></a> <a href="#" class="tiwq">微信桌面版</a><p><span class="xin4"></span></p>
-            <div class="siegs">
-      <span class="lv"><b>qq7.5qq7.5qq7.5qq7.5qq7.5</b>
-      <p>免费的即时通信平台，带来更多沟通乐趣</p>
-      </span>
-      <a href="#" class="lvde">一键安装</a>
-      </div>
-      </li>
-      <li><a href="#" class="softimg"><img src="images/tou.jpg" width="46" height="46"></a> <a href="#" class="tiwq">微信桌面版</a><p><span class="xin5"></span></p>
-            <div class="siegs">
-      <span class="lv"><b>qq7.5qq7.5qq7.5qq7.5qq7.5</b>
-      <p>免费的即时通信平台，带来更多沟通乐趣</p>
-      </span>
-      <a href="#" class="lvde">一键安装</a>
-      </div>
-      </li>
-      <li><a href="#" class="softimg"><img src="images/tou.jpg" width="46" height="46"></a> <a href="#" class="tiwq">微信桌面版</a><p><span class="shengji">可升级</span></p>
-      <div class="siegs">
-      <span class="eryu"><b>qq7.5qq7.5qq7.5qq7.5qq7.5</b>
-      <p>免费的即时通信平台，带来更多沟通乐趣</p>
-      </span>
-      <a href="#" class="cheng">去升级</a>
-      </div>
-      
-      </li>
-      <li><a href="#" class="softimg"><img src="images/tou.jpg" width="46" height="46"></a> <a href="#" class="tiwq">微信桌面版</a><p><span class="anzhuang">已安装</span></p>
-      <div class="siegs">
-      <span class="iehs"><b>微信桌面版</b>
-      <p>免费的即时通信平台，带来更多沟通乐趣</p>
-      </span>
-      <a href="#" class="yian">已安装更高版本</a>
-      </div>
-      </li>
-      <li><a href="#" class="softimg"><img src="images/tou.jpg" width="46" height="46"></a> <a href="#" class="tiwq">微信桌面版</a><p><span class="xin1"></span></p>
-       <div class="siegs">
-      <span class="lv"><b>qq7.5qq7.5qq7.5qq7.5qq7.5</b>
-      <p>免费的即时通信平台，带来更多沟通乐趣</p>
-      </span>
-      <a href="#" class="lvde">一键安装</a>
-      </div>
-      </li>
-      <li><a href="#" class="softimg"><img src="images/tou.jpg" width="46" height="46"></a> <a href="#" class="tiwq">微信桌面版</a><p><span class="xin2"></span></p>
-       <div class="siegs">
-      <span class="lv"><b>qq7.5qq7.5qq7.5qq7.5qq7.5</b>
-      <p>免费的即时通信平台，带来更多沟通乐趣</p>
-      </span>
-      <a href="#" class="lvde">一键安装</a>
-      </div>
-      </li>
-      <li><a href="#" class="softimg"><img src="images/tou.jpg" width="46" height="46"></a> <a href="#" class="tiwq">微信桌面版</a><p><span class="xin3"></span></p>
-       <div class="siegs">
-      <span class="lv"><b>qq7.5qq7.5qq7.5qq7.5qq7.5</b>
-      <p>免费的即时通信平台，带来更多沟通乐趣</p>
-      </span>
-      <a href="#" class="lvde">一键安装</a>
-      </div>
-      </li>
-      <li><a href="#" class="softimg"><img src="images/tou.jpg" width="46" height="46"></a> <a href="#" class="tiwq">微信桌面版</a><p><span class="xin4"></span></p>
-       <div class="siegs">
-      <span class="lv"><b>qq7.5qq7.5qq7.5qq7.5qq7.5</b>
-      <p>免费的即时通信平台，带来更多沟通乐趣</p>
-      </span>
-      <a href="#" class="lvde">一键安装</a>
-      </div>
-      </li>
-      <li><a href="#" class="softimg"><img src="images/tou.jpg" width="46" height="46"></a> <a href="#" class="tiwq">微信桌面版</a><p><span class="xin5"></span></p>
-       <div class="siegs">
-      <span class="lv"><b>qq7.5qq7.5qq7.5qq7.5qq7.5</b>
-      <p>免费的即时通信平台，带来更多沟通乐趣</p>
-      </span>
-      <a href="#" class="lvde">一键安装</a>
-      </div>
-      </li>
-      <li><a href="#" class="softimg"><img src="images/tou.jpg" width="46" height="46"></a> <a href="#" class="tiwq">微信桌面版</a><p><span class="shengji">可升级</span></p>
-      <div class="siegs">
-      <span class="eryu"><b>qq7.5qq7.5qq7.5qq7.5qq7.5</b>
-      <p>免费的即时通信平台，带来更多沟通乐趣</p>
-      </span>
-      <a href="#" class="cheng">去升级</a>
-      </div> 
-      </li>
-      <li><a href="#" class="softimg"><img src="images/tou.jpg" width="46" height="46"></a> <a href="#" class="tiwq">微信桌面版</a><p><span class="anzhuang">已安装</span></p>
-      <div class="siegs">
-      <span class="iehs"><b>微信桌面版</b>
-      <p>免费的即时通信平台，带来更多沟通乐趣</p>
-      </span>
-      <a href="#" class="yian">已安装更高版本</a>
-      </div>
-      
-      </li>
-      <li><a href="#" class="softimg"><img src="images/tou.jpg" width="46" height="46"></a> <a href="#" class="tiwq">微信桌面版</a><p><span class="xin1"></span></p>
-       <div class="siegs">
-      <span class="lv"><b>qq7.5qq7.5qq7.5qq7.5qq7.5</b>
-      <p>免费的即时通信平台，带来更多沟通乐趣</p>
-      </span>
-      <a href="#" class="lvde">一键安装</a>
-      </div>
-      </li>
-      <li><a href="#" class="softimg"><img src="images/tou.jpg" width="46" height="46"></a> <a href="#" class="tiwq">微信桌面版</a><p><span class="xin2"></span></p>
-       <div class="siegs">
-      <span class="lv"><b>qq7.5qq7.5qq7.5qq7.5qq7.5</b>
-      <p>免费的即时通信平台，带来更多沟通乐趣</p>
-      </span>
-      <a href="#" class="lvde">一键安装</a>
-      </div>
-      </li>
-      <li><a href="#" class="softimg"><img src="images/tou.jpg" width="46" height="46"></a> <a href="#" class="tiwq">微信桌面版</a><p><span class="xin3"></span></p>
-       <div class="siegs">
-      <span class="lv"><b>qq7.5qq7.5qq7.5qq7.5qq7.5</b>
-      <p>免费的即时通信平台，带来更多沟通乐趣</p>
-      </span>
-      <a href="#" class="lvde">一键安装</a>
-      </div>
-      </li>
-      <li><a href="#" class="softimg"><img src="images/tou.jpg" width="46" height="46"></a> <a href="#" class="tiwq">微信桌面版</a><p><span class="xin4"></span></p>
-       <div class="siegs">
-      <span class="lv"><b>qq7.5qq7.5qq7.5qq7.5qq7.5</b>
-      <p>免费的即时通信平台，带来更多沟通乐趣</p>
-      </span>
-      <a href="#" class="lvde">一键安装</a>
-      </div>
-      </li>
-      <li><a href="#" class="softimg"><img src="images/tou.jpg" width="46" height="46"></a> <a href="#" class="tiwq">微信桌面版</a><p><span class="xin5"></span></p>
-       <div class="siegs">
-      <span class="lv"><b>qq7.5qq7.5qq7.5qq7.5qq7.5</b>
-      <p>免费的即时通信平台，带来更多沟通乐趣</p>
-      </span>
-      <a href="#" class="lvde">一键安装</a>
-      </div>
-      </li>
-       <li><a href="#" class="softimg"><img src="images/tou.jpg" width="46" height="46"></a> <a href="#" class="tiwq">微信桌面版</a><p><span class="shengji">可升级</span></p><
-      <div class="siegs">
-      <span class="eryu"><b>qq7.5qq7.5qq7.5qq7.5qq7.5</b>
-      <p>免费的即时通信平台，带来更多沟通乐趣</p>
-      </span>
-      <a href="#" class="cheng">去升级</a>
-      </div>
-       
-       </li>
-      <li><a href="#" class="softimg"><img src="images/tou.jpg" width="46" height="46"></a> <a href="#" class="tiwq">微信桌面版</a><p><span class="anzhuang">已安装</span></p>
-      <div class="siegs">
-      <span class="iehs"><b>微信桌面版</b>
-      <p>免费的即时通信平台，带来更多沟通乐趣</p>
-      </span>
-      <a href="#" class="yian">已安装更高版本</a>
-      </div>
-      
-      </li>
-      <li><a href="#" class="softimg"><img src="images/tou.jpg" width="46" height="46"></a> <a href="#" class="tiwq">微信桌面版</a><p><span class="xin1"></span>
-      </p>
-       <div class="siegs">
-      <span class="lv"><b>qq7.5qq7.5qq7.5qq7.5qq7.5</b>
-      <p>免费的即时通信平台，带来更多沟通乐趣</p>
-      </span>
-      <a href="#" class="lvde">一键安装</a>
-      </div>
-      </li>
-      <li><a href="#" class="softimg"><img src="images/tou.jpg" width="46" height="46"></a> <a href="#" class="tiwq">微信桌面版</a><p><span class="xin2"></span></p>
-       <div class="siegs">
-      <span class="lv"><b>qq7.5qq7.5qq7.5qq7.5qq7.5</b>
-      <p>免费的即时通信平台，带来更多沟通乐趣</p>
-      </span>
-      <a href="#" class="lvde">一键安装</a>
-      </div>
-      </li>
-      <li><a href="#" class="softimg"><img src="images/tou.jpg" width="46" height="46"></a> <a href="#" class="tiwq">微信桌面版</a><p><span class="xin3"></span></p>
-       <div class="siegs">
-      <span class="lv"><b>qq7.5qq7.5qq7.5qq7.5qq7.5</b>
-      <p>免费的即时通信平台，带来更多沟通乐趣</p>
-      </span>
-      <a href="#" class="lvde">一键安装</a>
-      </div>
-      </li>
-      <li><a href="#" class="softimg"><img src="images/tou.jpg" width="46" height="46"></a> <a href="#" class="tiwq">微信桌面版</a><p><span class="xin4"></span></p>
-       <div class="siegs">
-      <span class="lv"><b>qq7.5qq7.5qq7.5qq7.5qq7.5</b>
-      <p>免费的即时通信平台，带来更多沟通乐趣</p>
-      </span>
-      <a href="#" class="lvde">一键安装</a>
-      </div>
-      </li>
-      <li><a href="#" class="softimg"><img src="images/tou.jpg" width="46" height="46"></a> <a href="#" class="tiwq">微信桌面版</a><p><span class="xin5"></span></p>
-       <div class="siegs">
-      <span class="lv"><b>qq7.5qq7.5qq7.5qq7.5qq7.5</b>
-      <p>免费的即时通信平台，带来更多沟通乐趣</p>
-      </span>
-      <a href="#" class="lvde">一键安装</a>
-      </div>
-      </li>
-      <li><a href="#" class="softimg"><img src="images/tou.jpg" width="46" height="46"></a> <a href="#" class="tiwq">微信桌面版</a><p><span class="shengji">可升级</span></p>
-      <div class="siegs">
-      <span class="eryu"><b>qq7.5qq7.5qq7.5qq7.5qq7.5</b>
-      <p>免费的即时通信平台，带来更多沟通乐趣</p>
-      </span>
-      <a href="#" class="cheng">去升级</a>
-      </div> 
-      
-      </li>
-      <li><a href="#" class="softimg"><img src="images/tou.jpg" width="46" height="46"></a> <a href="#" class="tiwq">微信桌面版</a><p><span class="anzhuang">已安装</span></p>
-      <div class="siegs">
-      <span class="iehs"><b>微信桌面版</b>
-      <p>免费的即时通信平台，带来更多沟通乐趣</p>
-      </span>
-      <a href="#" class="yian">已安装更高版本</a>
-      </div>
-      </li>
-      <li><a href="#" class="softimg"><img src="images/tou.jpg" width="46" height="46"></a> <a href="#" class="tiwq">微信桌面版</a><p><span class="xin1"></span></p>
-       <div class="siegs">
-      <span class="lv"><b>qq7.5qq7.5qq7.5qq7.5qq7.5</b>
-      <p>免费的即时通信平台，带来更多沟通乐趣</p>
-      </span>
-      <a href="#" class="lvde">一键安装</a>
-      </div>
-      
-      </li>
-      <li><a href="#" class="softimg"><img src="images/tou.jpg" width="46" height="46"></a> <a href="#" class="tiwq">微信桌面版</a><p><span class="xin2"></span></p>
-       <div class="siegs">
-      <span class="lv"><b>qq7.5qq7.5qq7.5qq7.5qq7.5</b>
-      <p>免费的即时通信平台，带来更多沟通乐趣</p>
-      </span>
-      <a href="#" class="lvde">一键安装</a>
-      </div>
-      </li>
-      <li><a href="#" class="softimg"><img src="images/tou.jpg" width="46" height="46"></a> <a href="#" class="tiwq">微信桌面版</a><p><span class="xin3"></span></p>
-       <div class="siegs">
-      <span class="lv"><b>qq7.5qq7.5qq7.5qq7.5qq7.5</b>
-      <p>免费的即时通信平台，带来更多沟通乐趣</p>
-      </span>
-      <a href="#" class="lvde">一键安装</a>
-      </div>
-      </li>
-      <li><a href="#" class="softimg"><img src="images/tou.jpg" width="46" height="46"></a> <a href="#" class="tiwq">微信桌面版</a><p><span class="xin4"></span></p> 
-       <div class="siegs">
-      <span class="lv"><b>qq7.5qq7.5qq7.5qq7.5qq7.5</b>
-      <p>免费的即时通信平台，带来更多沟通乐趣</p>
-      </span>
-      <a href="#" class="lvde">一键安装</a>
-      </div>
-      </li>
-      <li><a href="#" class="softimg"><img src="images/tou.jpg" width="46" height="46"></a> <a href="#" class="tiwq">微信桌面版</a><p><span class="xin5"></span></p>
-       <div class="siegs">
-      <span class="lv"><b>qq7.5qq7.5qq7.5qq7.5qq7.5</b>
-      <p>免费的即时通信平台，带来更多沟通乐趣</p>
-      </span>
-      <a href="#" class="lvde">一键安装</a>
-      </div>
-      </li>
-      <li><a href="#" class="softimg"><img src="images/tou.jpg" width="46" height="46"></a> <a href="#" class="tiwq">微信桌面版</a><p><span class="shengji">可升级</span></p>
-      <div class="siegs">
-      <span class="eryu"><b>qq7.5qq7.5qq7.5qq7.5qq7.5</b>
-      <p>免费的即时通信平台，带来更多沟通乐趣</p>
-      </span>
-      <a href="#" class="cheng">去升级</a>
-      </div>
-      </li>
-      <li><a href="#" class="softimg"><img src="images/tou.jpg" width="46" height="46"></a> <a href="#" class="tiwq">微信桌面版</a><p><span class="anzhuang">已安装</span></p>
-      <div class="siegs">
-      <span class="iehs"><b>微信桌面版</b>
-      <p>免费的即时通信平台，带来更多沟通乐趣</p>
-      </span>
-      <a href="#" class="yian">已安装更高版本</a>
-      </div>
-      
-      </li>
-      <li><a href="#" class="softimg"><img src="images/tou.jpg" width="46" height="46"></a> <a href="#" class="tiwq">微信桌面版</a><p><span class="xin1"></span></p>
-       <div class="siegs">
-      <span class="lv"><b>qq7.5qq7.5qq7.5qq7.5qq7.5</b>
-      <p>免费的即时通信平台，带来更多沟通乐趣</p>
-      </span>
-      <a href="#" class="lvde">一键安装</a>
-      </div>
-      </li>
-      <li><a href="#" class="softimg"><img src="images/tou.jpg" width="46" height="46"></a> <a href="#" class="tiwq">微信桌面版</a><p><span class="xin2"></span></p>
-       <div class="siegs">
-      <span class="lv"><b>qq7.5qq7.5qq7.5qq7.5qq7.5</b>
-      <p>免费的即时通信平台，带来更多沟通乐趣</p>
-      </span>
-      <a href="#" class="lvde">一键安装</a>
-      </div>
-      </li>
-      <li><a href="#" class="softimg"><img src="images/tou.jpg" width="46" height="46"></a> <a href="#" class="tiwq">微信桌面版</a><p><span class="xin3"></span></p>
-       <div class="siegs">
-      <span class="lv"><b>qq7.5qq7.5qq7.5qq7.5qq7.5</b>
-      <p>免费的即时通信平台，带来更多沟通乐趣</p>
-      </span>
-      <a href="#" class="lvde">一键安装</a>
-      </div>
-      </li>
-      <li><a href="#" class="softimg"><img src="images/tou.jpg" width="46" height="46"></a> <a href="#" class="tiwq">微信桌面版</a><p><span class="xin4"></span></p>
-       <div class="siegs">
-      <span class="lv"><b>qq7.5qq7.5qq7.5qq7.5qq7.5</b>
-      <p>免费的即时通信平台，带来更多沟通乐趣</p>
-      </span>
-      <a href="#" class="lvde">一键安装</a>
-      </div>
-      </li>
-      <li><a href="#" class="softimg"><img src="images/tou.jpg" width="46" height="46"></a> <a href="#" class="tiwq">微信桌面版</a><p><span class="xin5"></span></p>
-       <div class="siegs">
-      <span class="lv"><b>qq7.5qq7.5qq7.5qq7.5qq7.5</b>
-      <p>免费的即时通信平台，带来更多沟通乐趣</p>
-      </span>
-      <a href="#" class="lvde">一键安装</a>
-      </div>
-      </li>
-     </ul>
-	</div>
-</div>
-<div class="scro" id="scro">
-<p id="pks"></p>
-</div>
-</div>    
-</div>
-</div>
-<div class="footer"><span class="banben">当前软件版本v1.4.50</span><span class="ico">ICO <a href="#" id="ct">软件管理官网</a></span></div>
-</div>
-<script type="text/javascript" src="inject_core.js"></script>
 </body>
 </html>
