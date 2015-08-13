@@ -161,6 +161,10 @@ public slots:
     void requestAllResumePackage(){} //resume all package
     void requestStopDownloadPackage(QString szCategoryID,QString szPackageID){}
 
+    //misc operation
+    void openSystemBrowser(QString urlAddress){} //use system default browser open a http://website
+    void openWebkitWindow(QString urlAddress, int windowWidth, int windowHeight){}//use self webkit container open a qrc|file|http url
+
     // For UI interface end
 };
 
