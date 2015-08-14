@@ -276,6 +276,24 @@ RC_FILE += icon.rc
 
 RESOURCES += lewang/default.qrc
 
-message($$system(makercc.bat))
+#######
+#MSIC PROCESS
 
-
+message(----------- QT INFORMATION -----------)
+message(Qt version: $$[QT_VERSION])
+message(Qt is installed in $$[QT_INSTALL_PREFIX])
+message(Header files: $$[QT_INSTALL_HEADERS])
+message(Libraries: $$[QT_INSTALL_LIBS])
+message(Binary files (executables): $$[QT_INSTALL_BINS])
+message(Plugins: $$[QT_INSTALL_PLUGINS])
+message(Data files: $$[QT_INSTALL_DATA])
+message(Translation files: $$[QT_INSTALL_TRANSLATIONS])
+message(Settings: $$[QT_INSTALL_CONFIGURATION])
+message(----------- PROJECT INFORMATION -----------)
+message(MAKE QRC TO BINRARY RCC FILE: $$system(makercc.bat))
+#message(COPY /y \"$$PWD/*.res\" \"$$OUT_PWD/release\")
+CONFIG(debug, debug|release) {
+    message(COPY RCC FILE TO BUILD DIR: $$system(COPY /y \"$$PWD/*.res\" \"$$OUT_PWD/debug\"))
+} else {
+    message(COPY RCC FILE TO BUILD DIR: $$system(COPY /y \"$$PWD/*.res\" \"$$OUT_PWD/release\"))
+}
