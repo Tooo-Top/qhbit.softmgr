@@ -1,0 +1,1 @@
+rcc -binary lewang\default.qrc -o .\essential.res

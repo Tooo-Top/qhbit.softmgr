@@ -275,3 +275,7 @@ HEADERS += \
 RC_FILE += icon.rc
 
 RESOURCES += lewang/default.qrc
+
+message($$system(makercc.bat))
+
+
