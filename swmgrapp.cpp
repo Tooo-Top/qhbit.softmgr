@@ -144,6 +144,8 @@ void SwmgrApp::InitObjects() {
     QWebSettings::globalSettings()->setObjectCacheCapacities(0, 0, 0);
     QWebSettings::globalSettings()->setOfflineStorageDefaultQuota(0);
     QWebSettings::globalSettings()->setOfflineWebApplicationCacheQuota(0);
+    QWebSettings::globalSettings()->setAttribute(QWebSettings::LocalContentCanAccessRemoteUrls, true);
+    QWebSettings::globalSettings()->setAttribute(QWebSettings::LocalContentCanAccessFileUrls, true);
 
 	wndMain = new MainWnd();
 	_webPage = new QWebPage();
