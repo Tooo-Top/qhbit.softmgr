@@ -180,7 +180,7 @@ void SwmgrApp::InitWnd() {
 	//wndFull = new Widget(NULL);
     wndMain->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowSystemMenuHint | Qt::WindowMinimizeButtonHint);
     wndMain->setMouseTracking(true);
-    wndMain->setFixedSize(982, 607);
+    wndMain->setFixedSize(963, 595);
 //    wndMain->setUrl(QUrl::fromUserInput("D:/workspace/trunk/lewang/Index.html"));
 //    wndMain->setUrl(QUrl::fromUserInput(GLOBAL::_DY_DIR_RUNNERSELF +"/lewang/Index.html"));
 //	QObject::connect(wndMain->page()->mainFrame(), SIGNAL(javaScriptWindowObjectCleared()), this, SLOT(initWebViewHost()));
