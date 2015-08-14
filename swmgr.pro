@@ -274,7 +274,7 @@ HEADERS += \
 
 RC_FILE += icon.rc
 
-RESOURCES += lewang/default.qrc
+#RESOURCES += lewang/default.qrc
 
 #######
 #MSIC PROCESS

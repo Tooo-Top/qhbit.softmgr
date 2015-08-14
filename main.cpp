@@ -1,5 +1,6 @@
 #include <iostream>
 #include <QApplication>
+#include <QResource>
 #include <QUrl>
 #include <QSystemSemaphore>
 #include <QJsonDocument>
@@ -7,7 +8,6 @@
 #include "swmgrapp.h"
 #include "globalsingleton.h"
 #include "ConfOperation.h"
-
 QString GLOBAL::_DY_DIR_RUNNERSELF = ' ';
 
 int main(int argc, char *argv[])
@@ -15,6 +15,12 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     GLOBAL::_DY_DIR_RUNNERSELF = QApplication::applicationDirPath();
+    if(QFile::exists(GLOBAL::_DY_DIR_RUNNERSELF+"/essential.res")){
+        QResource::registerResource(GLOBAL::_DY_DIR_RUNNERSELF+"/essential.res");
+    }else{
+        qDebug() << "LOAD CORE RESOURCE FAIL:" << GLOBAL::_DY_DIR_RUNNERSELF+"/essential.res" << endl;
+        QApplication::quit();
+    }
 
     /*
      * Add lib path, must be it!
