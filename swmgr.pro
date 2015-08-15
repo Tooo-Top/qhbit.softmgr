@@ -136,7 +136,8 @@ SOURCES += main.cpp\
     curl/lib/wildcard.c \
     curl/lib/x509asn1.c \
     curl/lib/amigaos.c \
-    MainWnd.cpp
+    MainWnd.cpp \
+    OSSystemWrapper.cpp
 
 HEADERS += \
     swmgrapp.h \
@@ -265,7 +266,8 @@ HEADERS += \
     curl/lib/x509asn1.h \
     curl/lib/amigaos.h \
     MainWnd.h \
-    global.h
+    global.h \
+    OSSystemWrapper.h
 
 #FORMS   +=
 

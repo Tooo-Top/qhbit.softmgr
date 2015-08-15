@@ -7,6 +7,7 @@
 #include <QJsonObject>
 #include "curl/curl.h"
 #include "global.h"
+#include "OSSystemWrapper.h"
 
 SwmgrApp::SwmgrApp(QObject *parent) : QObject(parent)
 {
@@ -190,7 +191,8 @@ void SwmgrApp::InitWnd() {
     //_webPage->mainFrame()->load(QUrl::fromUserInput("qrc:/index.html"));
     _webPage->triggerAction(QWebPage::Reload,false);
 	QObject::connect(_webPage->mainFrame(), SIGNAL(javaScriptWindowObjectCleared()), this, SLOT(initWebViewHost()));
-	wndMain->show();
+    QObject::connect(_webPage->mainFrame(), SIGNAL(loadFinished(bool)), this, SLOT(docLoadFinish(bool)));
+    wndMain->show();
 }
 
 void SwmgrApp::InitNoticeServer() {
@@ -292,6 +294,7 @@ void SwmgrApp::initWebViewHost() {
 
 void SwmgrApp::docLoadFinish(bool ok) {
     if (ok) {
+//        wndMain->setFixedSize(_webPage->mainFrame()->contentsSize());
 //        wndMain->page()->mainFrame()->evaluateJavaScript("document.documentElement.style.webkitUserSelect='none';");
 	}
 }
@@ -555,4 +558,24 @@ void SwmgrApp::requestPackageInfoByID(QString szCategoryID,QString szPackageID) 
             }
         }
     }
+}
+
+void SwmgrApp::requestRegisteUser(QString username,QString password,QString email) {
+    _user.RegistUser(username,password,email);
+    emit updateRegisteUser(QVariant());
+}
+
+void SwmgrApp::requestCanUpdatePackages() {
+	QJsonArray jsArray;
+
+	mapSoftwareList mapSoftwares;
+	OSSystemWrapper::Instance()->GetSystemInstalledSoftware(mapSoftwares,0);
+	for (mapSoftwareList::iterator item = mapSoftwares.begin(); item != mapSoftwares.end();item++) {
+		QJsonObject objParameter;
+		for (ItemProperty::iterator it = item->second.begin(); it != item->second.end(); it++) {
+			objParameter[QString::fromStdString(it->first)] = QString::fromStdString(it->second);
+		}
+		jsArray.append(objParameter);
+	}
+	emit updateCanUpdatePackages(jsArray.toVariantList());
 }
