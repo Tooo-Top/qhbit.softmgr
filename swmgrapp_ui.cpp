@@ -3,6 +3,7 @@
 #include <QApplication>
 #include <QMenu>
 #include <QDir>
+#include <QDesktopServices>
 
 void SwmgrApp::InitObjects() {
     appTrayIcon = new QIcon();
@@ -92,4 +93,14 @@ void SwmgrApp::showMiniWnd() {
 void SwmgrApp::initWebViewHost() {
     wndMain->page()->mainFrame()->addToJavaScriptWindowObject("DYBC",this);
 }
+
+
+/**
+ * @brief SwmgrApp::openSystemBrowser
+ * @param urlAddress
+ */
+void SwmgrApp::execOpenSystemBrowser(QString urlAddress){
+    QDesktopServices::openUrl(QUrl::fromUserInput(urlAddress));
+}
+
 

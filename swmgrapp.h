@@ -125,6 +125,9 @@ public slots:
     void showFullWnd();
     void showMiniWnd();
 
+    //msic
+    void execOpenSystemBrowser(QString urlAddress);//js bind signal
+
 // For UI interface begin
 signals:
     void updateSoftCategory(QVariantList swCategory);//for software category
@@ -142,6 +145,7 @@ signals:
     void updateTaskInfo(QVariantMap swPackageInfo);  // someone task status
     void updateDownloadProgress(QString szCategoryID,QString szPackageID,float fPercent);//down load progress
 	void updateCanUninstallPackages(QVariantList swCategory);
+
 public slots:
     //about software
     void requestSoftCategoryList();
@@ -166,8 +170,8 @@ public slots:
 	void requestCanUninstallPackages(); //can be uninstall pacakge list
 
     //misc operation
-    void openSystemBrowser(QString urlAddress){} //use system default browser open a http://website
-    void openWebkitWindow(QString urlAddress, int windowWidth, int windowHeight){}//use self webkit container open a qrc|file|http url
+    //void openSystemBrowser(QUrl urlAddress){} //use system default browser open a http://website
+    //void openWebkitWindow(QUrl urlAddress, int windowWidth, int windowHeight){}//use self webkit container open a qrc|file|http url
 
     // For UI interface end
 };
