@@ -137,7 +137,10 @@ SOURCES += main.cpp\
     curl/lib/x509asn1.c \
     curl/lib/amigaos.c \
     MainWnd.cpp \
-    OSSystemWrapper.cpp
+    OSSystemWrapper.cpp \
+    swmgrapp_ui.cpp \
+    swmgrapp_env.cpp \
+    swmgrapp_IF.cpp
 
 HEADERS += \
     swmgrapp.h \

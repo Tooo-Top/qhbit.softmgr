@@ -1,13 +1,9 @@
 #include "swmgrapp.h"
 #include <QApplication>
-
-#include <QMenu>
-#include <QDir>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include "curl/curl.h"
 #include "global.h"
-#include "OSSystemWrapper.h"
 
 SwmgrApp::SwmgrApp(QObject *parent) : QObject(parent)
 {
@@ -24,175 +20,30 @@ SwmgrApp *SwmgrApp::Instance() {
     return _Instance;
 }
 
-const QString &SwmgrApp::GetEnvVar() {
-	static QString refEnvVar("CommonProgramFiles");
-	return refEnvVar;
-}
-
-const QString &SwmgrApp::GetCompanyName() {
-	static const QString companyName("HurricaneTeam");
-	return companyName;
-}
-
-const QString &SwmgrApp::GetSoftwareName() {
-	static const QString softwareName("xbsoftMgr");
-	return softwareName;
-}
-
-QString SwmgrApp::GetAppDataPath(QString szCompany) {
-	QString szPath(""), szKey = SwmgrApp::GetEnvVar();
-	QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-	if (env.keys().contains(szKey, Qt::CaseInsensitive)) {
-		szPath = env.value(szKey);
-		szPath.append(QDir::separator());
-		szPath.append(szCompany);
-		szPath = QDir::toNativeSeparators(szPath);
-	}
-	return szPath;
-}
-
-QString SwmgrApp::GetProgramProfilePath(QString name) {
-	QString szProgProfile = GetAppDataPath(SwmgrApp::GetCompanyName());
-	szProgProfile.append(QDir::separator());
-	szProgProfile.append(name);
-	szProgProfile = QDir::toNativeSeparators(szProgProfile);
-	return szProgProfile;
-}
-
-QString SwmgrApp::GetFilePathFromFile(QString szFile) {
-	QFileInfo fieInfo(szFile);
-	return QDir::toNativeSeparators(fieInfo.absolutePath());
-}
-
-QString SwmgrApp::GetCookieFile() {
-	return GetProgramProfilePath(QString("xbsoftMgr")) + "\\xbsoftMgr.cookie";
-}
-
-QString SwmgrApp::GetUserLoginUrl() {
-	return QString("http://ctr.datacld.com/api/user");
-}
-
-QString SwmgrApp::GetUserRegisteUrl() {
-	return GetUserLoginUrl() + "/register";
-}
-
 BOOL SwmgrApp::InitAppEnv() {
     //DumpEnv();
-	InitDir(SwmgrApp::GetProgramProfilePath(SwmgrApp::GetSoftwareName()));
-	LoadSettingProfile();
-	if (!InitCurl()) {
-		return FALSE;
-	}
-	if (!InitMiniXL()) {
-		return FALSE;
-	}
-	// ----------
-	InitObjects();
-	InitIcons();
-	InitMenuActions();
-	InitSlots();
-	InitTray();
-	_DataModel.initAll();
-	_PendingTasks.initTasks();
-	InitNoticeServer();
-	InitWnd();
-	StartPoll();
-//	_user.RegistUser("xiehc", "password", "xiehechong@sina.com");
-	_user.UserLogin("xiehc", "password");
-//    _window->load(QUrl::fromUserInput("D:/workspace/trunk/lewang/Index.html"));
-//    _window->show();
+    InitDir(SwmgrApp::GetProgramProfilePath(SwmgrApp::GetSoftwareName()));
+    LoadSettingProfile();
+    if (!InitCurl()) {
+        return FALSE;
+    }
+    if (!InitMiniXL()) {
+        return FALSE;
+    }
+    // ----------
+    InitObjects();
+    InitIcons();
+    InitMenuActions();
+    InitSlots();
+    InitTray();
+    _DataModel.initAll();
+    _PendingTasks.initTasks();
+    InitNoticeServer();
+    InitWnd();
+    StartPoll();
+    _user.UserLogin("xiehc", "password");
 
-	return TRUE;
-}
-
-void SwmgrApp::InitDir(QString szAppDir) {
-	QDir dir;
-
-	QStringList szItems = (QStringList()<<QString("UpdateDir")<<QString("Data")<<QString("Conf")<<QString("Temp") );
-	ConfOperation::Root().setRootPath(szAppDir);// set root path
-	ConfOperation::Root().initSubpath(szItems); // create sub path
-}
-
-BOOL SwmgrApp::InitCurl() {
-	if (::curl_global_init(CURL_GLOBAL_WIN32) == CURLE_OK)
-		m_bCurlStatus = TRUE;
-	return m_bCurlStatus;
-}
-BOOL SwmgrApp::InitMiniXL() {
-	_pWapper = LoadDll();
-	if (!_pWapper) {
-		return FALSE;
-	}
-	if (!_pWapper->Init()) {
-		UnloadDll(&_pWapper);
-		return FALSE;
-	}
-	return TRUE;
-}
-
-void SwmgrApp::InitObjects() {
-	appTrayIcon = new QIcon();
-
-	trayIconMenu = new QMenu(NULL);
-	fullAction = new QAction(QString("Full"), this);
-	miniAction = new QAction(QString("Min"), this);
-	quitAction = new QAction(QString("Close"), this);
-	traySystem = new QSystemTrayIcon(this);
-	srvLaunchInst = new QLocalServer(this);
-	pollDownloadTaskObject = new QTimer(this);
-    QWebSettings::globalSettings()->setAttribute(QWebSettings::DeveloperExtrasEnabled,true);
-    QWebSettings::globalSettings()->setMaximumPagesInCache(0);
-    QWebSettings::globalSettings()->setObjectCacheCapacities(0, 0, 0);
-    QWebSettings::globalSettings()->setOfflineStorageDefaultQuota(0);
-    QWebSettings::globalSettings()->setOfflineWebApplicationCacheQuota(0);
-    QWebSettings::globalSettings()->setAttribute(QWebSettings::LocalContentCanAccessRemoteUrls, true);
-    QWebSettings::globalSettings()->setAttribute(QWebSettings::LocalContentCanAccessFileUrls, true);
-
-	wndMain = new MainWnd();
-	_webPage = new QWebPage();
-	wndMain->setPage(_webPage);
-}
-
-void SwmgrApp::InitIcons() {
-	appTrayIcon->addFile(":/xbmgr.ico");
-}
-
-void SwmgrApp::InitMenuActions() {
-	trayIconMenu->addAction(fullAction);
-	trayIconMenu->addAction(miniAction);
-	trayIconMenu->addSeparator();
-	trayIconMenu->addAction(quitAction);
-}
-
-void SwmgrApp::InitSlots() {
-	QObject::connect(quitAction, SIGNAL(triggered(bool)), this, SLOT(appquit()));
-	QObject::connect(fullAction, SIGNAL(triggered(bool)), this, SLOT(showFullWnd()));
-	QObject::connect(miniAction, SIGNAL(triggered(bool)), this, SLOT(showMiniWnd()));
-	QObject::connect(srvLaunchInst, SIGNAL(newConnection()), this, SLOT(launchInstall()));
-	QObject::connect(this, SIGNAL(sigInstaller(QJsonObject)), SLOT(addInstaller(QJsonObject)));
-	QObject::connect(pollDownloadTaskObject, SIGNAL(timeout()), this,SLOT(downloadPoll()));
-}
-
-void SwmgrApp::InitTray() {
-	traySystem->setIcon(*appTrayIcon);
-	traySystem->setContextMenu(trayIconMenu);
-	traySystem->show();
-}
-
-void SwmgrApp::InitWnd() {
-	//wndFull = new Widget(NULL);
-    wndMain->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowSystemMenuHint | Qt::WindowMinimizeButtonHint);
-    wndMain->setMouseTracking(true);
-    wndMain->setFixedSize(963, 595);
-//    wndMain->setUrl(QUrl::fromUserInput("D:/workspace/trunk/lewang/Index.html"));
-//    wndMain->setUrl(QUrl::fromUserInput(GLOBAL::_DY_DIR_RUNNERSELF +"/lewang/Index.html"));
-//	QObject::connect(wndMain->page()->mainFrame(), SIGNAL(javaScriptWindowObjectCleared()), this, SLOT(initWebViewHost()));
-    _webPage->mainFrame()->load(QUrl::fromUserInput(GLOBAL::_DY_DIR_RUNNERSELF + "/lewang/Index.html"));
-    //_webPage->mainFrame()->load(QUrl::fromUserInput("qrc:/index.html"));
-    _webPage->triggerAction(QWebPage::Reload,false);
-	QObject::connect(_webPage->mainFrame(), SIGNAL(javaScriptWindowObjectCleared()), this, SLOT(initWebViewHost()));
-    QObject::connect(_webPage->mainFrame(), SIGNAL(loadFinished(bool)), this, SLOT(docLoadFinish(bool)));
-    wndMain->show();
+    return TRUE;
 }
 
 void SwmgrApp::InitNoticeServer() {
@@ -207,13 +58,6 @@ void SwmgrApp::StartPoll() {
 
 void SwmgrApp::UninitEnv() {
 
-}
-
-void SwmgrApp::DumpEnv() {
-	QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-	foreach(QString key, env.keys()) {
-		qDebug() << key << "=" << env.value(key) << endl;
-	}
 }
 
 void SwmgrApp::LoadSettingProfile() {
@@ -233,70 +77,6 @@ QString SwmgrApp::getSettingParameter(QString name, QString defaultValue) {
 		return defaultValue;
 	}
 	return _setting.value(name).toString(defaultValue);
-}
-
-DownWrapper* SwmgrApp::LoadDll()
-{
-	WCHAR szDllpath[512] = { 0 };
-	QString szLoadPath = SwmgrApp::GetProgramProfilePath(QString("xbSpeed"));
-	szLoadPath.append( QDir::separator() + QString("xldl.dll") );
-	szLoadPath = QDir::toNativeSeparators(szLoadPath);
-
-	StrCpyW(szDllpath, szLoadPath.toStdWString().data());
-	DownWrapper* pWapper = NULL;
-	try{
-		pWapper = new DownWrapper(szDllpath);
-	}
-	catch (wchar_t e[]) {
-		pWapper = NULL;
-		qDebug() << "*****************:"<<QString::fromWCharArray(e);
-	}
-	return pWapper;
-}
-
-void SwmgrApp::UnloadDll(DownWrapper** Wapper){
-	if (!Wapper) {
-		return;
-	}
-	if ((*Wapper) != NULL) {
-		(*Wapper)->UnInit();
-		delete (*Wapper);
-		(*Wapper) = NULL;
-	}
-}
-
-void SwmgrApp::appquit() {
-    wndMain->close();
-	_webPage->deleteLater();
-	wndMain->deleteLater();
-    QWebSettings::globalSettings()->clearMemoryCaches();
-    qApp->quit();
-//	QCoreApplication::exit(0);
-}
-
-void SwmgrApp::showFullWnd() {
-    if (wndMain->isVisible())
-        wndMain->hide();
-    else {
-        wndMain->show();
-    }
-}
-
-void SwmgrApp::showMiniWnd() {
-//    if (wndMain->isVisible())
-//        wndMain->hide();
-	// show mini widget
-}
-
-void SwmgrApp::initWebViewHost() {
-    wndMain->page()->mainFrame()->addToJavaScriptWindowObject("DYBC",this);
-}
-
-void SwmgrApp::docLoadFinish(bool ok) {
-    if (ok) {
-//        wndMain->setFixedSize(_webPage->mainFrame()->contentsSize());
-//        wndMain->page()->mainFrame()->evaluateJavaScript("document.documentElement.style.webkitUserSelect='none';");
-	}
 }
 
 void SwmgrApp::monitorProf() {
@@ -350,57 +130,6 @@ void SwmgrApp::launchInstall() {
 	}
 	jsAddInstallObject = jsDoc.object();
     emit sigInstaller(jsAddInstallObject);
-}
-
-#include <comdef.h>
-#include <comutil.h>
-#include <atlbase.h>
-#include <atlcomcli.h>
-#include <Shobjidl.h>
-
-BOOL SwmgrApp::CreateShellLink(QString szTargetExec,QString szID,QString szCategory,QString szLnkName,QString szIconName,QString szDescription) {
-    CComPtr<IShellLink>   pShortCutLink;    //IShellLink对象指针
-	CComPtr<IPersistFile> ppf;		        //IPersisFile对象指针
-
-	QString szLnkPath,szWorkingDirectory,szArguments;
-	QString szKey("USERPROFILE");
-
-	QFileInfo fieInfo(szTargetExec);
-	QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-	// Initialize var
-	if (env.keys().contains(szKey, Qt::CaseInsensitive)) {
-		szLnkPath = env.value(szKey);
-		szLnkPath.append(QDir::separator());
-		szLnkPath.append("Desktop");
-		szLnkPath.append(QDir::separator());
-		szLnkPath.append(szLnkName);
-		szLnkPath = QDir::toNativeSeparators(szLnkPath);
-	}
-	else {
-		return FALSE;
-	}
-	if (QFile::exists(szLnkPath)) {
-		return TRUE;
-	}
-	szWorkingDirectory = QDir::toNativeSeparators(fieInfo.absolutePath());
-
-	szArguments = QString("install id=%1 catid=%2 %3").arg(szID).arg(szCategory).arg(szLnkName);
-
-	// Create shelllink
-	CoInitialize(NULL);
-	pShortCutLink.CoCreateInstance(CLSID_ShellLink, NULL);
-	// Set shelllink parameters
-	pShortCutLink->SetPath(szTargetExec.toStdWString().data());
-	pShortCutLink->SetArguments(szArguments.toStdWString().data());
-	pShortCutLink->SetWorkingDirectory(szWorkingDirectory.toStdWString().data());
-	pShortCutLink->SetIconLocation(szIconName.toStdWString().data(), 0);
-	pShortCutLink->SetDescription(szDescription.toStdWString().data());
-	pShortCutLink->SetShowCmd(SW_SHOW);
-	// Save shelllink
-	pShortCutLink->QueryInterface(&ppf);
-	ppf->Save(szLnkPath.toStdWString().data(), FALSE);
-    CoUninitialize();
-	return TRUE;
 }
 
 void SwmgrApp::addInstaller(QJsonObject installer) {
@@ -497,56 +226,3 @@ void SwmgrApp::downloadPoll()
 	}
 }
 
-//==== for UI interface
-void SwmgrApp::requestSoftCategoryList() {
-	emit updateSoftCategory(_DataModel.getSoftCategory().toVariantList());
-}
-
-void SwmgrApp::requestHotList() {
-	emit updateHotList(_DataModel.getHotPackages().toVariantList());
-}
-
-void SwmgrApp::requestCategoryListByID(QString szCategoryID) {
-    // get someone category list
-	QMap<QString, QJsonArray>::Iterator curItem = _DataModel.getSoftPackages().find(szCategoryID);
-    if ( curItem != _DataModel.getSoftPackages().end() ) {
-        emit updateCategoryListForID(szCategoryID, curItem.value().toVariantList());
-    }
-}
-
-void SwmgrApp::requestPackageInfoByID(QString szCategoryID,QString szPackageID) {
-    QMap<QString, QJsonArray>::Iterator curItem = _DataModel.getSoftPackages().find(szCategoryID);
-    if (curItem!=_DataModel.getSoftPackages().end()) {
-        QJsonArray lstSoftPkg = curItem.value();
-
-        foreach(QJsonValue it,lstSoftPkg) {
-            if (it.toObject().value("id").toString().compare(szPackageID,Qt::CaseInsensitive)==0) {
-				emit updatePackageInfoByID(it.toObject().toVariantMap());
-                break;
-            }
-        }
-    }
-}
-
-void SwmgrApp::requestRegisteUser(QString username,QString password,QString email) {
-    _user.RegistUser(username,password,email);
-    emit updateRegisteUser(QVariant());
-}
-#include <QTextCodec>
-void SwmgrApp::requestCanUninstallPackages() {
-    QJsonArray jsArray;
-
-	mapSoftwareList mapSoftwares;
-	OSSystemWrapper::Instance()->GetSystemInstalledSoftware(mapSoftwares,0);
-	for (mapSoftwareList::iterator item = mapSoftwares.begin(); item != mapSoftwares.end();item++) {
-		QJsonObject objParameter;
-		for (ItemProperty::iterator it = item->second.begin(); it != item->second.end(); it++) {
-			//wchar_t szInfo[1024];
-			//MultiByteToWideChar(CP_ACP, 0, it->second.data(), -1, szInfo, 1024);
-			//qDebug()<<QString::fromStdString(it->first)<<":"<<QTextCodec::codecForLocale()->toUnicode(it->second.data(), it->second.size());
-			objParameter[QString::fromStdString(it->first)] = QTextCodec::codecForLocale()->toUnicode(it->second.data(), it->second.size());// QString::fromWCharArray(szInfo);
-		}
-		jsArray.append(objParameter);
-	}
-    emit updateCanUninstallPackages(jsArray.toVariantList());
-}
