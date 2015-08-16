@@ -125,8 +125,13 @@ public slots:
     void showFullWnd();
     void showMiniWnd();
 
-    //msic
-    void execOpenSystemBrowser(QString urlAddress);//js bind signal
+    //msic js bind signal
+    void execOpenSystemBrowser(QString urlAddress);//use system default browser open a http://website
+    void execOpenPopBrowser(QString urlAddress, int windowWidth, int windowHeight);//use self webkit container open a qrc|file|http url
+
+    //misc operation
+    //void openSystemBrowser(QUrl urlAddress){}
+    //void openWebkitWindow(QUrl urlAddress
 
 // For UI interface begin
 signals:
@@ -168,10 +173,6 @@ public slots:
 
 	void requestCanUpdatePackages(){} //can be update pacakge list
 	void requestCanUninstallPackages(); //can be uninstall pacakge list
-
-    //misc operation
-    //void openSystemBrowser(QUrl urlAddress){} //use system default browser open a http://website
-    //void openWebkitWindow(QUrl urlAddress, int windowWidth, int windowHeight){}//use self webkit container open a qrc|file|http url
 
     // For UI interface end
 };

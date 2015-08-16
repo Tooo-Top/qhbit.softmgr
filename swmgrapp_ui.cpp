@@ -96,6 +96,7 @@ void SwmgrApp::initWebViewHost() {
 
 
 /**
+ * Use system default browser open url address
  * @brief SwmgrApp::openSystemBrowser
  * @param urlAddress
  */
@@ -104,3 +105,13 @@ void SwmgrApp::execOpenSystemBrowser(QString urlAddress){
 }
 
 
+/**
+ * Use self webkit container pop open a qrc|file|http url
+ * @brief SwmgrApp::execOpenPopBrowser
+ * @param urlAddress
+ * @param windowWidth
+ * @param windowHeight
+ */
+void SwmgrApp::execOpenPopBrowser(QString urlAddress, int windowWidth, int windowHeight){
+
+}
