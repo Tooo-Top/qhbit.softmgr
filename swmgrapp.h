@@ -141,7 +141,7 @@ signals:
     void updateRunningTasks(QVariantList swCategory);// all package status
     void updateTaskInfo(QVariantMap swPackageInfo);  // someone task status
     void updateDownloadProgress(QString szCategoryID,QString szPackageID,float fPercent);//down load progress
-	void updateCanUpdatePackages(QVariantList swCategory);
+	void updateCanUninstallPackages(QVariantList swCategory);
 public slots:
     //about software
     void requestSoftCategoryList();
@@ -150,7 +150,7 @@ public slots:
     void requestPackageInfoByID(QString szCategoryID,QString szPackageID);
 
     //about user
-    void requestRegisteUser(QString username,QString password,QString email){}
+    void requestRegisteUser(QString username,QString password,QString email);
     void requestLoginUser(QString username,QString password){}
     void requestModifyUserInfo(QVariant userinfo){}
 
@@ -162,8 +162,8 @@ public slots:
     void requestAllResumePackage(){} //resume all package
     void requestStopDownloadPackage(QString szCategoryID,QString szPackageID){}
 
-	void requestCanUpdatePackages(); //can be update pacakge list
-    void requestCanUninstallPackages(){} //can be uninstall pacakge list
+	void requestCanUpdatePackages(){} //can be update pacakge list
+	void requestCanUninstallPackages(); //can be uninstall pacakge list
 
     //misc operation
     void openSystemBrowser(QString urlAddress){} //use system default browser open a http://website

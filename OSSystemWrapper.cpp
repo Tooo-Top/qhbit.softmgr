@@ -11,13 +11,12 @@ std::string softwareParam[]={
     "Version",
     "VersionMajor",
     "VersionMinor",
-    "WindowsInstaller"
+    "WindowsInstaller",
+	"EstimatedSize",
+	"DisplayIcon"
 };
 
-OSSystemWrapper::OSSystemWrapper()
-{
-
-}
+OSSystemWrapper::OSSystemWrapper() {}
 
 OSSystemWrapper *OSSystemWrapper::Instance() {
     static OSSystemWrapper _Instance;
@@ -72,11 +71,12 @@ DWORD OSSystemWrapper::GetSystemInstalledSoftware(mapSoftwareList &mapSoftwares,
 #define MAX_VALUE_NAME 16383
 
 void OSSystemWrapper::GetWinInstalledSoftware(mapSoftwareList &mapSoftwares,DWORD flag) {
-	int i = 0, j = 0;
+	DWORD i = 0, j = 0;
 	char achKey[MAX_KEY_LENGTH];
 	char achValue[MAX_VALUE_NAME];
 	DWORD cbKey = MAX_KEY_LENGTH;
 	DWORD cchValue = MAX_VALUE_NAME;
+	DWORD dwDataType = 0,dwValueTmp=0;
 
 	DWORD cSubKeys = 0;
     DWORD RegAccessMask=KEY_ALL_ACCESS;
@@ -122,8 +122,20 @@ void OSSystemWrapper::GetWinInstalledSoftware(mapSoftwareList &mapSoftwares,DWOR
                     std::string szValue;
                     achValue[0] = '\0';
                     cchValue = MAX_VALUE_NAME;
-                    if ((RegQueryValueExA(hUninstallSubKey, softwareParam[j].data(), NULL, NULL, (LPBYTE)achValue, &cchValue) == ERROR_SUCCESS) && strlen(achValue) > 0) {
-                        szValue.append(achValue,cchValue);
+					if ((RegQueryValueExA(hUninstallSubKey, softwareParam[j].data(), NULL, &dwDataType, (LPBYTE)achValue, &cchValue) == ERROR_SUCCESS) && strlen(achValue) > 0) {
+						if (dwDataType == REG_DWORD || dwDataType == REG_QWORD) {
+							dwValueTmp = 0;
+							memcpy(&dwValueTmp, achValue, cchValue<sizeof(DWORD) ? cchValue : sizeof(DWORD));
+							szValue = std::to_string(dwValueTmp);
+						}
+						else{
+							//wchar_t szInfo[1024];
+							//MultiByteToWideChar(CP_ACP, 0, achValue, -1, szInfo, 1024);
+							//WideCharToMultiByte(CP_ACP, 0, achValue, -1, szInfo, 1024, NULL, NULL);
+
+							szValue.append(achValue, cchValue);
+							//qDebug() << QString::fromWCharArray(szInfo);
+						}
                     }
                     item.insert(ItemProperty::value_type(softwareParam[j],szValue));
                 }

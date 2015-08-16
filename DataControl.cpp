@@ -5,19 +5,19 @@ DataControl::DataControl()
 
 }
 
-mapSoftwareCategory &DataControl::getSoftCategory() {
+QJsonArray &DataControl::getSoftCategory() {
 	return _softCategory;  //category list
 }
 
-mapSoftwarePackages &DataControl::getSoftPackages() {
+QMap<QString, QJsonArray> &DataControl::getSoftPackages() {
 	return _softPackages;  //package list by category
 }
 
-lstSoftwarePackage  &DataControl::getTopPackages() {
+QJsonArray &DataControl::getTopPackages() {
 	return  _softTopPackages;
 }
 
-lstSoftwarePackage  &DataControl::getHotPackages() {
+QJsonArray  &DataControl::getHotPackages() {
 	return  _softHotPackages;
 }
 
@@ -26,9 +26,9 @@ bool DataControl::initSoftCategory() {
 }
 
 bool DataControl::initSoftPackages() {
-	foreach(CommonItem category, _softCategory) {
-		QString szSubCategroySoftlist = ConfOperation::Root().getSubpathFile("Data", QString("SoftwareCategory") + category["id"] + ".list");
-		SoftwareList::LoadCategorySoftwareList(szSubCategroySoftlist, category["id"], _softPackages);
+	foreach(QJsonValue category, _softCategory) {
+		QString szSubCategroySoftlist = ConfOperation::Root().getSubpathFile("Data", QString("SoftwareCategory") + category.toObject().value("id").toString() + ".list");
+		SoftwareList::LoadCategorySoftwareList(szSubCategroySoftlist, category.toObject().value("id").toString(), _softPackages);
 	}
 	return true;
 }

@@ -8,7 +8,7 @@
 //--------json soft list parameter use these  **begin
 const int nCategoryItemCount = 4;
 const int nPackageItemCount = 28;
-
+/*
 extern QString categoryItems[nCategoryItemCount];
 extern QString packageItems[nPackageItemCount];
 //--------json soft list parameter use these  **end
@@ -18,7 +18,7 @@ typedef QMap<QString, CommonItem> mapSoftwareCategory;
 
 typedef QVector<CommonItem> lstSoftwarePackage;
 typedef QMap<QString, lstSoftwarePackage> mapSoftwarePackages;
-
+*/
 /*
 * status follow in configure file
 *     0 : just add
@@ -47,11 +47,11 @@ protected:
     SoftwareList(){};
 public:
     // for category list
-	static bool LoadSoftwareCategory(QString, mapSoftwareCategory &);
+	static bool LoadSoftwareCategory(QString, QJsonArray &);
 
     // for package list
-	static bool LoadCategorySoftwareList(QString, QString, mapSoftwarePackages&);
-	static bool LoadArrayOfSoftwareList(QString , lstSoftwarePackage &);
+	static bool LoadCategorySoftwareList(QString, QString, QMap<QString, QJsonArray>&);
+	static bool LoadArrayOfSoftwareList(QString, QJsonArray &);
 
 	// for launch list
 	static bool AddItemToConfArray(QString , QJsonObject &);

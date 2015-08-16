@@ -92,10 +92,10 @@ BOOL SwmgrApp::InitAppEnv() {
 	InitMenuActions();
 	InitSlots();
 	InitTray();
-	InitWnd();
 	_DataModel.initAll();
 	_PendingTasks.initTasks();
 	InitNoticeServer();
+	InitWnd();
 	StartPoll();
 //	_user.RegistUser("xiehc", "password", "xiehechong@sina.com");
 	_user.UserLogin("xiehc", "password");
@@ -462,7 +462,7 @@ void SwmgrApp::downloadPoll()
 			if (startCount < MaxTask) {
 				startCount++;
 
-				CommonItem TaskConfig;
+/*				CommonItem TaskConfig;
 				if (taskObjectReplenish->status != 0) {
 					continue;
 				}
@@ -491,7 +491,7 @@ void SwmgrApp::downloadPoll()
 				if (hTask) {
 					_pWapper->TaskStart(hTask);
 					taskObjectReplenish->hTaskHandle = hTask;
-				}
+				}*/
 			}
 		}
 	}
@@ -499,61 +499,29 @@ void SwmgrApp::downloadPoll()
 
 //==== for UI interface
 void SwmgrApp::requestSoftCategoryList() {
-    QJsonArray jsArray;
-    foreach (CommonItem item,_DataModel.getSoftCategory().values()) {
-        QJsonObject objParameter;
-        foreach(QString key,item.keys()) {
-            objParameter[key] = item.value(key);
-        }
-
-        jsArray.append(objParameter);
-    }
-
-	emit updateSoftCategory(jsArray.toVariantList());
+	emit updateSoftCategory(_DataModel.getSoftCategory().toVariantList());
 }
 
 void SwmgrApp::requestHotList() {
-    QJsonArray jsArray;
-    foreach (CommonItem item,_DataModel.getHotPackages().toList()) {
-        QJsonObject objParameter;
-        foreach(QString key,item.keys()) {
-            objParameter[key] = item.value(key);
-        }
-
-        jsArray.append(objParameter);
-    }
-    emit updateHotList(jsArray.toVariantList());
+	emit updateHotList(_DataModel.getHotPackages().toVariantList());
 }
 
 void SwmgrApp::requestCategoryListByID(QString szCategoryID) {
-    QJsonArray jsArray;
     // get someone category list
-    mapSoftwarePackages::Iterator curItem = _DataModel.getSoftPackages().find(szCategoryID);
+	QMap<QString, QJsonArray>::Iterator curItem = _DataModel.getSoftPackages().find(szCategoryID);
     if ( curItem != _DataModel.getSoftPackages().end() ) {
-        foreach (CommonItem item,curItem.value().toList()) {
-            QJsonObject objParameter;
-            foreach(QString key,item.keys()) {
-                objParameter[key] = item.value(key);
-            }
-
-            jsArray.append(objParameter);
-        }
-        emit updateCategoryListForID(szCategoryID,jsArray.toVariantList());
+        emit updateCategoryListForID(szCategoryID, curItem.value().toVariantList());
     }
 }
 
 void SwmgrApp::requestPackageInfoByID(QString szCategoryID,QString szPackageID) {
-    QJsonObject objParameter;
-    mapSoftwarePackages::Iterator curItem = _DataModel.getSoftPackages().find(szCategoryID);
+    QMap<QString, QJsonArray>::Iterator curItem = _DataModel.getSoftPackages().find(szCategoryID);
     if (curItem!=_DataModel.getSoftPackages().end()) {
-        lstSoftwarePackage lstSoftPkg = curItem.value();
-        foreach(CommonItem it,lstSoftPkg) {
-            if (it.value("id").compare(szPackageID,Qt::CaseInsensitive)==0) {
-                foreach(QString key,it.keys()) {
-                    objParameter[key] = it.value(key);
-                }
+        QJsonArray lstSoftPkg = curItem.value();
 
-                emit updatePackageInfoByID(objParameter.toVariantMap());
+        foreach(QJsonValue it,lstSoftPkg) {
+            if (it.toObject().value("id").toString().compare(szPackageID,Qt::CaseInsensitive)==0) {
+				emit updatePackageInfoByID(it.toObject().toVariantMap());
                 break;
             }
         }
@@ -564,18 +532,21 @@ void SwmgrApp::requestRegisteUser(QString username,QString password,QString emai
     _user.RegistUser(username,password,email);
     emit updateRegisteUser(QVariant());
 }
-
-void SwmgrApp::requestCanUpdatePackages() {
-	QJsonArray jsArray;
+#include <QTextCodec>
+void SwmgrApp::requestCanUninstallPackages() {
+    QJsonArray jsArray;
 
 	mapSoftwareList mapSoftwares;
 	OSSystemWrapper::Instance()->GetSystemInstalledSoftware(mapSoftwares,0);
 	for (mapSoftwareList::iterator item = mapSoftwares.begin(); item != mapSoftwares.end();item++) {
 		QJsonObject objParameter;
 		for (ItemProperty::iterator it = item->second.begin(); it != item->second.end(); it++) {
-			objParameter[QString::fromStdString(it->first)] = QString::fromStdString(it->second);
+			//wchar_t szInfo[1024];
+			//MultiByteToWideChar(CP_ACP, 0, it->second.data(), -1, szInfo, 1024);
+			//qDebug()<<QString::fromStdString(it->first)<<":"<<QTextCodec::codecForLocale()->toUnicode(it->second.data(), it->second.size());
+			objParameter[QString::fromStdString(it->first)] = QTextCodec::codecForLocale()->toUnicode(it->second.data(), it->second.size());// QString::fromWCharArray(szInfo);
 		}
 		jsArray.append(objParameter);
 	}
-	emit updateCanUpdatePackages(jsArray.toVariantList());
+    emit updateCanUninstallPackages(jsArray.toVariantList());
 }

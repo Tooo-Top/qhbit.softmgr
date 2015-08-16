@@ -47,7 +47,7 @@ QString packageItems[nPackageItemCount] = {
 	"status"
 };
 
-bool SoftwareList::LoadSoftwareCategory(QString szCategoryFile, mapSoftwareCategory &mapCategory) {
+bool SoftwareList::LoadSoftwareCategory(QString szCategoryFile, QJsonArray &mapCategory) {
 	QByteArray fileBuf;
 	QJsonArray jsArray;
 	QJsonObject jsObj;
@@ -77,22 +77,12 @@ bool SoftwareList::LoadSoftwareCategory(QString szCategoryFile, mapSoftwareCateg
 	if (jsObj.value("code").toInt() != 0) {
 		return false;
 	}
-	jsArray = jsObj.value("msg").toArray();
-	foreach(QJsonValue it, jsArray) {
-		CommonItem category;
-		jsObj = it.toObject();
-		if (mapCategory.find(jsObj.value(categoryItems[0]).toString()) != mapCategory.end())
-			continue;
-		for (int i = 0; i < nCategoryItemCount; i++) {
-			category[categoryItems[i]] = jsObj.value(categoryItems[i]).toString();
-		}
-		mapCategory.insert(jsObj.value(categoryItems[0]).toString(), category);
-	}
+	mapCategory = jsObj.value("msg").toArray();
 
     return true;
 }
 
-bool SoftwareList::LoadCategorySoftwareList(QString szCategoryListFile, QString szCategoryID, mapSoftwarePackages &mapPackageByCategoryID) {
+bool SoftwareList::LoadCategorySoftwareList(QString szCategoryListFile, QString szCategoryID, QMap<QString, QJsonArray> &mapPackageByCategoryID) {
 	QByteArray fileBuf;
 	QJsonArray jsArray;
 	QJsonDocument doc;
@@ -117,30 +107,11 @@ bool SoftwareList::LoadCategorySoftwareList(QString szCategoryListFile, QString 
 	if (jsObj.value("code").toInt() != 0) {
 		return false;
 	}
-	jsArray = jsObj.value("msg").toArray();
-
-	foreach(QJsonValue it, jsArray)
-	{
-		CommonItem category;
-		bool bFound = false;
-		jsObj = it.toObject();
-		foreach(CommonItem it, mapPackageByCategoryID[szCategoryID]) {
-			if (it[packageItems[0]].compare(jsObj.value(packageItems[0]).toString()) == 0) {
-				bFound = true;
-			}
-		}
-		if (bFound) {
-			continue;
-		}
-		for (int i = 0; i < nPackageItemCount; i++) {
-			category[packageItems[i]] = jsObj.value(packageItems[i]).toString();
-		}
-		mapPackageByCategoryID[szCategoryID].append(category);
-	}
+	mapPackageByCategoryID[szCategoryID] = jsObj.value("msg").toArray();
 	return true;
 }
 
-bool SoftwareList::LoadArrayOfSoftwareList(QString szSoftListFile, lstSoftwarePackage &arrPackage) {
+bool SoftwareList::LoadArrayOfSoftwareList(QString szSoftListFile, QJsonArray &arrPackage) {
 	QByteArray fileBuf;
 	QJsonArray jsArray;
 	QJsonDocument doc;
@@ -165,26 +136,7 @@ bool SoftwareList::LoadArrayOfSoftwareList(QString szSoftListFile, lstSoftwarePa
 	if (jsObj.value("code").toInt() != 0) {
 		return false;
 	}
-	jsArray = jsObj.value("msg").toArray();
-
-	foreach(QJsonValue it, jsArray)
-	{
-		CommonItem category;
-		bool bFound = false;
-		jsObj = it.toObject();
-		foreach(CommonItem it, arrPackage) {
-			if (it[packageItems[0]].compare(jsObj.value(packageItems[0]).toString()) == 0) {
-				bFound = true;
-			}
-		}
-		if (bFound) {
-			continue;
-		}
-		for (int i = 0; i < nPackageItemCount; i++) {
-			category[packageItems[i]] = jsObj.value(packageItems[i]).toString();
-		}
-		arrPackage.append(category);
-	}
+	arrPackage = jsObj.value("msg").toArray();
 	return true;
 }
 

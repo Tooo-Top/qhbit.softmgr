@@ -1,6 +1,6 @@
 #ifndef DATACONTROL_H
 #define DATACONTROL_H
-
+#include <QJsonArray>
 #include "ConfOperation.h"
 #include "SoftwareList.h"
 
@@ -11,17 +11,17 @@ public:
 
 protected:
 	// -----------------------
-	mapSoftwareCategory _softCategory;  //category list
-	mapSoftwarePackages _softPackages;  //package list by category
-	lstSoftwarePackage  _softTopPackages;
-	lstSoftwarePackage  _softHotPackages;
+	QJsonArray _softCategory;  //category list
+	QMap<QString,QJsonArray> _softPackages;  //package list by category
+	QJsonArray  _softTopPackages;
+	QJsonArray  _softHotPackages;
 	// -----------------------
 	
 public:
-	mapSoftwareCategory &getSoftCategory();
-	mapSoftwarePackages &getSoftPackages();
-	lstSoftwarePackage  &getTopPackages();
-	lstSoftwarePackage  &getHotPackages();
+	QJsonArray &getSoftCategory();
+	QMap<QString, QJsonArray> &getSoftPackages();
+	QJsonArray  &getTopPackages();
+	QJsonArray  &getHotPackages();
 public:
 	bool initSoftCategory();
 	bool initSoftPackages();
