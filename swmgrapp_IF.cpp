@@ -14,8 +14,8 @@ void SwmgrApp::requestSoftCategoryList() {
     emit updateSoftCategory(_DataModel.getSoftCategory().toVariantList());
 }
 
-void SwmgrApp::requestHotList() {
-    emit updateHotList(_DataModel.getHotPackages().toVariantList());
+void SwmgrApp::requestExtraCategoryList() {
+    emit updateExtraCategoryList(_DataModel.getHotPackages().toVariantList());
 }
 
 void SwmgrApp::requestCategoryListByID(QString szCategoryID) {

@@ -21,12 +21,12 @@ VS_VERSION_INFO VERSIONINFO
         BEGIN
             BLOCK "080404b0"
             BEGIN
-                VALUE "CompanyName", "Hurricane Team."
+                VALUE "CompanyName", " Hurricane Team."
                 VALUE "FileDescription", "Windows Software Manager."
                 VALUE "FileVersion", "1.0.0.0"
                 VALUE "InternalName", "xbmgr.exe"
                 VALUE "LegalCopyright", "Copyright (C) 2015"
-                VALUE "LegalTrademarks" "Hurricane Team."
+                VALUE "LegalTrademarks" " Hurricane Team."
                 VALUE "OriginalFilename", "xbmgr.exe"
                 VALUE "ProductName", "Windows Software Manager"
                 VALUE "ProductVersion", "1.0.0.0"
