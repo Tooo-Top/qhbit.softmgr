@@ -22,6 +22,13 @@ void SwmgrApp::InitObjects() {
     QWebSettings::globalSettings()->setOfflineWebApplicationCacheQuota(0);
     QWebSettings::globalSettings()->setAttribute(QWebSettings::LocalContentCanAccessRemoteUrls, true);
     QWebSettings::globalSettings()->setAttribute(QWebSettings::LocalContentCanAccessFileUrls, true);
+    QString strCacheDir= GetProgramProfilePath(QString("xbsoftMgr")) + "\\BrowserCache";
+    QDir d(strCacheDir);
+    if(!d.exists()){
+        d.mkpath(strCacheDir);
+    }
+    QWebSettings::globalSettings()->enablePersistentStorage(strCacheDir);
+
 
     wndMain = new MainWnd();
     _webPage = new QWebPage();
