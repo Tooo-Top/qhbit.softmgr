@@ -84,6 +84,16 @@ QJsonObject UserInfo::toJsonObject() {
     return userObject;
 }
 
+void UserInfo::clean() {
+    this->init = "0xff";
+    this->username.clear();
+    this->password.clear();
+    this->usertoken.clear();
+    for (int i = 0; i < userinfoItemCount; i++) {
+        userPrivateInfo[userinfoItem[i]].clear();
+    }
+}
+
 size_t UserInfo::LoginCallback(char *buffer, size_t size, size_t nitems, void *outstream) {
 	QByteArray *response = (QByteArray *)outstream;
 	if (!response) {
@@ -149,10 +159,11 @@ void UserInfo::UserLogin(QString szUserName, QString szPassword) {
 	if (szUserName.isEmpty()) {
 		return ;
 	}
-
+    clean();
 	byCrypto = UserInfo::cryptPassword(szPassword);
 
 	this->username = szUserName;
+	this->init = "0";
 
 	POSTFIELDS=QString("%1=%2&%3=%4").arg("username").arg(this->username).arg("password").arg(QString(byCrypto));
 	szResult = postMethod(szUserLoginUrl.toStdString(), szCookieFile.toStdString(), POSTFIELDS.toStdString());
@@ -174,12 +185,10 @@ void UserInfo::UserLogin(QString szUserName, QString szPassword) {
 		}
 		else {
 			qDebug() << resObject.value("msg").toString();
-			this->init = "0";
 		}
 	}
 	else {
 		qDebug() << szResult;
-		this->init = "0";
 	}
 	this->serializeUserInfo(true);
 }
@@ -193,6 +202,8 @@ void UserInfo::RegistUser(QString szUserName, QString szPassword, QString szEmai
 	if (szUserName.isEmpty()){
 		return;
 	}
+    clean();
+
 	byCrypto = UserInfo::cryptPassword(szPassword);
 	POSTFIELDS = QString("%1=%2&%3=%4&%5=%6").arg("username").arg(szUserName).arg("password").arg(QString(byCrypto)).arg("email").arg(szEmail);
 	szResult = postMethod(szUserRegisteUrl.toStdString(), szCookieFile.toStdString(), POSTFIELDS.toStdString());
@@ -205,13 +216,15 @@ void UserInfo::RegistUser(QString szUserName, QString szPassword, QString szEmai
 			qDebug() << L"×¢²á³É¹¦";
 			this->init = "0";
 			this->username = szUserName;
-			this->serializeUserInfo(true);
 		}
 		else {
 			qDebug() << resObject.value("msg").toString();
+            this->init="1";
+            this->username = szUserName;
 		}
 	}
 	else {
 		qDebug() << szResult;
 	}
+    this->serializeUserInfo(true);
 }

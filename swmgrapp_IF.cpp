@@ -79,7 +79,7 @@ void SwmgrApp::requestPackageInfoByID(QString szCategoryID,QString szPackageID) 
 
 void SwmgrApp::requestRegisteUser(QString username,QString password,QString email) {
     _user.RegistUser(username,password,email);
-    emit updateRegisteUser(QVariant());
+    emit updateRegisteUser(_user.toJsonObject().toVariantMap());
 }
 
 void SwmgrApp::requestLoginUser(QString username,QString password) {
