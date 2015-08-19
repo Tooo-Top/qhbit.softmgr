@@ -14,39 +14,60 @@ void SwmgrApp::requestSoftCategoryList() {
     emit updateSoftCategory(_DataModel.getSoftCategory().toVariantList());
 }
 
-void SwmgrApp::requestExtraCategoryList(QString szCategoryID) {
+void SwmgrApp::requestExtraCategoryList(QString szCategoryID,int pageNumber,int count) {
+    int pageTotol = 0;
 	QJsonArray content;
+    QJsonArray *curCatorgoryList=NULL;
+    if (pageNumber<1) { pageNumber=1; }
+    if (count<=0) { count=20; }
+
     if (szCategoryID.compare("hot",Qt::CaseInsensitive)==0) {
-        for (int i = 0;i < _DataModel.getHotPackages().size()&& i<20;i++) {
-            content.append(_DataModel.getHotPackages().at(i));
-        }
-        emit updateExtraCategoryList(szCategoryID, content.toVariantList());
+        curCatorgoryList = &(_DataModel.getHotPackages());
     }
     else if (szCategoryID.compare("top",Qt::CaseInsensitive)==0){
-        for (int i = 0;i < _DataModel.getTopPackages().size()&& i<20;i++) {
-            content.append(_DataModel.getTopPackages().at(i));
-        }
-        emit updateExtraCategoryList(szCategoryID, content.toVariantList());
+        curCatorgoryList = &(_DataModel.getHotPackages());
     }
     else {
-        emit updateExtraCategoryList(szCategoryID, content.toVariantList());
+        emit updateExtraCategoryList(szCategoryID, content.toVariantList(),0,pageNumber);
+		return ;
     }
+
+    if (curCatorgoryList->size() <=0) {
+        emit updateExtraCategoryList(szCategoryID, content.toVariantList(),0,pageNumber);
+        return ;
+    }
+    pageTotol = curCatorgoryList->size()/count + ((curCatorgoryList->size()%count)>0 ? 1: 0);
+    if (pageNumber>pageTotol) { pageNumber = pageTotol; }
+
+    for (int i = (pageNumber-1)*count + 0;i < curCatorgoryList->size()&& i<((pageNumber-1)*count+20);i++) {
+        content.append(curCatorgoryList->at(i));
+    }
+    emit updateExtraCategoryList(szCategoryID, content.toVariantList(),pageTotol,pageNumber);
 }
 
-void SwmgrApp::requestCategoryListByID(QString szCategoryID) {
+void SwmgrApp::requestCategoryListByID(QString szCategoryID,int pageNumber,int count) {
     // get someone category list
+    int pageTotol = 0;
+	QJsonArray currentPage;
+
+    if (pageNumber<1) { pageNumber=1; }
+    if (count<=0) { count=20; }
+
     QMap<QString, QJsonArray>::Iterator curItem = _DataModel.getSoftPackages().find(szCategoryID);
     if ( curItem != _DataModel.getSoftPackages().end() ) {
-        emit updateCategoryListForID(szCategoryID, curItem.value().toVariantList());
+        QJsonArray &appData = curItem.value();
+        pageTotol = appData.size()/count + ((appData.size()%count)>0 ? 1: 0);
+        for(int i=(pageNumber-1)*count + 0; i<((pageNumber-1)*count+20) && i< appData.size();i++) {
+            currentPage.append(appData.at(i));
+        }
     }
+    emit updateCategoryListForID(szCategoryID, currentPage.toVariantList(),pageTotol,pageNumber);
 }
 
 void SwmgrApp::requestPackageInfoByID(QString szCategoryID,QString szPackageID) {
     QMap<QString, QJsonArray>::Iterator curItem = _DataModel.getSoftPackages().find(szCategoryID);
     if (curItem!=_DataModel.getSoftPackages().end()) {
-        QJsonArray lstSoftPkg = curItem.value();
-
-        foreach(QJsonValue it,lstSoftPkg) {
+        foreach(QJsonValue it,curItem.value()) {
             if (it.toObject().value("id").toString().compare(szPackageID,Qt::CaseInsensitive)==0) {
                 emit updatePackageInfoByID(it.toObject().toVariantMap());
                 break;

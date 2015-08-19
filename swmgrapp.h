@@ -136,8 +136,8 @@ public slots:
 // For UI interface begin
 signals:
     void updateSoftCategory(QVariantList swCategory);//for software category
-    void updateExtraCategoryList(QString szCategoryID,QVariantList swCategory); //for top/hot/other... list
-    void updateCategoryListForID(QString szCategoryID,QVariantList swCategory); //for someone category list
+    void updateExtraCategoryList(QString szCategoryID,QVariantList swCategory,int pageTotal,int pageNumber); //for top/hot/other... list
+    void updateCategoryListForID(QString szCategoryID,QVariantList swCategory,int pageTotal,int pageNumber); //for someone category list
     void updatePackageInfoByID(QVariantMap swObject); //for someone package info
 
     //about user
@@ -154,8 +154,8 @@ signals:
 public slots:
     //about software
     void requestSoftCategoryList();
-    void requestExtraCategoryList(QString szCategoryID);//fetch top/hot/other category packages list
-    void requestCategoryListByID(QString szCategoryID);
+    void requestExtraCategoryList(QString szCategoryID,int pageNumber=0,int count=0);//fetch top/hot/other category packages list
+    void requestCategoryListByID(QString szCategoryID,int pageNumber=0,int count=0);
     void requestPackageInfoByID(QString szCategoryID,QString szPackageID);
 
     //about user
