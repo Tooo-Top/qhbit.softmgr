@@ -41,7 +41,8 @@ BOOL SwmgrApp::InitAppEnv() {
     InitNoticeServer();
     InitWnd();
     StartPoll();
-    _user.UserLogin("xiehc", "password");
+    _user.serializeUserInfo();
+//    _user.UserLogin("xiehc", "password");
 
     return TRUE;
 }

@@ -90,6 +90,8 @@ protected:
 
     // -----------------------
     MainWnd *wndMain;
+    QWebView *myBrowser;
+	QWebPage *myBrowserPage;
     QWebPage *_webPage;
 	// -----------------------
 	QLocalServer *srvLaunchInst;
@@ -160,7 +162,7 @@ public slots:
 
     //about user
     void requestRegisteUser(QString username,QString password,QString email);
-    void requestLoginUser(QString username,QString password){}
+    void requestLoginUser(QString username,QString password);
     void requestModifyUserInfo(QVariant userinfo){}
 
     //soft package operation

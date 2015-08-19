@@ -33,6 +33,8 @@ void SwmgrApp::InitObjects() {
     wndMain = new MainWnd();
     _webPage = new QWebPage();
     wndMain->setPage(_webPage);
+    myBrowser = new QWebView();
+    myBrowserPage = new QWebPage();
 }
 
 void SwmgrApp::InitIcons() {
@@ -120,5 +122,9 @@ void SwmgrApp::execOpenSystemBrowser(QString urlAddress){
  * @param windowHeight
  */
 void SwmgrApp::execOpenPopBrowser(QString urlAddress, int windowWidth, int windowHeight){
-
+    if (myBrowserPage) {
+        myBrowserPage->mainFrame()->load(urlAddress);
+        myBrowserPage->view()->setGeometry(myBrowserPage->view()->geometry().x(),myBrowserPage->view()->y(),windowWidth,windowHeight);
+        myBrowserPage->view()->show();
+    }
 }

@@ -58,7 +58,7 @@ void UserInfo::serializeUserInfo(bool bSerialize) {
 			doc = QJsonDocument::fromJson(fileBuf);
 			saveFile.close();
 		}
-		if (!doc.isEmpty() || !doc.isObject()) {
+		if ( doc.isEmpty() || !doc.isObject() ) {
 			return;
 		}
 		jsUserInfo = doc.object();
@@ -70,6 +70,18 @@ void UserInfo::serializeUserInfo(bool bSerialize) {
 			userPrivateInfo[userinfoItem[i]] = jsUserInfo.contains(userinfoItem[i]) ? jsUserInfo.value(userinfoItem[i]).toString() : QString("");
 		}
 	}
+}
+
+QJsonObject UserInfo::toJsonObject() {
+    QJsonObject userObject;
+    userObject["init"] = QJsonValue(init);
+    userObject["username"] = QJsonValue(username);
+    userObject["password"] = QJsonValue(password);
+    userObject["token"] = QJsonValue(usertoken);
+    for (int i = 0; i < userinfoItemCount; i++) {
+        userObject[userinfoItem[i]] = userPrivateInfo.contains(userinfoItem[i]) ? userPrivateInfo[userinfoItem[i]] : QString("");
+    }
+    return userObject;
 }
 
 size_t UserInfo::LoginCallback(char *buffer, size_t size, size_t nitems, void *outstream) {

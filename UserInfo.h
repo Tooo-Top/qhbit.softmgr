@@ -23,8 +23,10 @@ protected:
 	static QByteArray cryptPassword(QString szPassword);
 public:
 	void serializeUserInfo(bool bSerialize=false);
-	QString postMethod(std::string url, std::string cookieFile, std::string post);
-public:
+    QJsonObject toJsonObject();
+
+protected:
+    QString postMethod(std::string url, std::string cookieFile, std::string post);
 	static size_t LoginCallback(char *buffer, size_t size, size_t nitems, void *outstream);
 signals:
 

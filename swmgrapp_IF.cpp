@@ -6,6 +6,7 @@ void SwmgrApp::docLoadFinish(bool ok) {
     if (ok) {
 //        wndMain->setFixedSize(_webPage->mainFrame()->contentsSize());
 //        wndMain->page()->mainFrame()->evaluateJavaScript("document.documentElement.style.webkitUserSelect='none';");
+        emit updateLoginUser(_user.toJsonObject().toVariantMap());
     }
 }
 
@@ -79,6 +80,11 @@ void SwmgrApp::requestPackageInfoByID(QString szCategoryID,QString szPackageID) 
 void SwmgrApp::requestRegisteUser(QString username,QString password,QString email) {
     _user.RegistUser(username,password,email);
     emit updateRegisteUser(QVariant());
+}
+
+void SwmgrApp::requestLoginUser(QString username,QString password) {
+    _user.UserLogin(username,password);
+    emit updateLoginUser(_user.toJsonObject().toVariantMap());
 }
 
 void SwmgrApp::requestCanUninstallPackages() {
