@@ -14,8 +14,23 @@ void SwmgrApp::requestSoftCategoryList() {
     emit updateSoftCategory(_DataModel.getSoftCategory().toVariantList());
 }
 
-void SwmgrApp::requestExtraCategoryList() {
-    emit updateExtraCategoryList(_DataModel.getHotPackages().toVariantList());
+void SwmgrApp::requestExtraCategoryList(QString szCategoryID) {
+	QJsonArray content;
+    if (szCategoryID.compare("hot",Qt::CaseInsensitive)==0) {
+        for (int i = 0;i < _DataModel.getHotPackages().size()&& i<20;i++) {
+            content.append(_DataModel.getHotPackages().at(i));
+        }
+        emit updateExtraCategoryList(szCategoryID, content.toVariantList());
+    }
+    else if (szCategoryID.compare("top",Qt::CaseInsensitive)==0){
+        for (int i = 0;i < _DataModel.getTopPackages().size()&& i<20;i++) {
+            content.append(_DataModel.getTopPackages().at(i));
+        }
+        emit updateExtraCategoryList(szCategoryID, content.toVariantList());
+    }
+    else {
+        emit updateExtraCategoryList(szCategoryID, content.toVariantList());
+    }
 }
 
 void SwmgrApp::requestCategoryListByID(QString szCategoryID) {

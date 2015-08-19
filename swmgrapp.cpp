@@ -129,6 +129,9 @@ void SwmgrApp::launchInstall() {
 		return;
 	}
 	jsAddInstallObject = jsDoc.object();
+
+	if (wndMain != NULL)
+		wndMain->show();
     emit sigInstaller(jsAddInstallObject);
 }
 
