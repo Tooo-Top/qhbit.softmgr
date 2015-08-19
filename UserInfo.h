@@ -14,7 +14,12 @@ class UserInfo : public QObject
 public:
     explicit UserInfo(QObject *parent = 0);
 protected:
-	QString init;
+    // property "init":
+    // 0xff:all informatin uninitialize;
+    // 0:only has 'username';
+    // 1:have 'username,password',but not login;
+    // 2:have 'username,password' already login
+    QString init;
 	QString username;
 	QString password;
 	QString usertoken;
@@ -26,6 +31,7 @@ public:
     QJsonObject toJsonObject();
 
 protected:
+    void clean();
     QString postMethod(std::string url, std::string cookieFile, std::string post);
 	static size_t LoginCallback(char *buffer, size_t size, size_t nitems, void *outstream);
 signals:
