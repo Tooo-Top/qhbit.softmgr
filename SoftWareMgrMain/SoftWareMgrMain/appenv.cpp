@@ -94,3 +94,34 @@ BOOL WStringToString(const std::wstring &wstr, std::string &str)
 
 	return TRUE;
 }
+
+BOOL UTF8ToWString(const std::string &str, std::wstring &wstr)
+{
+	int nLen = (int)str.size(); 
+	nLen = (int)WideCharToMultiByte(CP_UTF8, 0, (LPCWSTR)wstr.c_str(), nLen, NULL, 0, NULL, NULL);
+	wstr.resize(nLen, L' ');
+
+	int nResult = MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)str.c_str(), nLen, (LPWSTR)wstr.c_str(), nLen);
+
+	if (nResult == 0) {
+		return FALSE;
+	}
+
+	return TRUE;
+}
+//wstring高字节不为0，返回FALSE
+BOOL WStringToUTF8(const std::wstring &wstr, std::string &str)
+{
+	int nLen = (int)wstr.length();
+
+	str.resize(nLen, ' ');
+
+	int nResult = WideCharToMultiByte(CP_ACP, 0, (LPCWSTR)wstr.c_str(), nLen, (LPSTR)str.c_str(), nLen, NULL, NULL);
+
+	if (nResult == 0)
+	{
+		return FALSE;
+	}
+
+	return TRUE;
+}

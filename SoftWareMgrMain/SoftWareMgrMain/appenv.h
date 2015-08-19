@@ -15,5 +15,6 @@ void InitDir();
 
 BOOL StringToWString(const std::string &str, std::wstring &wstr);
 BOOL WStringToString(const std::wstring &wstr, std::string &str);
+BOOL UTF8ToWString(const std::string &str, std::wstring &wstr);
 
 #endif // APPENV_H

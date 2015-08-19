@@ -289,7 +289,7 @@ int tickUserTokon(LPUserInfo pUserInfo) {
 			if (r.parse(szBuf, retObject)) {
 				if (retObject.isMember("code") && retObject["code"].isInt() && retObject.isMember("msg") && retObject["msg"].isInt()) {
 					if (retObject["code"].asInt() == 0) {
-						nRetval = retObject["msg"].asInt();
+						nRetval = retObject["msg"].asInt()*1000;
 					}
 					else if (retObject["code"].asInt() == 1) {
 						pUserInfo->userToken = "";
@@ -345,7 +345,7 @@ int autoUserLogin(LPUserInfo pUserInfo) {
 						pUserInfo->init = "2";
 						if (retObject["msg"].isMember("token")) {
 							pUserInfo->userToken = retObject["msg"].isMember("token")&&retObject["msg"]["token"].isString() ? retObject["msg"]["token"].asString() : "";
-							std::cout << "autoUserLogin : msg field=" << pUserInfo->userToken << std::endl;
+							//std::cout << "autoUserLogin : msg field=" << pUserInfo->userToken << std::endl;
 						}
 						for (int i = 0; i < userinfoitem_count; i++){
 							pUserInfo->userPrivateInfo[userinfoItem[i]] = retObject["msg"].isMember(userinfoItem[i]) && retObject["msg"][userinfoItem[i]].isString() ? retObject["msg"][userinfoItem[i]].asString() : "";
@@ -365,33 +365,42 @@ int autoUserLogin(LPUserInfo pUserInfo) {
 	return nRetval;
 }
 
+void StartDirMonitor(std::string &userDatPath,char *chBuf,DWORD chSize, DWORD &dwDirNotify,HANDLE evtSignal, HANDLE &hDir, OVERLAPPED &op) {
+	op.hEvent = evtSignal;
+	op.Internal = 0;
+	op.InternalHigh = 0;
+	op.Offset = 0;
+	op.OffsetHigh = 0;
+	dwDirNotify = 0;
+	memset(chBuf, '\0', chSize);
+	ReadDirectoryChangesW(hDir, chBuf, chSize, FALSE, FILE_NOTIFY_CHANGE_CREATION | FILE_NOTIFY_CHANGE_LAST_WRITE | FILE_NOTIFY_CHANGE_SIZE, &dwDirNotify, &op, NULL);
+}
+
 DWORD SoftListProc(PThreadCtrl pThrdCtrl) {
 	bool bOpenFileMonitor = false; // for need open monitor user.dat
 	bool bCreateShellLink = false;// for check shell link -- create
+	bool bConfigInited = false;
 
 	bool autoLogin = false;  // auto login
 	bool userContinueToken = false;    // continue token
 
 	DWORD waitRet = WAIT_FAILED;
 
+	DWORD dwConstPerTimeWait = 10;         // 100 ms;
+	DWORD dwConstIdle = 100;
 
-	DWORD dwConstPerTimeWait = 50;         // 100 ms;
-	DWORD dwConstIdle = 200;
+	LONGLONG dwConstWaitTimerUse = -10000; //1 ms
 
-	DWORD dwConstTickTokenWait = 10000;//1200000;   // 20 min  for continue token
-	DWORD dwConstAutoLoginTimeWait = 10000;//180000;// 3 min
-	DWORD dwConstUpdateSoftList = 3600000;  // 1 hour
-
+	LONG dwConstTickTokenWait = 20*60*1000;   // 20 min  for continue token
+	LONG dwConstAutoLoginTimeWait = 3*60*1000;// 3 min
+	LONG dwConstUpdateSoftList = 60*60*1000;  // 1 hour
 
 	DWORD dwTickCountCur = GetTickCount();   // current time
-	DWORD dwTickTokenCount = dwTickCountCur; // for continue token
-	DWORD dwTickCountUpdate = dwTickCountCur;  // update software list
-	DWORD dwTickCountAutoLogin = dwTickCountCur; // for next auto login
 
 	DWORD dwTickLoopIdle = dwTickCountCur; // for common idle
 	DWORD dwTickLoopIdleLower = dwTickCountCur; // for lower common idle
 
-	UserInfo userInfo;
+	UserInfo userInfo,priv_userInfo;
 	lstPackageDetails lstUserPackages;
 
 	OVERLAPPED op;
@@ -402,6 +411,7 @@ DWORD SoftListProc(PThreadCtrl pThrdCtrl) {
 	int nNextTickToken = -1;
 	std::vector<std::string> iconDownTask;
 	std::string userDatPath = GetProgramProfilePath("xbsoftMgr") + "\\Data";
+
 	_mkdir(userDatPath.data()); // path is exist. sure
 	unsigned char waitHandleCnt = 0;
 	HANDLE waitHandles[20] = { INVALID_HANDLE_VALUE, INVALID_HANDLE_VALUE };
@@ -410,107 +420,121 @@ DWORD SoftListProc(PThreadCtrl pThrdCtrl) {
 	waitHandles[2] = CreateEvent(NULL, TRUE, FALSE, NULL); waitHandleCnt++;
 	waitHandles[3] = CreateEvent(NULL, TRUE, FALSE, NULL); waitHandleCnt++;
 	waitHandles[4] = CreateEvent(NULL, TRUE, FALSE, NULL); waitHandleCnt++;
-	waitHandles[5] = CreateEvent(NULL, TRUE, TRUE, NULL); waitHandleCnt++;
+	waitHandles[5] = CreateEvent(NULL, TRUE, TRUE, NULL);  waitHandleCnt++;//load user info
 	waitHandles[6] = CreateEvent(NULL, TRUE, FALSE, NULL); waitHandleCnt++;
 	waitHandles[7] = CreateEvent(NULL, TRUE, FALSE, NULL); waitHandleCnt++;
 	waitHandles[8] = CreateEvent(NULL, TRUE, FALSE, NULL); waitHandleCnt++;
 	waitHandles[9] = CreateEvent(NULL, TRUE, FALSE, NULL); waitHandleCnt++;
+	waitHandles[10] = CreateWaitableTimer(NULL, FALSE, NULL); waitHandleCnt++;
+	waitHandles[11] = CreateWaitableTimer(NULL, FALSE, NULL); waitHandleCnt++;
+	waitHandles[12] = CreateWaitableTimer(NULL, FALSE, NULL); waitHandleCnt++;
+	LARGE_INTEGER liDueTimeer_1, liDueTimeer_2, liDueTimeer_3;
 
+	liDueTimeer_1.QuadPart = dwConstWaitTimerUse *dwConstAutoLoginTimeWait;
+	SetWaitableTimer(waitHandles[10], &liDueTimeer_1, dwConstAutoLoginTimeWait, NULL, NULL, FALSE);
+	
+	liDueTimeer_2.QuadPart = dwConstWaitTimerUse *dwConstTickTokenWait;
+	SetWaitableTimer(waitHandles[11], &liDueTimeer_2, dwConstTickTokenWait, NULL, NULL, FALSE);
+	
+	liDueTimeer_3.QuadPart = dwConstWaitTimerUse *dwConstUpdateSoftList;
+	SetWaitableTimer(waitHandles[12], &liDueTimeer_3, dwConstUpdateSoftList, NULL, NULL, FALSE);
+	
 	software_cache_init();
 	while (true) { // run loop
 		if (bOpenFileMonitor) {
 			bOpenFileMonitor = false;
 			if (hDir == INVALID_HANDLE_VALUE) {
 				_mkdir(userDatPath.data());
-				hDir = ::CreateFileA(userDatPath.data(), GENERIC_READ | GENERIC_WRITE | FILE_LIST_DIRECTORY,    // 访问(读/写)模式 
-					FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED, NULL);
-				op.hEvent = waitHandles[1];
-				op.Internal = 0;
-				op.InternalHigh = 0;
-				op.Offset = 0;
-				op.OffsetHigh = 0;
-				ReadDirectoryChangesW(hDir, chBuf, 1024, FALSE, FILE_NOTIFY_CHANGE_CREATION | FILE_NOTIFY_CHANGE_LAST_WRITE | FILE_NOTIFY_CHANGE_SIZE, &dwDirNotify, &op, NULL);
+				hDir = ::CreateFileA(userDatPath.data(), GENERIC_READ | GENERIC_WRITE | FILE_LIST_DIRECTORY,
+					FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, OPEN_EXISTING, 
+					FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED, NULL);
+				StartDirMonitor(userDatPath, (char *)chBuf, 1024, dwDirNotify, waitHandles[1], hDir, op);
 			}
 		}
 
 		waitRet = WaitForMultipleObjects(waitHandleCnt, waitHandles, FALSE, dwConstPerTimeWait);  // per 1min
 		dwTickCountCur = GetTickCount();
-		if (waitRet == WAIT_FAILED){
-			break;
-		}
-		else if (waitRet == WAIT_OBJECT_0) {
-			ResetEvent(waitHandles[0]);
-			break;
-		}
+		if (waitRet == WAIT_FAILED){ break; }
+		else if (waitRet == WAIT_OBJECT_0) { ResetEvent(waitHandles[0]); break; }
 		else if (waitRet == WAIT_OBJECT_0 + 1) { // monitor user.data be modify
 			ResetEvent(waitHandles[1]);
 
 			PFILE_NOTIFY_INFORMATION pFNI = (PFILE_NOTIFY_INFORMATION)chBuf;
 			if (pFNI->Action == FILE_ACTION_MODIFIED && pFNI->NextEntryOffset == 0) {
-				std::wcout << "pFNI->NextEntryOffset:" << pFNI->NextEntryOffset << L";FILE_ACTION_MODIFIED:" << pFNI->FileName << std::endl;
-				if (_wcsicmp(pFNI->FileName, L"user.data") == 0) {
+				if (_wcsicmp(pFNI->FileName, L"user.dat") == 0) {
+					std::wcout << "pFNI->NextEntryOffset:" << pFNI->NextEntryOffset << L";FILE_ACTION_MODIFIED:" << pFNI->FileName << std::endl;
 					SetEvent(waitHandles[5]);
 				}
 				else if (_wcsicmp(pFNI->FileName, L"userRestoreSoft.list") == 0) {
+					std::wcout << "pFNI->NextEntryOffset:" << pFNI->NextEntryOffset << L";FILE_ACTION_MODIFIED:" << pFNI->FileName << std::endl;
 					SetEvent(waitHandles[6]);
 				}
 			}
-
-			dwDirNotify = 0;
-			op.hEvent = waitHandles[1];
-			op.Internal = 0;
-			op.InternalHigh = 0;
-			op.Offset = 0;
-			op.OffsetHigh = 0;
-			memset(chBuf, '\0', 1024);
-			ReadDirectoryChangesW(hDir, chBuf, 1024, FALSE,	FILE_NOTIFY_CHANGE_CREATION | FILE_NOTIFY_CHANGE_LAST_WRITE | FILE_NOTIFY_CHANGE_SIZE, &dwDirNotify, &op, NULL);
+			StartDirMonitor(userDatPath, (char *)chBuf, 1024, dwDirNotify, waitHandles[1], hDir, op);
 		}
 		else if (waitRet == WAIT_OBJECT_0 + 2) { //update config
 			ResetEvent(waitHandles[2]);
+			std::cout << "update config" << std::endl;
+
 			FetchConfigList();
 			software_cache_init(1);
-			std::cout << "update config" << std::endl;
-			dwTickCountUpdate = dwTickCountCur + dwConstUpdateSoftList;
+			bConfigInited = false;
+			liDueTimeer_3.QuadPart = dwConstWaitTimerUse * dwConstUpdateSoftList; 
+			SetWaitableTimer(waitHandles[12], &liDueTimeer_3, dwConstUpdateSoftList, NULL, NULL, FALSE);
 			bCreateShellLink = true;
 		}
 		else if (waitRet == WAIT_OBJECT_0 + 3) {
 			ResetEvent(waitHandles[3]);
-			software_cache_idle();
-			std::cout << "software_cache_idle" << std::endl;
+			bool status = false;
+			software_cache_idle(status);
+			if (!bConfigInited) {
+				if (status) {
+					bConfigInited = true;
+					SetEvent(waitHandles[6]);
+				}
+			}
 		}
 		else if (waitRet == WAIT_OBJECT_0 + 4) {
 			ResetEvent(waitHandles[4]);
 			software_cache_idle_lower();
-			std::cout << "software_cache_idle_lower" << std::endl;
 		}
 		else if (waitRet == WAIT_OBJECT_0 + 5) { 
 			// use to load user info 
-			std::cout << "use to load user info" << std::endl;
 			ResetEvent(waitHandles[5]);
+			std::cout << "use to load user info" << std::endl;
 			if (hDir != INVALID_HANDLE_VALUE) {
 				CloseHandle(hDir);
 				ResetEvent(waitHandles[1]);
 				hDir = INVALID_HANDLE_VALUE;
 				bOpenFileMonitor = false;
 			}
+			priv_userInfo = userInfo;
 
 			if (GetUserInfo(&userInfo) == 0){
-				if (userInfo.init.compare("0xff") == 0 || userInfo.init.compare("0") == 0) { // user name and password not initialize
-					bOpenFileMonitor = true;
+				if (priv_userInfo.init.compare(userInfo.init) != 0) { //status changed.
+					if (userInfo.init.compare("1") == 0) { // username and password is initialize need auto login
+						// change user name or password ??
+						if (priv_userInfo.userName.compare(userInfo.userName) != 0 || priv_userInfo.userPassword.compare(userInfo.userPassword)!=0) {
+							//==start auto login==
+							SetEvent(waitHandles[7]);
+						}
+					}
+					else if (userInfo.init.compare("2") == 0) { // user already login need continue token
+						// change user name or password ??
+						if (priv_userInfo.userName.compare(userInfo.userName) != 0 || priv_userInfo.userPassword.compare(userInfo.userPassword)!=0) {
+							//==start auto login==
+							SetEvent(waitHandles[7]);
+						}
+						else {
+							userContinueToken = true;
+							//SetEvent(waitHandles[8]);
+							liDueTimeer_2.QuadPart = dwConstWaitTimerUse * dwConstTickTokenWait; //1s
+							SetWaitableTimer(waitHandles[11], &liDueTimeer_2, dwConstTickTokenWait, NULL, NULL, FALSE);
+						}
+					}
 				}
-				else if (userInfo.init.compare("1") == 0) { // username and password is initialize need auto login
-					//autoLogin = true; //start auto login
-					SetEvent(waitHandles[7]);
-					dwTickCountAutoLogin = dwTickCountCur + dwConstAutoLoginTimeWait;
-				}
-				else if (userInfo.init.compare("2") == 0) { // user already login need continue token
-					userContinueToken = true;
-//					SetEvent(waitHandles[8]);
-					dwTickTokenCount = dwTickCountCur + dwConstTickTokenWait;
-				}
-				else { bOpenFileMonitor = true;}
 			}
-			else {bOpenFileMonitor = true;}
+			bOpenFileMonitor = true;
 		}
 		else if (waitRet == WAIT_OBJECT_0 + 6) {
 			// load reload desktop shelllink define
@@ -539,14 +563,16 @@ DWORD SoftListProc(PThreadCtrl pThrdCtrl) {
 			if (nNextTickToken > 0) {
 				autoLogin = false; // close auto login
 				userContinueToken = true; // open continue token
-				dwTickTokenCount = dwTickCountCur + nNextTickToken*1000;//dwConstTickTokenWait;//
+				liDueTimeer_2.QuadPart = dwConstWaitTimerUse * nNextTickToken ;
+				SetWaitableTimer(waitHandles[11], &liDueTimeer_2, nNextTickToken , NULL, NULL, FALSE);
 			}
 			else {
 				bOpenFileMonitor = true;
 			}
 			// need next auto login
 			if (autoLogin) {
-				dwTickCountAutoLogin = dwTickCountCur + dwConstAutoLoginTimeWait;
+				liDueTimeer_1.QuadPart = dwConstWaitTimerUse *dwConstAutoLoginTimeWait;
+				SetWaitableTimer(waitHandles[10], &liDueTimeer_1, dwConstAutoLoginTimeWait, NULL, NULL, FALSE);
 			}
 		}
 		else if (waitRet == WAIT_OBJECT_0 + 8) {
@@ -556,70 +582,57 @@ DWORD SoftListProc(PThreadCtrl pThrdCtrl) {
 			std::cout << "use to touch token" << std::endl;
 			nNextTickToken = tickUserTokon(&userInfo);
 			if (nNextTickToken > 0) {  // ok  next continue token
-				dwTickTokenCount = dwTickCountCur +  nNextTickToken*1000;//dwConstTickTokenWait;//
+				liDueTimeer_2.QuadPart = dwConstWaitTimerUse *nNextTickToken ; 
+				SetWaitableTimer(waitHandles[11], &liDueTimeer_2, nNextTickToken , NULL, NULL, FALSE);
 			}
 			else {  //error
 				// need relogin
 				userContinueToken = false;// close continue token
 				autoLogin = true;
-				dwTickCountAutoLogin = dwTickCountCur + dwConstAutoLoginTimeWait;
+				liDueTimeer_1.QuadPart = dwConstWaitTimerUse *dwConstAutoLoginTimeWait;
+				SetWaitableTimer(waitHandles[10], &liDueTimeer_1, dwConstAutoLoginTimeWait, NULL, NULL, FALSE);
 			}
 		}
-		else if (waitRet == WAIT_OBJECT_0 + 9){
-			//not used
-			ResetEvent(waitHandles[9]);
+		else if (waitRet == WAIT_OBJECT_0 + 9){	ResetEvent(waitHandles[9]); }
+		//=== timer
+		else if (waitRet == WAIT_OBJECT_0 + 10){ 
+			std::cout << "timer 1" << std::endl;
+			if (autoLogin) {
+				SetEvent(waitHandles[7]);
+			}
 		}
+		else if (waitRet == WAIT_OBJECT_0 + 11){
+			std::cout << "timer 2" << std::endl;
+			if (userContinueToken) {
+				SetEvent(waitHandles[8]);
+			}
+		}
+		else if (waitRet == WAIT_OBJECT_0 + 12){std::cout << "timer 3" << std::endl;SetEvent(waitHandles[2]);}
+		//=== idle
 		else if (waitRet == WAIT_TIMEOUT) {
 			// for update software list
 			software_cache_load();
-			if (dwTickCountCur > dwTickLoopIdle) {
-				SetEvent(waitHandles[3]);
-				dwTickLoopIdle = dwTickCountCur + dwConstIdle; // for common idle
-			}
-			else if (dwTickCountCur > dwTickLoopIdleLower) {
-				SetEvent(waitHandles[4]);
-				dwTickLoopIdleLower = dwTickCountCur + dwConstIdle * 5; // for lower common idle
-			}
+			if (dwTickCountCur > dwTickLoopIdle) { SetEvent(waitHandles[3]); dwTickLoopIdle = dwTickCountCur + dwConstIdle; }// for common idle
+			if (dwTickCountCur > dwTickLoopIdleLower) { SetEvent(waitHandles[4]); dwTickLoopIdleLower = dwTickCountCur + dwConstIdle * 5; }// for lower common idle
 
-			if ( dwTickCountCur > dwTickCountUpdate ) { // first launch or per 1 hour
-				SetEvent(waitHandles[2]);//start update config
+			if (bCreateShellLink) {
+				// create shelllink on desktop
+				if (lstUserPackages.size() > 0) {
+					bCreateShellLink = CreateShellLinkForRecommend(lstUserPackages) ? false : true; // all shelllink be created
+				}
+				else {
+					bCreateShellLink = false;
+				}
 			}
-			//if (bUserselfSoftwareListDirty) {
-			//	bUserselfSoftwareListDirty = false;
-			//	lstUserPackages.clear();
-			//	if (UserLoginRestore()) {
-			//		;// load userself software list
-			//	}
-			//	else {
-			//		LoadTopConfigList(lstUserPackages);
-			//	}
-			//	bCreateShellLink = true;
-			//}
-			//if (bCreateShellLink) {
-			//	// create shelllink on desktop
-			//	if (lstUserPackages.size() > 0) {
-			//		bCreateShellLink = CreateShellLinkForRecommend(lstUserPackages) ? false : true; // all shelllink be created
-			//	}
-			//	else {
-			//		bCreateShellLink = false;
-			//	}
-			//}
-
-			//-------for user autologin And continue token---------------------------begin
-			// for auto login
-			if ( autoLogin && dwTickCountCur > dwTickCountAutoLogin ) {
-				SetEvent(waitHandles[7]);
-			}
-			// for token continue
-			if (userContinueToken && dwTickCountCur > dwTickTokenCount) {
-				SetEvent(waitHandles[8]);
-			}
-			//-------for user autologin And continue token---------------------------end
 		}
 	} // end loop
 
 	SetEvent(pThrdCtrl->m_hEvent[1]);
-	if (waitHandles[1] != INVALID_HANDLE_VALUE) CloseHandle(waitHandles[1]);
+	for (int i = 1; i < waitHandleCnt; i++) {
+		if (waitHandles[i] != INVALID_HANDLE_VALUE) 
+			CloseHandle(waitHandles[1]);
+		waitHandles[i] = INVALID_HANDLE_VALUE;
+	}
 	if (hDir != INVALID_HANDLE_VALUE) CloseHandle(hDir);
 	return 0;
 }
@@ -731,7 +744,7 @@ BOOL UpdateShellLinkOfRepository(commonItems &item){
 	if (!bFoundItem) {
 		ShellLinkName = item["name"]+".lnk";
 
-		IconName = item["id"]+".ico";
+		IconName = item["id"]+".png";
 
 		if (CreateShellLink(Programe, item["id"], item["category"], ShellLinkName, IconName, item["description"])) {
 			obj["id"] = item["id"];
@@ -1109,115 +1122,23 @@ BOOL chkCategoryPackageDetailItem(Json::Value &__jsonPkgItem) {
 	return TRUE;
 }
 
-//BOOL ParseCategoryList(mapCategory &category) {
-//	std::string BaseDir, dataDir;
-//	Json::Reader r(Json::Features::strictMode());
-//	std::ifstream fJson;
-//	Json::Value	__jsonRoot,categoryItem;
-//	LONGLONG code = 0;
-//
-//	BaseDir = GetProgramProfilePath("xbsoftMgr");
-//	dataDir = BaseDir + "\\Data\\SoftwareCategoryAll.list";
-//
-//	if (!PathFileExistsA(dataDir.data())) {
-//		return FALSE;
-//	}
-//	fJson.open(dataDir);
-//	if (!fJson.is_open() || !r.parse(fJson, __jsonRoot, false) || !__jsonRoot.isObject()) {
-//		return FALSE;
-//	}
-//	if (!__jsonRoot.isMember("code") || !__jsonRoot["code"].isIntegral()) {
-//		return FALSE;
-//	}
-//	code = __jsonRoot["code"].asUInt64();
-//	if (code == 0) {
-//		// new config
-//		if (__jsonRoot.isMember("msg") && __jsonRoot["msg"].isArray()) {
-//			for (unsigned int i = 0; i < __jsonRoot["msg"].size(); i++) {
-//				categoryItem = __jsonRoot["msg"][i];
-//
-//				if (category.find(categoryItem["id"].asString()) != category.end()) {
-//					continue;
-//				}
-//
-//				commonItems categoryit;
-//				for (int i = 0; i < 4; i++) {
-//					categoryit[categoryItems[i]] = categoryItem[categoryItems[i]].asString();
-//				}
-//				category.insert(mapCategory::value_type(categoryItem["id"].asString(), categoryit));
-//			}
-//		}
-//		else {
-//			// error format
-//			return FALSE;
-//		}
-//	}
-//	else if (code == 9){
-//		// keep now list
-//		return FALSE;
-//	}
-//	else {
-//		// error format
-//		return FALSE;
-//	}
-//
-//	return TRUE;
-//}
-
-//BOOL ParsePackageList(std::string nCategory, lstPackageDetails &lstPackage) {
-//	std::string BaseDir, dataDir;
-//	Json::Reader r;
-//	std::ifstream fJson;
-//	Json::Value	__jsonRoot, pkgItem;
-//	std::ostringstream ostrBuf;
-//
-//	BaseDir = GetProgramProfilePath("xbsoftMgr");
-//
-//	dataDir = BaseDir + "\\Data\\";
-//	ostrBuf << "SoftwareCategory" << nCategory << ".list" << std::ends;
-//	dataDir.append(ostrBuf.str());
-//	
-//	if (!PathFileExistsA(dataDir.data())) {
-//		return FALSE;
-//	}
-//	fJson.open(dataDir);
-//	if (!fJson.is_open() || !r.parse(fJson, __jsonRoot, false) || !__jsonRoot.isObject()) {
-//		return FALSE;
-//	}
-//	if (!__jsonRoot.isMember("code") || !__jsonRoot["code"].isIntegral()) {
-//		return FALSE;
-//	}
-//	if (__jsonRoot["code"].asUInt64() == 0 && __jsonRoot.isMember("msg") && __jsonRoot["msg"].isArray()) {
-//		for (unsigned int i = 0; i < __jsonRoot["msg"].size(); i++) {
-//			pkgItem = __jsonRoot["msg"][i];
-//			commonItems categoryit;
-//
-//			for (int i = 0; i < packageitem_count; i++) {
-//				categoryit[packageItems[i]] = pkgItem[packageItems[i]].asString();
-//			}
-//
-//			lstPackage.push_back(categoryit);
-//		}
-//	}
-//	else {
-//		return FALSE;
-//	}
-//	return TRUE;
-//}
-
 bool CreateShellLink(std::string szTargetExec, std::string szID, std::string szCatID, std::string szLnkName, std::string szIconName, std::string szDescription) {
 	CComPtr<IShellLink>   pShortCutLink;    //IShellLink对象指针
 	CComPtr<IPersistFile> ppf;		        //IPersisFile对象指针
-
+	std::string szIconPath = GetProgramProfilePath("xbsoftMgr");
 	wchar_t wszEnvVarUSERPROFILE[1024];
+
 	std::wstring wszDesktopPath, wszWorkingDir, szArguments, wszLinkFullName, wszTmp1;
+
+	szIconPath.append("\\Data\\Icons\\");
+	szIconPath.append("xbmgr.ico"/*szIconName*/);
 
 	GetEnvironmentVariableW(L"USERPROFILE", (LPWSTR)wszEnvVarUSERPROFILE, 1024);
 	wszDesktopPath.append(wszEnvVarUSERPROFILE);
 	wszDesktopPath.append(L"\\Desktop\\");
 
 	wszLinkFullName = wszDesktopPath;
-	wszTmp1.clear(); StringToWString(szLnkName, wszTmp1);
+	wszTmp1.clear(); UTF8ToWString(szLnkName, wszTmp1);
 	wszLinkFullName.append(wszTmp1);
 	if (PathFileExistsW(wszLinkFullName.data())) {
 		// shelllink exist
@@ -1229,7 +1150,7 @@ bool CreateShellLink(std::string szTargetExec, std::string szID, std::string szC
 	pShortCutLink.CoCreateInstance(CLSID_ShellLink, NULL);
 
 	//set execute 
-	wszTmp1.clear(); StringToWString(szTargetExec, wszTmp1);
+	wszTmp1.clear(); UTF8ToWString(szTargetExec, wszTmp1);
 	pShortCutLink->SetPath(wszTmp1.data());
 
 	//set execute path
@@ -1238,18 +1159,21 @@ bool CreateShellLink(std::string szTargetExec, std::string szID, std::string szC
 	pShortCutLink->SetWorkingDirectory(wszWorkingDir.data());
 
 	// set execute parameters
-	szArguments.append(L"install ");
-	szArguments.append(L"id=");    wszTmp1.clear(); StringToWString(szID, wszTmp1);      szArguments.append(wszTmp1);
-	szArguments.append(L"catid="); wszTmp1.clear(); StringToWString(szCatID, wszTmp1);   szArguments.append(wszTmp1);
-	szArguments.append(L" ");	   wszTmp1.clear(); StringToWString(szLnkName, wszTmp1); szArguments.append(wszTmp1);
+	szArguments.append(L"install");
+	szArguments.append(L" id=");    wszTmp1.clear(); UTF8ToWString(szID, wszTmp1);      szArguments.append(wszTmp1);
+	szArguments.append(L" catid="); wszTmp1.clear(); UTF8ToWString(szCatID, wszTmp1);   szArguments.append(wszTmp1);
+	szArguments.append(L" ");	    wszTmp1.clear(); UTF8ToWString(szLnkName, wszTmp1); szArguments.append(wszTmp1);
+
+	szArguments;//trim
+
 	pShortCutLink->SetArguments(szArguments.data());
 
 	// set icon path
-	wszTmp1.clear(); StringToWString(szIconName, wszTmp1);
+	wszTmp1.clear(); UTF8ToWString(szIconPath, wszTmp1);
 	pShortCutLink->SetIconLocation(wszTmp1.data(), 0);
 
 	// set shelllink description
-	wszTmp1.clear(); StringToWString(szDescription, wszTmp1);
+	wszTmp1.clear(); UTF8ToWString(szDescription, wszTmp1);
 	pShortCutLink->SetDescription(wszTmp1.data());
 
 	pShortCutLink->SetShowCmd(SW_SHOW);

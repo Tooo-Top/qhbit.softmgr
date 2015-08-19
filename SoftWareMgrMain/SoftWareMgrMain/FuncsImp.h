@@ -53,7 +53,7 @@ BOOL GetConfFromServ(std::string &serverUrl, std::string &fileName);
 
 void software_cache_init(int refresh=0);
 void software_cache_load();
-void software_cache_idle();
+void software_cache_idle(bool &bOver);
 void software_cache_idle_lower();
 
 BOOL chkCategoryList(std::string szFileName);

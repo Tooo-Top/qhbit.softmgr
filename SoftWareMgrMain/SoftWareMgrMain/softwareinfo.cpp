@@ -153,7 +153,9 @@ void software_cache_load() {
 		dataDir = BaseDir + "\\Data\\SoftwareCategory" + szTask + ".list";
 		if (PathFileExistsA(dataDir.data())) { 
 			std::cout << "load file:" << dataDir << std::endl; 
-			ThirdTask.push_back(szTask);
+			if (szTask.compare("top") == 0 || szTask.compare("hot") == 0) {
+				ThirdTask.push_back(szTask);
+			}
 			return; 
 		}
 		else {
@@ -190,9 +192,9 @@ void topORhotIcons(Json::ArrayIndex &aiItIcon, Json::Value &category, std::list<
 		iconFileName.append(".png");
 
 		// fetch;
-		if (!FetchPackageData(0, category["msg"][aiItIcon]["iconUrl"].asString(), iconFileName)) {
+		if (FetchPackageData(0, category["msg"][aiItIcon]["iconUrl"].asString(), iconFileName)) {
 			//add to icon list
-			AddToIconsRepository(category["msg"][aiItIcon]["id"].asString(), category["msg"][aiItIcon], iconFileName);
+			AddToIconsRepository(category["msg"][aiItIcon]["category"].asString(), category["msg"][aiItIcon], iconFileName);
 		}
 		else {
 			lstIconsFailed.push_back(aiItIcon);
@@ -205,7 +207,7 @@ void topORhotIcons(Json::ArrayIndex &aiItIcon, Json::Value &category, std::list<
 	}
 }
 
-void software_cache_idle() {
+void software_cache_idle(bool &bOver) {
 	std::string BaseDir, dataDir;
 	std::ifstream fJson;
 	Json::Reader r;
@@ -220,7 +222,7 @@ void software_cache_idle() {
 	if (FirstTask.size()==0 && FirstTaskFailed.size() > 0) {
 		do_FirstTask();
 	}
-	if (FirstTask.size() > 0 || FirstTaskFailed.size()>0) { return; }
+	if (FirstTask.size()>0 || FirstTaskFailed.size()>0) { return; }
 
 	//init top icons
 	if (itTopIcon != Json::ArrayIndex(-1) && std::find(FirstTaskFailed.begin(), FirstTaskFailed.end(), "top") == FirstTaskFailed.end()) {
@@ -238,6 +240,11 @@ void software_cache_idle() {
 		SecondTask.push_back(szTask);
 	}
 	if (SecondTask.size() == 0 && SecondTaskFailed.size() > 0) { return ; }
+
+	// notice finish
+	if (!bOver) {
+		bOver = true;
+	}
 }
 
 void software_cache_idle_lower() {
@@ -301,7 +308,7 @@ void software_cache_idle_lower() {
 			// fetch;
 			if (FetchPackageData(0, _jsCurPackageList["msg"][itCurPackageIcon]["iconUrl"].asString(), iconFileName)) {
 				//add to icon list
-				AddToIconsRepository(_jsCurPackageList["msg"][itCurPackageIcon]["id"].asString(), _jsCurPackageList["msg"][itCurPackageIcon], iconFileName);
+				AddToIconsRepository(_jsCurPackageList["msg"][itCurPackageIcon]["category"].asString(), _jsCurPackageList["msg"][itCurPackageIcon], iconFileName);
 			}
 			else {
 				packageIconsFailed.push_back(redoTask);
@@ -327,7 +334,7 @@ void software_cache_idle_lower() {
 			// fetch;
 			if (!FetchPackageData(0, _jsCurPackageList["msg"][itCurPackageIcon]["iconUrl"].asString(), iconFileName)) {
 				//add to icon list
-				AddToIconsRepository(_jsCurPackageList["msg"][itCurPackageIcon]["id"].asString(), _jsCurPackageList["msg"][itCurPackageIcon], iconFileName);
+				AddToIconsRepository(_jsCurPackageList["msg"][itCurPackageIcon]["category"].asString(), _jsCurPackageList["msg"][itCurPackageIcon], iconFileName);
 			}
 			else {
 				packageIconsFailed.push_back(redoTask);
