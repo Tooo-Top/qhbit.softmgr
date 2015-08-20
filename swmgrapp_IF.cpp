@@ -40,7 +40,7 @@ void SwmgrApp::requestExtraCategoryList(QString szCategoryID,int pageNumber,int 
     pageTotol = curCatorgoryList->size()/count + ((curCatorgoryList->size()%count)>0 ? 1: 0);
     if (pageNumber>pageTotol) { pageNumber = pageTotol; }
 
-    for (int i = (pageNumber-1)*count + 0;i < curCatorgoryList->size()&& i<((pageNumber-1)*count+20);i++) {
+    for (int i = (pageNumber-1)*count + 0;i < curCatorgoryList->size()&& i<((pageNumber-1)*count+count);i++) {
         content.append(curCatorgoryList->at(i));
     }
     emit updateExtraCategoryList(szCategoryID, content.toVariantList(),pageTotol,pageNumber);
@@ -58,7 +58,7 @@ void SwmgrApp::requestCategoryListByID(QString szCategoryID,int pageNumber,int c
     if ( curItem != _DataModel.getSoftPackages().end() ) {
         QJsonArray &appData = curItem.value();
         pageTotol = appData.size()/count + ((appData.size()%count)>0 ? 1: 0);
-        for(int i=(pageNumber-1)*count + 0; i<((pageNumber-1)*count+20) && i< appData.size();i++) {
+        for(int i=(pageNumber-1)*count + 0; i<((pageNumber-1)*count+count) && i< appData.size();i++) {
             currentPage.append(appData.at(i));
         }
     }
