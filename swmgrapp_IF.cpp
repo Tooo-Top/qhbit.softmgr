@@ -26,7 +26,7 @@ void SwmgrApp::requestExtraCategoryList(QString szCategoryID,int pageNumber,int 
         curCatorgoryList = &(_DataModel.getHotPackages());
     }
     else if (szCategoryID.compare("top",Qt::CaseInsensitive)==0){
-        curCatorgoryList = &(_DataModel.getHotPackages());
+        curCatorgoryList = &(_DataModel.getTopPackages());
     }
     else {
         emit updateExtraCategoryList(szCategoryID, content.toVariantList(),0,pageNumber);
