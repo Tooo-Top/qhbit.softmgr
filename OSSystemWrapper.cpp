@@ -118,7 +118,7 @@ void OSSystemWrapper::GetWinInstalledSoftware(mapSoftwareList &mapSoftwares,DWOR
                 }
 
                 ItemProperty item;
-                for (j=0; j<11;j++) {
+                for (j=0; j<13;j++) {
                     std::string szValue;
                     achValue[0] = '\0';
                     cchValue = MAX_VALUE_NAME;

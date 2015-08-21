@@ -12,7 +12,7 @@ TARGET = xbmgr
 TEMPLATE = app
 
 INCLUDEPATH += curl/include curl/lib
-LIBS += Wldap32.lib ws2_32.lib
+LIBS += Wldap32.lib ws2_32.lib Advapi32.lib User32.lib
 
 SOURCES += main.cpp\
     swmgrapp.cpp \

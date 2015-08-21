@@ -4,6 +4,7 @@
 MainWnd::MainWnd(QWidget *parent) : QWebView(parent)
 {
     setMouseTracking(true);
+    setAcceptDrops(false);
 }
 
 bool MainWnd::nativeEvent(const QByteArray & eventType, void * message, long * result) {
@@ -13,7 +14,7 @@ bool MainWnd::nativeEvent(const QByteArray & eventType, void * message, long * r
 
          QRect curRect(0,0,this->width(),82);
          if (curRect.contains(curPos)) {
-             ::SendMessage(HWND(this->winId()), WM_SYSCOMMAND, SC_MOVE + HTCAPTION, 0);
+             ::SendMessageW(HWND(this->winId()), WM_SYSCOMMAND, SC_MOVE + HTCAPTION, 0);
          }
      }
 

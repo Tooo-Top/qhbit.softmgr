@@ -140,9 +140,9 @@ signals:
     void updatePackageInfoByID(QVariantMap swObject); //for someone package info
 
     //about user
-    void updateRegisteUser(QVariant userinfo);
-    void updateLoginUser(QVariant userinfo);
-    void updateModifyUserInfo(QVariant userinfo);
+    void updateRegisteUser(QVariantMap userinfo);
+    void updateLoginUser(QVariantMap userinfo);
+    void updateModifyUserInfo(QVariantMap userinfo);
 
     //soft package operation
     void updateRunningTasks(QVariantList swCategory);// all package task status
