@@ -743,8 +743,7 @@ BOOL UpdateShellLinkOfRepository(commonItems &item){
 
 	if (!bFoundItem) {
 		ShellLinkName = item["name"]+".lnk";
-
-		IconName = item["id"]+".png";
+		IconName = item["id"]+".ico";
 
 		if (CreateShellLink(Programe, item["id"], item["category"], ShellLinkName, IconName, item["description"])) {
 			obj["id"] = item["id"];
@@ -817,10 +816,10 @@ BOOL AddToIconsRepository(std::string nCategoryID, Json::Value &item, std::strin
 	}
 	return FALSE;
 }
+#include "ximage.h"
 
 BOOL FetchPackageData(int type, std::string szUrl, std::string fileName) {
 	std::string BaseDir;
-	std::ostringstream ostrBuf;
 	BaseDir = GetProgramProfilePath("xbsoftMgr")+"\\Data\\";
 	if (type == 0) {
 		BaseDir.append("Icons\\");
@@ -829,6 +828,27 @@ BOOL FetchPackageData(int type, std::string szUrl, std::string fileName) {
 
 	BaseDir.append(fileName);
 	if (PathFileExistsA(BaseDir.data()) || GetResourceFromHttp(szUrl.data(), BaseDir.data())) {
+		char buf[1024] = { '\0' };
+		strcpy(buf, BaseDir.data());
+
+		std::string szIcoFile = BaseDir;
+		std::string szIcoFullFile;
+
+		PathRemoveExtensionA((LPSTR)buf);
+
+		szIcoFullFile.append(buf, strlen(buf));
+		szIcoFullFile.append(".ico");
+
+		if (!PathFileExistsA(szIcoFullFile.data())) {
+			CxImage img;
+			std::wstring wszPngFile, wszIcoFile;
+
+			StringToWString(BaseDir, wszPngFile);
+			StringToWString(szIcoFullFile, wszIcoFile);
+
+			img.Load(wszPngFile.c_str(), CXIMAGE_FORMAT_PNG);
+			img.Save(wszIcoFile.c_str(), CXIMAGE_FORMAT_ICO);
+		}
 		return TRUE;
 	}
 	else {
@@ -1131,7 +1151,7 @@ bool CreateShellLink(std::string szTargetExec, std::string szID, std::string szC
 	std::wstring wszDesktopPath, wszWorkingDir, szArguments, wszLinkFullName, wszTmp1;
 
 	szIconPath.append("\\Data\\Icons\\");
-	szIconPath.append("xbmgr.ico"/*szIconName*/);
+	szIconPath.append(szIconName);
 
 	GetEnvironmentVariableW(L"USERPROFILE", (LPWSTR)wszEnvVarUSERPROFILE, 1024);
 	wszDesktopPath.append(wszEnvVarUSERPROFILE);

@@ -50,9 +50,9 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>curl\include;curl\lib;json;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>curl\include;curl\lib;json;CxImage\;zlib\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -198,6 +198,30 @@
     <ClInclude Include="curl\lib\warnless.h" />
     <ClInclude Include="curl\lib\wildcard.h" />
     <ClInclude Include="curl\lib\x509asn1.h" />
+    <ClInclude Include="CxImage\xfile.h" />
+    <ClInclude Include="CxImage\ximabmp.h" />
+    <ClInclude Include="CxImage\ximacfg.h" />
+    <ClInclude Include="CxImage\ximadef.h" />
+    <ClInclude Include="CxImage\ximage.h" />
+    <ClInclude Include="CxImage\ximagif.h" />
+    <ClInclude Include="CxImage\ximaico.h" />
+    <ClInclude Include="CxImage\ximaiter.h" />
+    <ClInclude Include="CxImage\ximajas.h" />
+    <ClInclude Include="CxImage\ximajbg.h" />
+    <ClInclude Include="CxImage\ximajpg.h" />
+    <ClInclude Include="CxImage\ximamng.h" />
+    <ClInclude Include="CxImage\ximapcx.h" />
+    <ClInclude Include="CxImage\ximapng.h" />
+    <ClInclude Include="CxImage\ximapsd.h" />
+    <ClInclude Include="CxImage\ximaraw.h" />
+    <ClInclude Include="CxImage\ximaska.h" />
+    <ClInclude Include="CxImage\ximatga.h" />
+    <ClInclude Include="CxImage\ximath.h" />
+    <ClInclude Include="CxImage\ximatif.h" />
+    <ClInclude Include="CxImage\ximawbmp.h" />
+    <ClInclude Include="CxImage\ximawmf.h" />
+    <ClInclude Include="CxImage\xiofile.h" />
+    <ClInclude Include="CxImage\xmemfile.h" />
     <ClInclude Include="FuncsImp.h" />
     <ClInclude Include="json\json\autolink.h" />
     <ClInclude Include="json\json\config.h" />
@@ -209,11 +233,23 @@
     <ClInclude Include="json\json\writer.h" />
     <ClInclude Include="json\json_batchallocator.h" />
     <ClInclude Include="json\json_tool.h" />
+    <ClInclude Include="png\png.h" />
+    <ClInclude Include="png\pngconf.h" />
     <ClInclude Include="servicefuncs.h" />
     <ClInclude Include="servinstaller.h" />
     <ClInclude Include="ServMain.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="SysReportLog.h" />
+    <ClInclude Include="zlib\crc32.h" />
+    <ClInclude Include="zlib\deflate.h" />
+    <ClInclude Include="zlib\inffast.h" />
+    <ClInclude Include="zlib\inffixed.h" />
+    <ClInclude Include="zlib\inflate.h" />
+    <ClInclude Include="zlib\inftrees.h" />
+    <ClInclude Include="zlib\trees.h" />
+    <ClInclude Include="zlib\zconf.h" />
+    <ClInclude Include="zlib\zlib.h" />
+    <ClInclude Include="zlib\zutil.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="appenv.cpp" />
@@ -331,10 +367,57 @@
     <ClCompile Include="curl\lib\warnless.c" />
     <ClCompile Include="curl\lib\wildcard.c" />
     <ClCompile Include="curl\lib\x509asn1.c" />
+    <ClCompile Include="CxImage\tif_xfile.cpp" />
+    <ClCompile Include="CxImage\ximabmp.cpp" />
+    <ClCompile Include="CxImage\ximadsp.cpp" />
+    <ClCompile Include="CxImage\ximaenc.cpp" />
+    <ClCompile Include="CxImage\ximaexif.cpp" />
+    <ClCompile Include="CxImage\ximage.cpp" />
+    <ClCompile Include="CxImage\ximagif.cpp" />
+    <ClCompile Include="CxImage\ximahist.cpp" />
+    <ClCompile Include="CxImage\ximaico.cpp" />
+    <ClCompile Include="CxImage\ximainfo.cpp" />
+    <ClCompile Include="CxImage\ximaint.cpp" />
+    <ClCompile Include="CxImage\ximajas.cpp" />
+    <ClCompile Include="CxImage\ximajbg.cpp" />
+    <ClCompile Include="CxImage\ximajpg.cpp" />
+    <ClCompile Include="CxImage\ximalpha.cpp" />
+    <ClCompile Include="CxImage\ximalyr.cpp" />
+    <ClCompile Include="CxImage\ximamng.cpp" />
+    <ClCompile Include="CxImage\ximapal.cpp" />
+    <ClCompile Include="CxImage\ximapcx.cpp" />
+    <ClCompile Include="CxImage\ximapng.cpp" />
+    <ClCompile Include="CxImage\ximapsd.cpp" />
+    <ClCompile Include="CxImage\ximaraw.cpp" />
+    <ClCompile Include="CxImage\ximasel.cpp" />
+    <ClCompile Include="CxImage\ximaska.cpp" />
+    <ClCompile Include="CxImage\ximatga.cpp" />
+    <ClCompile Include="CxImage\ximath.cpp" />
+    <ClCompile Include="CxImage\ximatif.cpp" />
+    <ClCompile Include="CxImage\ximatran.cpp" />
+    <ClCompile Include="CxImage\ximawbmp.cpp" />
+    <ClCompile Include="CxImage\ximawmf.cpp" />
+    <ClCompile Include="CxImage\ximawnd.cpp" />
+    <ClCompile Include="CxImage\xmemfile.cpp" />
     <ClCompile Include="FuncsImp.cpp" />
     <ClCompile Include="json\json_reader.cpp" />
     <ClCompile Include="json\json_value.cpp" />
     <ClCompile Include="json\json_writer.cpp" />
+    <ClCompile Include="png\png.c" />
+    <ClCompile Include="png\pngerror.c" />
+    <ClCompile Include="png\pngget.c" />
+    <ClCompile Include="png\pngmem.c" />
+    <ClCompile Include="png\pngpread.c" />
+    <ClCompile Include="png\pngread.c" />
+    <ClCompile Include="png\pngrio.c" />
+    <ClCompile Include="png\pngrtran.c" />
+    <ClCompile Include="png\pngrutil.c" />
+    <ClCompile Include="png\pngset.c" />
+    <ClCompile Include="png\pngtrans.c" />
+    <ClCompile Include="png\pngwio.c" />
+    <ClCompile Include="png\pngwrite.c" />
+    <ClCompile Include="png\pngwtran.c" />
+    <ClCompile Include="png\pngwutil.c" />
     <ClCompile Include="servicefuncs.cpp" />
     <ClCompile Include="servinstaller.cpp" />
     <ClCompile Include="ServMain.cpp" />
@@ -345,6 +428,17 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="SysReportLog.cpp" />
+    <ClCompile Include="zlib\adler32.c" />
+    <ClCompile Include="zlib\compress.c" />
+    <ClCompile Include="zlib\crc32.c" />
+    <ClCompile Include="zlib\deflate.c" />
+    <ClCompile Include="zlib\infback.c" />
+    <ClCompile Include="zlib\inffast.c" />
+    <ClCompile Include="zlib\inflate.c" />
+    <ClCompile Include="zlib\inftrees.c" />
+    <ClCompile Include="zlib\trees.c" />
+    <ClCompile Include="zlib\uncompr.c" />
+    <ClCompile Include="zlib\zutil.c" />
   </ItemGroup>
   <ItemGroup>
     <None Include="json\json_internalarray.inl" />
