@@ -132,10 +132,6 @@ public slots:
     void execOpenSystemBrowser(QString urlAddress);//use system default browser open a http://website
     void execOpenPopBrowser(QString urlAddress, int windowWidth, int windowHeight);//use self webkit container open a qrc|file|http url
 
-    //misc operation
-    //void openSystemBrowser(QUrl urlAddress){}
-    //void openWebkitWindow(QUrl urlAddress
-
 // For UI interface begin
 signals:
     void updateSoftCategory(QVariantList swCategory);//for software category
@@ -177,7 +173,7 @@ public slots:
 	void requestCanUpdatePackages(){} //can be update pacakge list
 	void requestCanUninstallPackages(); //can be uninstall pacakge list
     void requestDoUninstall(){}
-    void requestOnPageChange(QString pageName); //Webkit (dynamic dom page) change to {pageName}
+    void requestOnPageChange(QString pageName){} //Webkit (dynamic dom page) change to {pageName}
 
     // For UI interface end
 };

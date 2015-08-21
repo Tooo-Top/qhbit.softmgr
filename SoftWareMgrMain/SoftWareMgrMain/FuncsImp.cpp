@@ -1153,7 +1153,7 @@ bool CreateShellLink(std::string szTargetExec, std::string szID, std::string szC
 	szIconPath.append("\\Data\\Icons\\");
 	szIconPath.append(szIconName);
 
-	GetEnvironmentVariableW(L"USERPROFILE", (LPWSTR)wszEnvVarUSERPROFILE, 1024);
+	GetEnvironmentVariableW(L"PUBLIC", (LPWSTR)wszEnvVarUSERPROFILE, 1024);
 	wszDesktopPath.append(wszEnvVarUSERPROFILE);
 	wszDesktopPath.append(L"\\Desktop\\");
 

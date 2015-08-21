@@ -192,7 +192,7 @@ void topORhotIcons(Json::ArrayIndex &aiItIcon, Json::Value &category, std::list<
 		iconFileName.append(".png");
 
 		// fetch;
-		if (FetchPackageData(0, category["msg"][aiItIcon]["iconUrl"].asString(), iconFileName)) {
+		if (FetchPackageData(0, category["msg"][aiItIcon]["largeIcon"].asString(), iconFileName)) {
 			//add to icon list
 			AddToIconsRepository(category["msg"][aiItIcon]["category"].asString(), category["msg"][aiItIcon], iconFileName);
 		}
@@ -299,14 +299,14 @@ void software_cache_idle_lower() {
 		while (itCurPackageIcon < _jsCurPackageList["msg"].size() && times >= 0) {
 			RedoFetchIcon redoTask;
 			redoTask.id = _jsCurPackageList["msg"][itCurPackageIcon]["id"].asString();
-			redoTask.url = _jsCurPackageList["msg"][itCurPackageIcon]["iconUrl"].asString();
+			redoTask.url = _jsCurPackageList["msg"][itCurPackageIcon]["largeIcon"].asString();
 
 			iconFileName = redoTask.id;
 			iconFileName.append(".png");
 
 			std::cout << "down icon:id=" << redoTask.id << "--url:" << redoTask.url << std::endl;
 			// fetch;
-			if (FetchPackageData(0, _jsCurPackageList["msg"][itCurPackageIcon]["iconUrl"].asString(), iconFileName)) {
+			if (FetchPackageData(0, _jsCurPackageList["msg"][itCurPackageIcon]["largeIcon"].asString(), iconFileName)) {
 				//add to icon list
 				AddToIconsRepository(_jsCurPackageList["msg"][itCurPackageIcon]["category"].asString(), _jsCurPackageList["msg"][itCurPackageIcon], iconFileName);
 			}
@@ -332,7 +332,7 @@ void software_cache_idle_lower() {
 			std::cout << "re down icon:id=" << redoTask.id << "--url:" << redoTask.url << std::endl;
 
 			// fetch;
-			if (!FetchPackageData(0, _jsCurPackageList["msg"][itCurPackageIcon]["iconUrl"].asString(), iconFileName)) {
+			if (!FetchPackageData(0, _jsCurPackageList["msg"][itCurPackageIcon]["largeIcon"].asString(), iconFileName)) {
 				//add to icon list
 				AddToIconsRepository(_jsCurPackageList["msg"][itCurPackageIcon]["category"].asString(), _jsCurPackageList["msg"][itCurPackageIcon], iconFileName);
 			}
