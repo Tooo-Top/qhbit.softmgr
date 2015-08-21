@@ -202,10 +202,15 @@ bool SoftwareList::LoadArrayFromConf(QString szConfFile, mapDowningTaskObject & 
 
 					mapTaskObject.insert(taskObject->id, taskObject);
 
-					qDebug() << "add task :" << jsObject.value("id").toString() << "," << jsObject.value("catid").toString() << "," << jsObject.value("launchName").toString();
+                    qDebug() << "add task :" << jsObject.value("id").toString() << ","
+						<< jsObject.value("catid").toString() << ","
+                        << jsObject.value("launchName").toString();
+						return true;
 				}
 				else {
-					qDebug() << "repeat task :" << jsObject.value("id").toString() << "," << jsObject.value("catid").toString() << "," << jsObject.value("launchName").toString();
+					qDebug() << "repeat task :" << jsObject.value("id").toString() << "," 
+						<< jsObject.value("catid").toString() << "," 
+                        << jsObject.value("launchName").toString();						
 				}
 			}
 		}

@@ -64,7 +64,6 @@ void SwmgrApp::InitTray() {
 }
 
 void SwmgrApp::InitWnd() {
-    //wndFull = new Widget(NULL);
     wndMain->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowSystemMenuHint | Qt::WindowMinimizeButtonHint);
     wndMain->setMouseTracking(true);
     wndMain->setFixedSize(963, 595);
@@ -77,11 +76,12 @@ void SwmgrApp::InitWnd() {
 }
 
 void SwmgrApp::appquit() {
-    wndMain->close();
-    _webPage->deleteLater();
+	wndMain->hide();
+	wndMain->close();
+	_webPage->deleteLater();
     wndMain->deleteLater();
-    QWebSettings::globalSettings()->clearMemoryCaches();
-    qApp->quit();
+	QWebSettings::globalSettings()->clearMemoryCaches();
+	qApp->quit();
 //	QCoreApplication::exit(0);
 }
 

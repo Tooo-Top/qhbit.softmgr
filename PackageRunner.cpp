@@ -29,12 +29,20 @@ bool PackageRunner::addTask(QJsonObject installer) {
 			taskObject->hTaskHandle = NULL;
 
 			_TaskObjects.insert(taskObject->id, taskObject);
-
-			qDebug() << "add task :" << installer.value("id").toString() << "," << installer.value("catid").toString() << "," << installer.value("launchName").toString();
+            SoftwareList::AddItemToConfArray(ConfOperation::Root().getSubpathFile("Conf", "installPending.conf"),installer);
+            qDebug() << "add task :" << installer.value("id").toString() << ","
+                     << installer.value("catid").toString() << ","
+					 << installer.value("launchName").toString();
 		}
-		else {
-			qDebug() << "repeat task :" << installer.value("id").toString() << "," << installer.value("catid").toString() << "," << installer.value("launchName").toString();
-		}
+        else {
+            qDebug() << "repeat task :" << installer.value("id").toString() << ","
+                     << installer.value("catid").toString() << ","
+					 << installer.value("launchName").toString();
+            return false;
+        }
 	}
+    else {
+        return false;
+    }
 	return true;
 }

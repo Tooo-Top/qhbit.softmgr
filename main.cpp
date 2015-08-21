@@ -12,6 +12,31 @@ QString GLOBAL::_DY_DIR_RUNNERSELF = ' ';
 
 int main(int argc, char *argv[])
 {
+	HANDLE hProcess = OpenProcess(MAXIMUM_ALLOWED, FALSE, GetCurrentProcessId());
+	HANDLE hPToken = INVALID_HANDLE_VALUE;
+	LUID luid;
+	TOKEN_PRIVILEGES tp;
+	if (hProcess != INVALID_HANDLE_VALUE && 
+		::OpenProcessToken(hProcess, TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY	| TOKEN_DUPLICATE | TOKEN_ASSIGN_PRIMARY | TOKEN_ADJUST_SESSIONID| TOKEN_READ | TOKEN_WRITE, &hPToken)) {
+		//ªÒµ√¡Ó≈∆æ‰±˙
+		if (hPToken != INVALID_HANDLE_VALUE && LookupPrivilegeValue(NULL, SE_DEBUG_NAME, &luid)) {
+			tp.PrivilegeCount = 1;
+			tp.Privileges[0].Luid = luid;
+			tp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
+			if (AdjustTokenPrivileges(hPToken, FALSE, &tp, sizeof(TOKEN_PRIVILEGES), (PTOKEN_PRIVILEGES)NULL, NULL)) {
+				qDebug()<<"adjust process privileges.";
+			}
+			else {
+				qDebug()<<GetLastError();
+			}
+		}
+		else {
+			;
+		}
+	}
+	else {
+		;
+	}
     QApplication a(argc, argv);
 
     GLOBAL::_DY_DIR_RUNNERSELF = QApplication::applicationDirPath();

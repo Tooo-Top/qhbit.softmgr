@@ -76,7 +76,7 @@ protected:
 	DownWrapper* LoadDll();
 	void UnloadDll(DownWrapper** Wapper);
 	// ShellLink
-	BOOL CreateShellLink(QString szTargetExec, QString szID, QString szCategory, QString szLnkName, QString szIconName, QString szDescription);
+	//BOOL CreateShellLink(QString szTargetExec, QString szID, QString szCategory, QString szLnkName, QString szIconName, QString szDescription);
 protected:
 protected:
     QSystemTrayIcon *traySystem;
@@ -121,6 +121,7 @@ protected slots:
     void launchInstall();
     void initWebViewHost();
     void docLoadFinish(bool);
+    void checkAllTaskInfo();
 public slots:
     // system control ex:show close hide
     void appquit();
@@ -166,7 +167,7 @@ public slots:
     void requestModifyUserInfo(QVariant userinfo){}
 
     //soft package operation
-    void requestStartInstallPackage(QString szCategoryID,QString szPackageID,bool autoInstall){} // software package download and install ( auto install ??)
+	void requestStartInstallPackage(QString szCategoryID, QString szPackageID, bool autoInstall); // software package download and install ( auto install ??)
     void requestBatStartInstallPackage(QVariantList lstPackage){}  // bat install
     void requestPausePackage(QString szCategoryID,QString szPackageID){} //pause someone package
     void requestResumePackage(QString szCategoryID,QString szPackageID){} //resume someone package
@@ -175,7 +176,7 @@ public slots:
 
 	void requestCanUpdatePackages(){} //can be update pacakge list
 	void requestCanUninstallPackages(); //can be uninstall pacakge list
-
+    void requestDoUninstall(){}
     void requestOnPageChange(QString pageName); //Webkit (dynamic dom page) change to {pageName}
 
     // For UI interface end

@@ -140,7 +140,23 @@ void SwmgrApp::addInstaller(QJsonObject installer) {
 	if (installer.isEmpty()) {
 		return;
 	}
-	_PendingTasks.addTask(installer);
+    if (_PendingTasks.addTask(installer)) {
+        QJsonObject update;
+        foreach(LPDowningTaskObject taskObject, _PendingTasks.getTasks().values()) {
+            if (taskObject->id.compare(installer["id"].toString(),Qt::CaseInsensitive)==0) {
+                update["id"] = taskObject->id;
+                update["name"] = taskObject->name;
+                update["category"] = taskObject->category;
+                update["percent"] = taskObject->percent;
+                update["status"] = taskObject->status;
+                break;
+            }
+        }
+
+        if (!update.isEmpty()) {
+            emit updateTaskInfo(update.toVariantMap());
+        }
+    }
 }
 
 void SwmgrApp::downloadPoll()

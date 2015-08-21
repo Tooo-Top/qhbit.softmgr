@@ -37,6 +37,7 @@ typedef struct __DowningTaskObject {
 	QString launchName;
 	DownTaskParam downTaskparam;
 	int status; //0:added,1:start,2:pause,3:stop,4:del,5:err,6:param err
+    float percent;
 	HANDLE hTaskHandle;
 }DowningTaskObject, *LPDowningTaskObject;
 
