@@ -148,7 +148,7 @@ signals:
     void updateModifyUserInfo(QVariant userinfo);
 
     //soft package operation
-    void updateRunningTasks(QVariantList swCategory);// all package status
+    void updateRunningTasks(QVariantList swCategory);// all package task status
     void updateTaskInfo(QVariantMap swPackageInfo);  // someone task status
     void updateDownloadProgress(QString szCategoryID,QString szPackageID,float fPercent);//down load progress
 	void updateCanUninstallPackages(QVariantList swCategory);
@@ -171,10 +171,12 @@ public slots:
     void requestPausePackage(QString szCategoryID,QString szPackageID){} //pause someone package
     void requestResumePackage(QString szCategoryID,QString szPackageID){} //resume someone package
     void requestAllResumePackage(){} //resume all package
-    void requestStopDownloadPackage(QString szCategoryID,QString szPackageID){}
+    void requestStopDownloadPackage(QString szCategoryID,QString szPackageID){} // remove processing task for download/installtion
 
 	void requestCanUpdatePackages(){} //can be update pacakge list
 	void requestCanUninstallPackages(); //can be uninstall pacakge list
+
+    void requestOnPageChange(QString pageName); //Webkit (dynamic dom page) change to {pageName}
 
     // For UI interface end
 };
