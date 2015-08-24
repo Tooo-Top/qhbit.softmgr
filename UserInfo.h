@@ -2,8 +2,9 @@
 #define USERINFO_H
 
 #include <QObject>
-#include <QMap>
 
+#include <QMap>
+#include <QVariantMap>
 
 const int userinfoItemCount = 13;
 extern QString userinfoItem[userinfoItemCount];
@@ -32,13 +33,19 @@ public:
 
 protected:
     void clean();
+
     QString postMethod(std::string url, std::string cookieFile, std::string post);
 	static size_t LoginCallback(char *buffer, size_t size, size_t nitems, void *outstream);
-signals:
 
+signals:
+    void signalRegisteUser(QVariantMap userinfo);
+    void signalLoginUser(QVariantMap userinfo);
+    void signalModifyUserInfo(QVariantMap userInfo);
 public slots :
 	void UserLogin(QString szUserName, QString szPassword);
-	void RegistUser(QString,QString,QString);
+    void RegistUser(QString szUserName,QString szPassword,QString szEmail);
+    void ModifyUserInfo(QVariantMap userInfo);
+    void QueryUserInfo();
 };
 
 #endif // USERINFO_H

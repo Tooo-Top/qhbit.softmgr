@@ -176,7 +176,6 @@ void UserInfo::UserLogin(QString szUserName, QString szPassword) {
 			qDebug() << L"³É¹¦µÇÂ¼";
 			resObject = resObject.value("msg").toObject();
 			this->init = "2";
-//			this->username = resObject.value("username").toString();
 			this->usertoken = resObject.value("token").toString();
 			this->password = byCrypto;
 			for (int i = 0; i < userinfoItemCount; i++) {
@@ -191,6 +190,7 @@ void UserInfo::UserLogin(QString szUserName, QString szPassword) {
 		qDebug() << szResult;
 	}
 	this->serializeUserInfo(true);
+    emit signalLoginUser(toJsonObject().toVariantMap());
 }
 
 void UserInfo::RegistUser(QString szUserName, QString szPassword, QString szEmail) {
@@ -227,4 +227,14 @@ void UserInfo::RegistUser(QString szUserName, QString szPassword, QString szEmai
 		qDebug() << szResult;
 	}
     this->serializeUserInfo(true);
+    emit signalRegisteUser(toJsonObject().toVariantMap());
+}
+
+void UserInfo::ModifyUserInfo(QVariantMap userInfo) {
+    Q_UNUSED(userInfo);
+    emit signalModifyUserInfo(toJsonObject().toVariantMap());
+}
+
+void UserInfo::QueryUserInfo() {
+    emit signalLoginUser(toJsonObject().toVariantMap());
 }

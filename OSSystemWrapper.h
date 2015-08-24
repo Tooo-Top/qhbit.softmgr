@@ -21,10 +21,11 @@ public:
     bool IsOSWin64();
     void GetLocalSystemInfo(SYSTEM_INFO);
     DWORD GetSystemInstalledSoftware(mapSoftwareList &mapSoftwares,DWORD type=0); //type=0(x86,x64),type=1(x86),type=2(x64);
-
-    void GetWinInstalledSoftware(mapSoftwareList &mapSoftwares,DWORD flag);
 public:
     static OSSystemWrapper *Instance();
+
+protected:
+    void GetWinInstalledSoftware(mapSoftwareList &mapSoftwares,DWORD flag);
 protected:
     PGetSystemInfo GetSystemInfoFunc;
 };

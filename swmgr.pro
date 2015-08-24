@@ -140,7 +140,11 @@ SOURCES += main.cpp\
     OSSystemWrapper.cpp \
     swmgrapp_ui.cpp \
     swmgrapp_env.cpp \
-    swmgrapp_IF.cpp
+    swmgrapp_IF.cpp \
+    TaskManager.cpp \
+    Storage.cpp \
+    CommandLine.cpp \
+    UserInfoManager.cpp
 
 HEADERS += \
     swmgrapp.h \
@@ -270,7 +274,11 @@ HEADERS += \
     curl/lib/amigaos.h \
     MainWnd.h \
     global.h \
-    OSSystemWrapper.h
+    OSSystemWrapper.h \
+    TaskManager.h \
+    Storage.h \
+    CommandLine.h \
+    UserInfoManager.h
 
 #FORMS   +=
 

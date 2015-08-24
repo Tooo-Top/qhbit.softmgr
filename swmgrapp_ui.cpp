@@ -13,8 +13,10 @@ void SwmgrApp::InitObjects() {
     miniAction = new QAction(QString("Min"), this);
     quitAction = new QAction(QString("Close"), this);
     traySystem = new QSystemTrayIcon(this);
-    srvLaunchInst = new QLocalServer(this);
     pollDownloadTaskObject = new QTimer(this);
+
+    _DataModel = new DataControl(this);
+
     QWebSettings::globalSettings()->setAttribute(QWebSettings::DeveloperExtrasEnabled,true);
     QWebSettings::globalSettings()->setMaximumPagesInCache(0);
     QWebSettings::globalSettings()->setObjectCacheCapacities(0, 0, 0);
@@ -52,9 +54,16 @@ void SwmgrApp::InitSlots() {
     QObject::connect(quitAction, SIGNAL(triggered(bool)), this, SLOT(appquit()));
     QObject::connect(fullAction, SIGNAL(triggered(bool)), this, SLOT(showFullWnd()));
     QObject::connect(miniAction, SIGNAL(triggered(bool)), this, SLOT(showMiniWnd()));
-    QObject::connect(srvLaunchInst, SIGNAL(newConnection()), this, SLOT(launchInstall()));
-    QObject::connect(this, SIGNAL(sigInstaller(QJsonObject)), SLOT(addInstaller(QJsonObject)));
     QObject::connect(pollDownloadTaskObject, SIGNAL(timeout()), this,SLOT(downloadPoll()));
+    QObject::connect(_DataModel,SIGNAL(updateRunningTasks(QVariantList)),this,SIGNAL(updateRunningTasks(QVariantList)));
+
+    QObject::connect(_DataModel,SIGNAL(updateLoginUser(QVariantMap)),this,SIGNAL(updateLoginUser(QVariantMap)));
+    QObject::connect(_DataModel,SIGNAL(updateRegisteUser(QVariantMap)),this,SIGNAL(updateRegisteUser(QVariantMap)));
+    QObject::connect(_DataModel,SIGNAL(updateModifyUserInfo(QVariantMap)),this,SIGNAL(updateModifyUserInfo(QVariantMap)));
+}
+
+void SwmgrApp::InitDataModel() {
+    _DataModel->initAll();
 }
 
 void SwmgrApp::InitTray() {
@@ -68,7 +77,6 @@ void SwmgrApp::InitWnd() {
     wndMain->setMouseTracking(true);
     wndMain->setFixedSize(963, 595);
     _webPage->mainFrame()->load(QUrl::fromUserInput(GLOBAL::_DY_DIR_RUNNERSELF + "/lewang/Index.html"));
-    //_webPage->mainFrame()->load(QUrl::fromUserInput("qrc:/index.html"));
     _webPage->triggerAction(QWebPage::Reload,false);
     QObject::connect(_webPage->mainFrame(), SIGNAL(javaScriptWindowObjectCleared()), this, SLOT(initWebViewHost()));
     QObject::connect(_webPage->mainFrame(), SIGNAL(loadFinished(bool)), this, SLOT(docLoadFinish(bool)));
@@ -82,7 +90,6 @@ void SwmgrApp::appquit() {
     wndMain->deleteLater();
 	QWebSettings::globalSettings()->clearMemoryCaches();
 	qApp->quit();
-//	QCoreApplication::exit(0);
 }
 
 void SwmgrApp::showFullWnd() {

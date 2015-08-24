@@ -7,13 +7,10 @@
 #include <QAction>
 #include <QSystemTrayIcon>
 #include <QProcessEnvironment>
-#include <QLocalServer>
-#include <QLocalSocket>
 
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QJsonArray>
-#include <QJsonValue>
+#include <QVariant>
+#include <QVariantList>
+#include <QVariantMap>
 
 #include <QWebView>
 #include <QWebPage>
@@ -22,11 +19,8 @@
 #include "DownWrapper.h"
 
 #include "ConfOperation.h"
-#include "SoftwareList.h"
 #include "DataControl.h"
-#include "PackageRunner.h"
 
-#include "UserInfo.h"
 #include "MainWnd.h"
 
 class SwmgrApp : public QObject
@@ -48,7 +42,7 @@ public:
 	static QString GetUserLoginUrl();
 	static QString GetUserRegisteUrl();
 	// ------------------------
-	static void NoticeMain(QObject *parent, QJsonObject &jsItem);
+    static void NoticeMain(QObject *parent, QVariantMap &jsItem);
 public:
 	// ------------------------
 	BOOL InitAppEnv();
@@ -60,23 +54,18 @@ protected:
     void InitIcons();
     void InitMenuActions();
     void InitSlots();
+    void InitDataModel();
     void InitTray();
     void InitWnd();
-	void InitNoticeServer();
 	void StartPoll();
 	void UninitEnv();
 	void DumpEnv();
+
 protected:
-	// program setting
-	void LoadSettingProfile();
-	void SaveSettingProfile();
-	QString getSettingParameter(QString name, QString defaultValue);
 
 	// XL mini
 	DownWrapper* LoadDll();
 	void UnloadDll(DownWrapper** Wapper);
-	// ShellLink
-	//BOOL CreateShellLink(QString szTargetExec, QString szID, QString szCategory, QString szLnkName, QString szIconName, QString szDescription);
 protected:
 protected:
     QSystemTrayIcon *traySystem;
@@ -94,34 +83,22 @@ protected:
 	QWebPage *myBrowserPage;
     QWebPage *_webPage;
 	// -----------------------
-	QLocalServer *srvLaunchInst;
 	QTimer *pollDownloadTaskObject;
 	// -----------------------
 
-	/* pending and downing */
-	PackageRunner _PendingTasks;  // use someone event poll this map for monitor task object status
 	// -----------------------
-	DataControl _DataModel;
+    DataControl *_DataModel;
 	// -----------------------
 	DownWrapper* _pWapper;  // xunlei mini
-	QJsonObject  _setting;  // program setting
 	BOOL m_bCurlStatus;
-
-	UserInfo _user;
-signals:
-	void sigInstaller(QJsonObject installer);
-protected slots:
-    void addInstaller(QJsonObject installer);
 
 protected slots:
     // task
     void downloadPoll();
     // operation
     void monitorProf();
-    void launchInstall();
     void initWebViewHost();
     void docLoadFinish(bool);
-    void checkAllTaskInfo();
 public slots:
     // system control ex:show close hide
     void appquit();
@@ -160,7 +137,7 @@ public slots:
     //about user
     void requestRegisteUser(QString username,QString password,QString email);
     void requestLoginUser(QString username,QString password);
-    void requestModifyUserInfo(QVariant userinfo){}
+	void requestModifyUserInfo(QVariantMap userinfo);
 
     //soft package operation
 	void requestStartInstallPackage(QString szCategoryID, QString szPackageID, bool autoInstall); // software package download and install ( auto install ??)

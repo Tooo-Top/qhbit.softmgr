@@ -1,7 +1,8 @@
 #include "PackageRunner.h"
+#include "Storage.h"
 #include <QtDebug>
 
-PackageRunner::PackageRunner()
+PackageRunner::PackageRunner(QObject *parent) : QObject(parent)
 {
 
 }
@@ -12,13 +13,13 @@ mapDowningTaskObject &PackageRunner::getTasks() {
 
 bool PackageRunner::initTasks() {
 	QString szFile = ConfOperation::Root().getSubpathFile("Conf", "installPending.conf");
-	return SoftwareList::LoadArrayFromConf(szFile, _TaskObjects);
+	return Storage::LoadItemsFromConfArray(szFile, _TaskObjects);
 }
 
-bool PackageRunner::addTask(QJsonObject installer) {
-	if (installer.contains("id") && installer.value("id").isString() &&
-		installer.contains("catid") && installer.value("catid").isString() &&
-		installer.contains("launchName") && installer.value("launchName").isString()
+bool PackageRunner::addTask(QVariantMap installer) {
+	if (installer.contains("id") && installer.value("id").type()==QVariant::String &&
+		installer.contains("catid") && installer.value("catid").type() == QVariant::String &&
+		installer.contains("launchName") && installer.value("launchName").type() == QVariant::String
 		) {
 		if (_TaskObjects.find(installer.value("id").toString()) == _TaskObjects.end()) {
 			LPDowningTaskObject taskObject = new DowningTaskObject();
@@ -29,7 +30,7 @@ bool PackageRunner::addTask(QJsonObject installer) {
 			taskObject->hTaskHandle = NULL;
 
 			_TaskObjects.insert(taskObject->id, taskObject);
-            SoftwareList::AddItemToConfArray(ConfOperation::Root().getSubpathFile("Conf", "installPending.conf"),installer);
+			Storage::AddItemToConfArray(ConfOperation::Root().getSubpathFile("Conf", "installPending.conf"), installer);
             qDebug() << "add task :" << installer.value("id").toString() << ","
                      << installer.value("catid").toString() << ","
 					 << installer.value("launchName").toString();
