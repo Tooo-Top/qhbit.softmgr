@@ -4,8 +4,8 @@
 
 void SwmgrApp::docLoadFinish(bool ok) {
     if (ok) {
-        _DataModel->reqQueryUserState();
-        _DataModel->checkAllTaskInfo();
+        _DataModel->reqQueryUserStatus();
+        _DataModel->reqQueryAllTaskStatus();
     }
 }
 
@@ -103,5 +103,10 @@ void SwmgrApp::requestCanUninstallPackages() {
 
 void SwmgrApp::requestStartInstallPackage(QString szCategoryID, QString szPackageID, bool autoInstall) {
 	qDebug() << "Category:" << szCategoryID << ";Package:" << szPackageID << ";auto install:" << autoInstall;
-	_DataModel->StartInstallPackage(szCategoryID, szPackageID, autoInstall);
+	QVariantMap task;
+	task.insert(QString("id"), QVariant::fromValue(szPackageID));
+	task.insert(QString("catid"), QVariant::fromValue(szCategoryID));
+	task.insert(QString("launchName"), QVariant::fromValue(QString("")));
+	task.insert(QString("autoInstall"), QVariant::fromValue(autoInstall));
+	_DataModel->reqAddTask(task);
 }

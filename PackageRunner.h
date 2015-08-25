@@ -3,7 +3,10 @@
 #include <QObject>
 
 #include <QVariant>
+#include <QVariantList>
 #include <QVariantMap>
+
+#include "DownWrapper.h"
 
 #include "ConfOperation.h"
 #include "DownWrapper.h"
@@ -24,8 +27,9 @@ typedef struct __DowningTaskObject {
 	QString name;
 	QString category;
 	QString launchName;
+    bool autoInstall;
 	DownTaskParam downTaskparam;
-	int status; //0:added,1:start,2:pause,3:stop,4:del,5:err,6:param err
+    int status; //0:added/pending,1:start,2:pause,3:stop,4:del,5:err,6:param err,7: run
 	float percent;
 	HANDLE hTaskHandle;
 }DowningTaskObject, *LPDowningTaskObject;
@@ -39,11 +43,41 @@ public:
     PackageRunner(QObject *parent=0);
 protected:
 	mapDowningTaskObject _TaskObjects;
+
+    DownWrapper* _Wapper;  // xunlei mini
+protected:
+	BOOL initMiniXL();
+	// XL mini
+    DownWrapper* LoadDll();
+    void UnloadDll(DownWrapper** Wapper);
+
 public:
-	mapDowningTaskObject &getTasks();
-public:
-	bool initTasks();
-    bool addTask(QVariantMap installer);
+	bool init();
+    void unInit();
+
+signals:
+    void initCrash();
+
+signals:
+    void updateAllTaskStatus(QVariantList);
+    void updateTaskStatus(QVariantMap);
+    void updateTaskDownloadProgress(QVariantMap swTaskProcess);
+public slots:
+    void reqAllTaskStatus();
+
+    void reqAddTask(QVariantMap task);
+    void reqAddTasks(QVariantList tasks);
+
+    void reqPauseTask(QVariantMap task);
+    void reqPauseAllTask();
+
+    void reqResumeTask(QVariantMap task);
+    void reqResumeAllTask();
+
+    void reqRemoveTask(QVariantMap task);
+    void reqRemoveAllTask();
+protected slots:
+    void PeriodPollTaskStatus();
 };
 
 #endif // PACKAGERUNNER_H

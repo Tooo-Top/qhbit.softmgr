@@ -1,5 +1,6 @@
 #include "DataControl.h"
 #include <QJsonDocument>
+#include <QJsonObject>
 #include "Storage.h"
 
 DataControl::DataControl(QObject *parent) : QObject(parent) {
@@ -38,7 +39,7 @@ void DataControl::launchInstall() {
     }
     jsAddInstallObject = jsDoc.object();
 
-    addInstaller(jsAddInstallObject);
+    reqAddTask(jsAddInstallObject.toVariantMap());
     emit sigRequestShow();
 }
 
@@ -104,14 +105,6 @@ mapSoftwareList &DataControl::getInstalledSoftware() {
     return _mapInstalledSoftwares;
 }
 
-TaskManager *DataControl::getTaskManager() {
-    return _TaskRunner;
-}
-
-PackageRunner &DataControl::getPackageRunner() {
-    return _PendingTasks;
-}
-
 bool DataControl::initSoftCategory() {
 	return Storage::LoadSoftwareCategory(ConfOperation::Root().getSubpathFile("Data", "SoftwareCategoryAll.list"), _lstSoftCategory);
 }
@@ -143,15 +136,25 @@ bool DataControl::initAll() {
     InstalledSoftwareChanged();
 
     QObject::connect(srvLaunchInst, SIGNAL(newConnection()), this, SLOT(launchInstall()));
-    InitNoticeServer();
 
     _UserInRunner->SetObjects(this,&_user);
     _UserInRunner->start();
 
-//    _PendingTasks.initTasks();
-//    _PendingTasks.moveToThread(_TaskRunner);
-	InitNoticeServer();
+    _TaskRunner->SetObjects(this,&_PendingTasks);
+    _TaskRunner->start();
+
+    InitNoticeServer();
     return true;
+}
+
+void DataControl::startUserService() { _UserInRunner->start(); }
+void DataControl::startTaskService() { _TaskRunner->start(); }
+
+void DataControl::unInit() {
+    _UserInRunner->exit();
+    _UserInRunner->wait();
+    _TaskRunner->exit();
+    _TaskRunner->wait();
 }
 
 void DataControl::InstalledSoftwareChanged() {
@@ -159,80 +162,21 @@ void DataControl::InstalledSoftwareChanged() {
     OSSystemWrapper::Instance()->GetSystemInstalledSoftware(_mapInstalledSoftwares,0);
 }
 
-void DataControl::startUserService() {
-    _UserInRunner->start();
-}
+void DataControl::reqLoginUser(QString username,QString password) { emit sigLoginUser(username,password); }
+void DataControl::reqRegisteUser(QString username,QString password,QString email) { emit sigRegisteUser(username,password,email); }
+void DataControl::reqModifyUserInfo(QVariantMap userinfo) { emit sigModifyUserInfo(userinfo); }
+void DataControl::reqQueryUserStatus(){ emit sigQueryUserState(); }
 
-void DataControl::startTaskService() {
-    _TaskRunner->start();
-}
+void DataControl::reqQueryAllTaskStatus() { emit sigQueryAllTaskStatus(); }
 
-void DataControl::reqLoginUser(QString username,QString password) {
-    emit sigLoginUser(username,password);
-}
+void DataControl::reqAddTask(QVariantMap task) { emit sigAddTask(task); }
+void DataControl::reqAddTasks(QVariantList tasks) { emit sigAddTasks(tasks); }
 
-void DataControl::reqRegisteUser(QString username,QString password,QString email) {
-    emit sigRegisteUser(username,password,email);
-}
+void DataControl::reqPauseTask(QVariantMap task) { emit sigPauseTask(task); }
+void DataControl::reqPauseAllTask() { emit sigPauseAllTask(); }
 
-void DataControl::reqModifyUserInfo(QVariantMap userinfo) {
-    emit sigModifyUserInfo(userinfo);
-}
+void DataControl::reqResumeTask(QVariantMap task) { emit sigResumeTask(task); }
+void DataControl::reqResumeAllTask() { emit sigResumeAllTask(); }
 
-void DataControl::reqQueryUserState(){
-    emit sigQueryUserState();
-}
-
-void DataControl::addInstaller(QJsonObject installer) {
-    if (installer.isEmpty()) {
-        return;
-    }
-    if (_PendingTasks.addTask(installer.toVariantMap())) {
-        QJsonObject update;
-        foreach(LPDowningTaskObject taskObject, _PendingTasks.getTasks().values()) {
-            if (taskObject->id.compare(installer["id"].toString(),Qt::CaseInsensitive)==0) {
-                update["id"] = taskObject->id;
-                update["name"] = taskObject->name;
-                update["category"] = taskObject->category;
-                update["percent"] = taskObject->percent;
-                update["status"] = taskObject->status;
-                break;
-            }
-        }
-
-        if (!update.isEmpty()) {
-//            emit updateTaskInfo(update.toVariantMap());
-        }
-    }
-}
-
-void DataControl::checkAllTaskInfo() {
-    //QJsonArray var;
-    //foreach(LPDowningTaskObject taskObject, _PendingTasks.getTasks().values()) {
-    //    QJsonObject it;
-    //    it["id"]=taskObject->id;
-    //    it["name"]=taskObject->name;
-    //    it["category"]=taskObject->category;
-    //    it["status"]=taskObject->status;
-    //    it["percent"]=taskObject->percent;
-    //    var.append(it);
-    //}
-
-    //emit updateRunningTasks(var.toVariantList());
-}
-
-void DataControl::StartInstallPackage(QString szCategoryID, QString szPackageID, bool autoInstall) {
-	//QJsonObject installer;
-	//QMap<QString, QJsonArray>::Iterator curItem = _softPackages.find(szCategoryID);
-	//if (curItem != _softPackages.end()) {
-	//	foreach(QJsonValue it, curItem.value()) {
-	//		if (it.toObject().value("id").toString().compare(szPackageID, Qt::CaseInsensitive) == 0) {
-	//			installer["id"] = it.toObject().value("id").toString();
-	//			installer["catid"] = it.toObject().value("category").toString();
-	//			installer["launchName"] = it.toObject().value("name").toString() + ".lnk";
-	//			addInstaller(installer);
-	//			break;
-	//		}
-	//	}
-	//}
-}
+void DataControl::reqRemoveTask(QVariantMap task) { emit sigRemoveTask(task); }
+void DataControl::reqRemoveAllTask() { emit sigRemoveAllTask(); }

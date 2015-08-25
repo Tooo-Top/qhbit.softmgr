@@ -7,6 +7,36 @@ CommandLine::CommandLine(QObject *parent) : QObject(parent)
     _id="";
     _catid="";
     _launchName="";
+    _autoInstall = true;
+}
+
+bool CommandLine::launchMode(){
+    return bMode;
+}
+
+QString CommandLine::launchID(){
+    return _id;
+}
+
+QString CommandLine::launchCatID() {
+    return _catid;
+}
+
+QString CommandLine::launchName() {
+    return _launchName;
+}
+
+bool CommandLine::launchAutoinstall() {
+    return _autoInstall;
+}
+
+QVariantMap CommandLine::encodeToVariantMap() {
+    QVariantMap object;
+    object.insert("id",QVariant::fromValue(_id));
+    object.insert("catid",QVariant::fromValue(_catid));
+    object.insert("launchName",QVariant::fromValue(_launchName));
+    object.insert("autoInstall",QVariant::fromValue(_autoInstall));
+    return object;
 }
 
 int CommandLine::parseCommandLine(QStringList commandLine) {
@@ -48,28 +78,4 @@ int CommandLine::parseCommandLine(QStringList commandLine) {
         }
     }
     return 0;
-}
-
-QVariantMap CommandLine::encodeToVariantMap() {
-    QVariantMap object;
-    object.insert("id",QVariant::fromValue(_id));
-    object.insert("catid",QVariant::fromValue(_catid));
-    object.insert("launchName",QVariant::fromValue(_launchName));
-    return object;
-}
-
-bool CommandLine::launchMode(){
-    return bMode;
-}
-
-QString CommandLine::launchID(){
-    return _id;
-}
-
-QString CommandLine::launchCatID() {
-    return _catid;
-}
-
-QString CommandLine::launchName() {
-    return _launchName;
 }

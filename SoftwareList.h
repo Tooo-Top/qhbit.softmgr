@@ -7,11 +7,11 @@
 #include <QVariantMap>
 
 //--------json soft list parameter use these  **begin
-const int nCategoryItemCount = 4;
-const int nPackageItemCount = 28;
+//const int nCategoryItemCount = 4;
+//const int nPackageItemCount = 28;
 
-extern QString categoryItems[nCategoryItemCount];
-extern QString packageItems[nPackageItemCount];
+//extern QString categoryItems[nCategoryItemCount];
+//extern QString packageItems[nPackageItemCount];
 //--------json soft list parameter use these  **end
 
 //typedef QMap<QString, QString> CommonItem;
@@ -20,10 +20,10 @@ extern QString packageItems[nPackageItemCount];
 //typedef QVector<CommonItem> lstSoftwarePackage;
 //typedef QMap<QString, lstSoftwarePackage> mapSoftwarePackages;
 
-class SoftwareList {
-protected:
-    SoftwareList(){}
-public:
-};
+//class SoftwareList {
+//protected:
+//    SoftwareList(){}
+//public:
+//};
 
 #endif // SOFTWARELIST_H

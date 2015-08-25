@@ -66,17 +66,6 @@ BOOL SwmgrApp::InitCurl() {
         m_bCurlStatus = TRUE;
     return m_bCurlStatus;
 }
-BOOL SwmgrApp::InitMiniXL() {
-    _pWapper = LoadDll();
-    if (!_pWapper) {
-        return FALSE;
-    }
-    if (!_pWapper->Init()) {
-        UnloadDll(&_pWapper);
-        return FALSE;
-    }
-    return TRUE;
-}
 
 void SwmgrApp::DumpEnv() {
     QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
@@ -85,32 +74,6 @@ void SwmgrApp::DumpEnv() {
     }
 }
 
-DownWrapper* SwmgrApp::LoadDll()
-{
-    WCHAR szDllpath[512] = { 0 };
-    QString szLoadPath = SwmgrApp::GetProgramProfilePath(QString("xbSpeed"));
-    szLoadPath.append( QDir::separator() + QString("xldl.dll") );
-    szLoadPath = QDir::toNativeSeparators(szLoadPath);
-
-    StrCpyW(szDllpath, szLoadPath.toStdWString().data());
-    DownWrapper* pWapper = NULL;
-    try{
-        pWapper = new DownWrapper(szDllpath);
-    }
-    catch (wchar_t e[]) {
-        pWapper = NULL;
-        qDebug() << "*****************:"<<QString::fromWCharArray(e);
-    }
-    return pWapper;
-}
-
-void SwmgrApp::UnloadDll(DownWrapper** Wapper){
-    if (!Wapper) {
-        return;
-    }
-    if ((*Wapper) != NULL) {
-        (*Wapper)->UnInit();
-        delete (*Wapper);
-        (*Wapper) = NULL;
-    }
+QString SwmgrApp::getSettingParameter(QString name, QString defaultValue) {
+    return _DataModel->getSettingParameter(name, defaultValue);
 }

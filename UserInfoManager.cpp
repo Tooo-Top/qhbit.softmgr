@@ -12,6 +12,7 @@ UserInfoManager::UserInfoManager(QObject *parent) : QThread(parent)
 void UserInfoManager::SetObjects(DataControl *dataControl,UserInfo *userInfo) {
     pDataControl = dataControl;
     pUserInfo = userInfo;
+    pUserInfo->moveToThread(this);
 }
 
 void UserInfoManager::run() {

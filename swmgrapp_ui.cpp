@@ -3,7 +3,6 @@
 #include <QApplication>
 #include <QMenu>
 #include <QDir>
-#include <QDesktopServices>
 
 void SwmgrApp::InitObjects() {
     appTrayIcon = new QIcon();
@@ -13,7 +12,6 @@ void SwmgrApp::InitObjects() {
     miniAction = new QAction(QString("Min"), this);
     quitAction = new QAction(QString("Close"), this);
     traySystem = new QSystemTrayIcon(this);
-    pollDownloadTaskObject = new QTimer(this);
 
     _DataModel = new DataControl(this);
 
@@ -54,12 +52,17 @@ void SwmgrApp::InitSlots() {
     QObject::connect(quitAction, SIGNAL(triggered(bool)), this, SLOT(appquit()));
     QObject::connect(fullAction, SIGNAL(triggered(bool)), this, SLOT(showFullWnd()));
     QObject::connect(miniAction, SIGNAL(triggered(bool)), this, SLOT(showMiniWnd()));
-    QObject::connect(pollDownloadTaskObject, SIGNAL(timeout()), this,SLOT(downloadPoll()));
-    QObject::connect(_DataModel,SIGNAL(updateRunningTasks(QVariantList)),this,SIGNAL(updateRunningTasks(QVariantList)));
+
+    QObject::connect(_DataModel,SIGNAL(sigRequestShow()),this,SLOT(showFullWnd()));
+    QObject::connect(_DataModel,SIGNAL(sigCrash()),this,SLOT(appquit()));
 
     QObject::connect(_DataModel,SIGNAL(updateLoginUser(QVariantMap)),this,SIGNAL(updateLoginUser(QVariantMap)));
     QObject::connect(_DataModel,SIGNAL(updateRegisteUser(QVariantMap)),this,SIGNAL(updateRegisteUser(QVariantMap)));
     QObject::connect(_DataModel,SIGNAL(updateModifyUserInfo(QVariantMap)),this,SIGNAL(updateModifyUserInfo(QVariantMap)));
+
+	QObject::connect(_DataModel, SIGNAL(updateAllTaskStatus(QVariantList)), this, SIGNAL(updateRunningTasks(QVariantList)));
+    QObject::connect(_DataModel, SIGNAL(updateTaskStatus(QVariantMap)),this,SIGNAL(updateTaskInfo(QVariantMap)));
+    QObject::connect(_DataModel, SIGNAL(updateTaskDownloadProgress(QVariantMap)),this,SIGNAL(updateDownloadProgress(QVariantMap)));
 }
 
 void SwmgrApp::InitDataModel() {
@@ -89,6 +92,7 @@ void SwmgrApp::appquit() {
 	_webPage->deleteLater();
     wndMain->deleteLater();
 	QWebSettings::globalSettings()->clearMemoryCaches();
+    _DataModel->unInit();
 	qApp->quit();
 }
 

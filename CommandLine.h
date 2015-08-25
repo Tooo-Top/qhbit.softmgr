@@ -13,18 +13,20 @@ class CommandLine : public QObject
 public:
     explicit CommandLine(QObject *parent = 0);
 public:
-    int parseCommandLine(QStringList commandLine);
     QVariantMap encodeToVariantMap();
+    int parseCommandLine(QStringList commandLine);
 public:
     bool launchMode();
     QString launchID();
     QString launchCatID();
     QString launchName();
+    bool    launchAutoinstall();
 protected:
     bool bMode;
     QString _id;
     QString _catid;
     QString _launchName;
+    bool    _autoInstall;
 
 signals:
 

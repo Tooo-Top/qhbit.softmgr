@@ -21,7 +21,7 @@ void adjustProcessPrivilege() {
 	TOKEN_PRIVILEGES tp;
 	if (hProcess != INVALID_HANDLE_VALUE &&
 		::OpenProcessToken(hProcess, TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY | TOKEN_DUPLICATE | TOKEN_ASSIGN_PRIMARY | TOKEN_ADJUST_SESSIONID | TOKEN_READ | TOKEN_WRITE, &hPToken)) {
-		//ªÒµ√¡Ó≈∆æ‰±˙
+		//Ëé∑Âæó‰ª§ÁâåÂè•ÊüÑ
 		if (hPToken != INVALID_HANDLE_VALUE && LookupPrivilegeValue(NULL, SE_DEBUG_NAME, &luid)) {
 			tp.PrivilegeCount = 1;
 			tp.Privileges[0].Luid = luid;

@@ -2,12 +2,12 @@
 #define SWMGRAPP_H
 #include <Shlwapi.h>
 #pragma comment(lib,"shlwapi.lib") 
+
 #include <QObject>
-#include <QTimer>
 #include <QAction>
 #include <QSystemTrayIcon>
 #include <QProcessEnvironment>
-
+#include <QDesktopServices>
 #include <QVariant>
 #include <QVariantList>
 #include <QVariantMap>
@@ -15,8 +15,9 @@
 #include <QWebView>
 #include <QWebPage>
 #include <QWebFrame>
+
 #include "global.h"
-#include "DownWrapper.h"
+//#include "DownWrapper.h"
 
 #include "ConfOperation.h"
 #include "DataControl.h"
@@ -44,11 +45,14 @@ public:
 	// ------------------------
     static void NoticeMain(QObject *parent, QVariantMap &jsItem);
 public:
+    QString getSettingParameter(QString name, QString defaultValue);
+
+public:
 	// ------------------------
 	BOOL InitAppEnv();
 	void InitDir(QString szAppDir);
 	BOOL InitCurl();
-	BOOL InitMiniXL();
+
 protected:
 	void InitObjects();
     void InitIcons();
@@ -57,16 +61,8 @@ protected:
     void InitDataModel();
     void InitTray();
     void InitWnd();
-	void StartPoll();
-	void UninitEnv();
 	void DumpEnv();
 
-protected:
-
-	// XL mini
-	DownWrapper* LoadDll();
-	void UnloadDll(DownWrapper** Wapper);
-protected:
 protected:
     QSystemTrayIcon *traySystem;
     QMenu *trayIconMenu;
@@ -83,18 +79,14 @@ protected:
 	QWebPage *myBrowserPage;
     QWebPage *_webPage;
 	// -----------------------
-	QTimer *pollDownloadTaskObject;
-	// -----------------------
 
-	// -----------------------
+    // -----------------------
     DataControl *_DataModel;
 	// -----------------------
-	DownWrapper* _pWapper;  // xunlei mini
+//	DownWrapper* _pWapper;  // xunlei mini
 	BOOL m_bCurlStatus;
 
 protected slots:
-    // task
-    void downloadPoll();
     // operation
     void monitorProf();
     void initWebViewHost();
@@ -124,7 +116,8 @@ signals:
     //soft package operation
     void updateRunningTasks(QVariantList swCategory);// all package task status
     void updateTaskInfo(QVariantMap swPackageInfo);  // someone task status
-    void updateDownloadProgress(QString szCategoryID,QString szPackageID,float fPercent);//down load progress
+    void updateDownloadProgress(QVariantMap swTaskProcess );//down load progress
+//    void updateDownloadProgress(QString szCategoryID,QString szPackageID,float fPercent);//down load progress
 	void updateCanUninstallPackages(QVariantList swCategory);
 
 public slots:

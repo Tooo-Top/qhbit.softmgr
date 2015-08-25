@@ -6,20 +6,19 @@
 #include <QVariant>
 #include <QVariantList>
 #include <QVariantMap>
+
 #include <QLocalServer>
 #include <QLocalSocket>
 
-#include <QJsonObject>
+#include "OSSystemWrapper.h"
 
 #include "ConfOperation.h"
-#include "SoftwareList.h"
 
-#include "OSSystemWrapper.h"
-#include "PackageRunner.h"
 #include "UserInfo.h"
-
-#include "TaskManager.h"
 #include "UserInfoManager.h"
+
+#include "PackageRunner.h"
+#include "TaskManager.h"
 
 class DataControl : public QObject
 {
@@ -39,8 +38,11 @@ protected:
 protected:
     TaskManager *_TaskRunner;
     UserInfoManager* _UserInRunner;
-    //
+    // programe setting
+
+    //QFileSystemWatcher
     QVariantMap  _setting;        // program setting
+    // user info
     UserInfo     _user;           // user
     /* pending and downing */
     PackageRunner _PendingTasks;  // use someone event poll this map for monitor task object status
@@ -55,8 +57,7 @@ public:
     QMap<QString,QVariantList> &getSoftPackages();
 
     mapSoftwareList &getInstalledSoftware();
-    TaskManager *getTaskManager();
-    PackageRunner &getPackageRunner();
+
 public:
 	bool initSoftCategory();
 	bool initSoftPackages();
@@ -67,11 +68,7 @@ public:
 
     void startUserService();
     void startTaskService();
-
-    void reqLoginUser(QString username,QString password);
-    void reqRegisteUser(QString username,QString password,QString email);
-    void reqModifyUserInfo(QVariantMap userinfo);
-    void reqQueryUserState();
+    void unInit();
 public:
     void LoadSettingProfile();
     void SaveSettingProfile();
@@ -82,28 +79,69 @@ protected:
     void InitNoticeServer();
 protected slots:
     void launchInstall();
+
+    // others
 signals:
     void sigRequestShow();
+    void sigCrash();
+protected slots:
+    void InstalledSoftwareChanged();
 
-    void sigInstaller(QJsonObject);
-    void updateRunningTasks(QVariantList swCategory);
+    // for task
+signals:
+    // response task operation
+    void updateAllTaskStatus(QVariantList taskStatus);
+    void updateTaskStatus(QVariantMap taskStatus);
+    void updateTaskDownloadProgress(QVariantMap swTaskProcess );
 
-    // response
+    // request task operation
+    void sigQueryAllTaskStatus();
+
+    void sigAddTask(QVariantMap task);
+    void sigAddTasks(QVariantList tasks);
+
+    void sigPauseTask(QVariantMap task);
+    void sigPauseAllTask();
+
+    void sigResumeTask(QVariantMap task);
+    void sigResumeAllTask();
+
+    void sigRemoveTask(QVariantMap task);
+    void sigRemoveAllTask();
+
+public slots:
+    void reqQueryAllTaskStatus();
+
+    void reqAddTask(QVariantMap task);
+    void reqAddTasks(QVariantList tasks);
+
+    void reqPauseTask(QVariantMap task);
+    void reqPauseAllTask();
+
+    void reqResumeTask(QVariantMap task);
+    void reqResumeAllTask();
+
+    void reqRemoveTask(QVariantMap task);
+    void reqRemoveAllTask();
+
+    // for user
+signals:
+    // response user operation
     void updateLoginUser(QVariantMap userinfo);
     void updateRegisteUser(QVariantMap userinfo);
     void updateModifyUserInfo(QVariantMap userinfo);
 
-    // request
+    // request user operation
     void sigLoginUser(QString username,QString password);
     void sigRegisteUser(QString username,QString password,QString email);
     void sigModifyUserInfo(QVariantMap userinfo);
-    void sigQueryUserState();
 
+    void sigQueryUserState();
 public slots:
-    void InstalledSoftwareChanged();
-    void addInstaller(QJsonObject installer);
-    void checkAllTaskInfo();
-	void StartInstallPackage(QString szCategoryID, QString szPackageID, bool autoInstall);
+    void reqLoginUser(QString username,QString password);
+    void reqRegisteUser(QString username,QString password,QString email);
+    void reqModifyUserInfo(QVariantMap userinfo);
+    void reqQueryUserStatus();
 };
 
 #endif // DATACONTROL_H

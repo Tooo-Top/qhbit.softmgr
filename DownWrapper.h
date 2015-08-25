@@ -1,9 +1,9 @@
-// xldl.dll导出函数的封装类
+// xldl.dll瀵煎嚭鍑芥暟鐨勫皝瑁呯被
 
 #pragma once
 #include <windows.h>
 #include "xldl.h"
-// 定义函数指针
+// 瀹氫箟鍑芥暟鎸囬拡
 typedef BOOL	(*fn_Init)(void);
 typedef BOOL	(*fn_UnInit)(void);
 typedef HANDLE  (*fn_TaskCreate)(DownTaskParam &stParam);
