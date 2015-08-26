@@ -15,7 +15,7 @@ void SwmgrApp::InitObjects() {
 
     _DataModel = new DataControl(this);
 
-    QWebSettings::globalSettings()->setAttribute(QWebSettings::DeveloperExtrasEnabled,true);
+    QWebSettings::globalSettings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
     QWebSettings::globalSettings()->setMaximumPagesInCache(0);
     QWebSettings::globalSettings()->setObjectCacheCapacities(0, 0, 0);
     QWebSettings::globalSettings()->setOfflineStorageDefaultQuota(0);
@@ -34,7 +34,9 @@ void SwmgrApp::InitObjects() {
     _webPage = new QWebPage();
     wndMain->setPage(_webPage);
     myBrowser = new QWebView();
-    myBrowserPage = new QWebPage();
+
+//	wndMain->setContextMenuPolicy(Qt::NoContextMenu);
+	myBrowser->setContextMenuPolicy(Qt::NoContextMenu);
 }
 
 void SwmgrApp::InitIcons() {
@@ -63,6 +65,8 @@ void SwmgrApp::InitSlots() {
 	QObject::connect(_DataModel, SIGNAL(updateAllTaskStatus(QVariantList)), this, SIGNAL(updateRunningTasks(QVariantList)));
     QObject::connect(_DataModel, SIGNAL(updateTaskStatus(QVariantMap)),this,SIGNAL(updateTaskInfo(QVariantMap)));
     QObject::connect(_DataModel, SIGNAL(updateTaskDownloadProgress(QVariantMap)),this,SIGNAL(updateDownloadProgress(QVariantMap)));
+
+	QObject::connect(_DataModel, SIGNAL(updateTaskDownloadProgress(QVariantMap)), this, SLOT(testslot(QVariantMap)));
 }
 
 void SwmgrApp::InitDataModel() {
@@ -80,10 +84,11 @@ void SwmgrApp::InitWnd() {
     wndMain->setMouseTracking(true);
     wndMain->setFixedSize(963, 595);
     _webPage->mainFrame()->load(QUrl::fromUserInput(GLOBAL::_DY_DIR_RUNNERSELF + "/lewang/Index.html"));
-    _webPage->triggerAction(QWebPage::Reload,false);
     QObject::connect(_webPage->mainFrame(), SIGNAL(javaScriptWindowObjectCleared()), this, SLOT(initWebViewHost()));
     QObject::connect(_webPage->mainFrame(), SIGNAL(loadFinished(bool)), this, SLOT(docLoadFinish(bool)));
     wndMain->show();
+
+    myBrowser->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowSystemMenuHint | Qt::WindowMinimizeButtonHint/* | Qt::Popup*/);
 }
 
 void SwmgrApp::appquit() {
@@ -133,9 +138,9 @@ void SwmgrApp::execOpenSystemBrowser(QString urlAddress){
  * @param windowHeight
  */
 void SwmgrApp::execOpenPopBrowser(QString urlAddress, int windowWidth, int windowHeight){
-    if (myBrowserPage) {
-        myBrowserPage->mainFrame()->load(urlAddress);
-        myBrowserPage->view()->setGeometry(myBrowserPage->view()->geometry().x(),myBrowserPage->view()->y(),windowWidth,windowHeight);
-        myBrowserPage->view()->show();
+    if (myBrowser) {
+        myBrowser->page()->mainFrame()->load(QUrl::fromUserInput(GLOBAL::_DY_DIR_RUNNERSELF + "/lewang/" + urlAddress));
+        myBrowser->page()->view()->setGeometry((qApp->desktop()->width() - windowWidth) / 2, (qApp->desktop()->height() - windowHeight) / 2, windowWidth, windowHeight);
+		myBrowser->page()->view()->show();
     }
 }

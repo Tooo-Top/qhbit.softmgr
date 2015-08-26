@@ -28,8 +28,10 @@ typedef struct __DowningTaskObject {
 	QString category;
 	QString launchName;
     bool autoInstall;
+
+    QString downloadUrl;
 	DownTaskParam downTaskparam;
-    int status; //0:added/pending,1:start,2:pause,3:stop,4:del,5:err,6:param err,7: run
+    int status; //0:added/pending,1:starting,2:pause,3:stop,4:del,5:err,6:param err,7: running, 10:finish
 	float percent;
 	HANDLE hTaskHandle;
 }DowningTaskObject, *LPDowningTaskObject;

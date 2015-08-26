@@ -9,6 +9,10 @@ void SwmgrApp::docLoadFinish(bool ok) {
     }
 }
 
+void SwmgrApp::testslot(QVariantMap var) {
+    qDebug()<<var;
+}
+
 //==== for UI interface
 void SwmgrApp::requestSoftCategoryList() {
     emit updateSoftCategory(_DataModel->getSoftCategory());
@@ -103,10 +107,29 @@ void SwmgrApp::requestCanUninstallPackages() {
 
 void SwmgrApp::requestStartInstallPackage(QString szCategoryID, QString szPackageID, bool autoInstall) {
 	qDebug() << "Category:" << szCategoryID << ";Package:" << szPackageID << ";auto install:" << autoInstall;
-	QVariantMap task;
-	task.insert(QString("id"), QVariant::fromValue(szPackageID));
-	task.insert(QString("catid"), QVariant::fromValue(szCategoryID));
-	task.insert(QString("launchName"), QVariant::fromValue(QString("")));
+
+	QVariantMap var;
+	QMap<QString, QVariantList>::Iterator curItem = _DataModel->getSoftPackages().find(szCategoryID);
+	if (curItem != _DataModel->getSoftPackages().end()) {
+        foreach(QVariant item,curItem.value()) {
+            if (item.toMap().value("id").toString().compare(szPackageID,Qt::CaseInsensitive)==0) {
+                var = item.toMap();
+		        break;
+		    }
+		}
+	}
+
+    if (var.empty()) {
+        qDebug()<<"category:"<<szCategoryID<<",<<package:"<<szPackageID <<"; Not Found!";
+        return ;
+    }
+	QVariantMap task = var;
+
+//	task.insert(QString("id"), QVariant::fromValue(szPackageID));
+//	task.insert(QString("catid"), QVariant::fromValue(szCategoryID));
+//    task.insert(QString("launchName"), QVariant::fromValue(var.value("name").toString()));
 	task.insert(QString("autoInstall"), QVariant::fromValue(autoInstall));
+//    task.insert(QString("downloadUrl"), QVariant::fromValue(var.value("downloadUrl").toString()));
+//	task.insert(QString("downloadUrl"), QVariant::fromValue(var.value("downloadUrl").toString()));
 	_DataModel->reqAddTask(task);
 }

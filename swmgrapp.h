@@ -8,6 +8,7 @@
 #include <QSystemTrayIcon>
 #include <QProcessEnvironment>
 #include <QDesktopServices>
+#include <QDesktopWidget>
 #include <QVariant>
 #include <QVariantList>
 #include <QVariantMap>
@@ -17,7 +18,6 @@
 #include <QWebFrame>
 
 #include "global.h"
-//#include "DownWrapper.h"
 
 #include "ConfOperation.h"
 #include "DataControl.h"
@@ -75,15 +75,14 @@ protected:
 
     // -----------------------
     MainWnd *wndMain;
-    QWebView *myBrowser;
-	QWebPage *myBrowserPage;
-    QWebPage *_webPage;
+	QWebPage *_webPage;
+
+	QWebView *myBrowser;
 	// -----------------------
 
     // -----------------------
     DataControl *_DataModel;
 	// -----------------------
-//	DownWrapper* _pWapper;  // xunlei mini
 	BOOL m_bCurlStatus;
 
 protected slots:
@@ -91,6 +90,7 @@ protected slots:
     void monitorProf();
     void initWebViewHost();
     void docLoadFinish(bool);
+    void testslot(QVariantMap var);
 public slots:
     // system control ex:show close hide
     void appquit();

@@ -184,6 +184,7 @@ bool Storage::LoadItemsFromConfArray(QString szConfFile, mapDowningTaskObject & 
                     taskObject->category = jsObject.value("catid").toString();
                     taskObject->launchName = jsObject.value("launchName").toString();
                     taskObject->autoInstall = jsObject.value("autoInstall").toBool();
+                    taskObject->downloadUrl = jsObject.value("downloadUrl").toString();
                     taskObject->status = 2;
                     taskObject->hTaskHandle = NULL;
 
@@ -192,14 +193,16 @@ bool Storage::LoadItemsFromConfArray(QString szConfFile, mapDowningTaskObject & 
                     qDebug() << "add task :" << jsObject.value("id").toString() << ","
                         << jsObject.value("catid").toString() << ","
                         << jsObject.value("launchName").toString() << ","
-                        << jsObject.value("autoInstall").toBool();
+                        << jsObject.value("autoInstall").toBool() << ","
+                        << jsObject.value("downloadUrl").toString();
                         return true;
                 }
                 else {
                     qDebug() << "repeat task :" << jsObject.value("id").toString() << ","
                         << jsObject.value("catid").toString() << ","
                         << jsObject.value("launchName").toString() << ","
-                        << jsObject.value("autoInstall").toBool();
+                        << jsObject.value("autoInstall").toBool() << ","
+                        << jsObject.value("downloadUrl").toString();
                 }
             }
         }
