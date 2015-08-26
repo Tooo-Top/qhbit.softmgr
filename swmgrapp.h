@@ -140,6 +140,11 @@ public slots:
     void requestAllResumePackage(){} //resume all package
     void requestStopDownloadPackage(QString szCategoryID,QString szPackageID){} // remove processing task for download/installtion
 
+    //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++^
+    void requestAllDownloadingTaskPause(){} //Pause all downloading task
+    void requestAllDownloadingTaskCancel(){} //Cancel all downloading task
+    //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++$
+
 	void requestCanUpdatePackages(){} //can be update pacakge list
 	void requestCanUninstallPackages(); //can be uninstall pacakge list
     void requestDoUninstall(){}
