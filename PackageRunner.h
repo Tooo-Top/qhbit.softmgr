@@ -35,6 +35,8 @@ typedef struct __DowningTaskObject {
     qint64  speed;
     int status; //0:added/pending,1:starting,2:pause,3:stop,4:del,5:err,6:param err,7: running, 9 : all completed, 10:finish
     QString downloadUrl;
+    QString versionName;
+    QString packageName;
     bool autoInstall;
 
     QString launchName;

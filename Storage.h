@@ -22,8 +22,8 @@ public:
     static bool LoadArrayOfSoftwareList(QString, QVariantList &);
 
     // for launch list
-    static bool AddItemToConfArray(QString , QVariantMap &);
-    static bool LoadItemsFromConfArray(QString , mapDowningTaskObject &);
+    static bool AddTaskToConfArray(QString , QVariantMap &);
+    static bool LoadTasksFromConfArray(QString , mapDowningTaskObject &);
 
 signals:
 

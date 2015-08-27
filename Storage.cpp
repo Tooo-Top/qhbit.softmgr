@@ -126,7 +126,7 @@ bool Storage::LoadArrayOfSoftwareList(QString szSoftListFile, QVariantList &arrP
     return true;
 }
 
-bool Storage::AddItemToConfArray(QString szConfFile, QVariantMap &jsItem) {
+bool Storage::AddTaskToConfArray(QString szConfFile, QVariantMap &jsItem) {
     QByteArray fileBuf;
     QJsonDocument doc;
     QVariantList jsArray;
@@ -157,7 +157,7 @@ bool Storage::AddItemToConfArray(QString szConfFile, QVariantMap &jsItem) {
     }
 }
 
-bool Storage::LoadItemsFromConfArray(QString szConfFile, mapDowningTaskObject & mapTaskObject) {
+bool Storage::LoadTasksFromConfArray(QString szConfFile, mapDowningTaskObject & mapTaskObject) {
     QJsonDocument doc;
     QJsonArray jsArray;
 

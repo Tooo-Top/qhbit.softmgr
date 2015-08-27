@@ -100,6 +100,7 @@ void PackageRunner::UnloadDll(DownWrapper** Wapper){
 void PackageRunner::encodeToVariantMap(LPDowningTaskObject task,QVariantMap& taskObject) {
     if (task==NULL)
         return ;
+
     taskObject.insert(QString("id"),QVariant::fromValue(task->id));
     taskObject.insert(QString("catid"),QVariant::fromValue(task->category));
     taskObject.insert(QString("name"),QVariant::fromValue(task->name));
@@ -111,6 +112,8 @@ void PackageRunner::encodeToVariantMap(LPDowningTaskObject task,QVariantMap& tas
     taskObject.insert(QString("status"),QVariant::fromValue(task->status));
     taskObject.insert(QString("downloadUrl"),QVariant::fromValue(task->downloadUrl));
     taskObject.insert(QString("autoInstall"),QVariant::fromValue(task->autoInstall));
+    taskObject.insert(QString("versionName"),QVariant::fromValue(task->versionName));
+    taskObject.insert(QString("packageName"),QVariant::fromValue(task->packageName));
 }
 
 void PackageRunner::reqAllTaskStatus() {
@@ -131,17 +134,6 @@ void PackageRunner::reqAddTask(QVariantMap task) {
     if (task.contains("id") && task.value("id").type()==QVariant::String ) {
         if (_TaskObjects.find(task.value("id").toString()) == _TaskObjects.end()) {
 			LPDowningTaskObject taskObject = new DowningTaskObject();
-//taskObject.insert(QString("id"),QVariant::fromValue(task->id));
-//taskObject.insert(QString("catid"),QVariant::fromValue(task->category));
-//taskObject.insert(QString("name"),QVariant::fromValue(task->name));
-//taskObject.insert(QString("largeIcon"),QVariant::fromValue(task->largeIcon));
-//taskObject.insert(QString("brief"),QVariant::fromValue(task->brief));
-//taskObject.insert(QString("size"),QVariant::fromValue(task->size));
-//taskObject.insert(QString("percent"),QVariant::fromValue(task->percent));
-//taskObject.insert(QString("speed"),QVariant::fromValue(task->speed));
-//taskObject.insert(QString("status"),QVariant::fromValue(task->status));
-//taskObject.insert(QString("downloadUrl"),QVariant::fromValue(task->downloadUrl));
-//taskObject.insert(QString("autoInstall"),QVariant::fromValue(task->autoInstall));
             taskObject->id = task.value("id").toString();
             taskObject->category = task.value("category").toString();
             taskObject->name = task.value("name").toString();
@@ -151,64 +143,26 @@ void PackageRunner::reqAddTask(QVariantMap task) {
             taskObject->percent= 0.0f;
             taskObject->speed=0.0f;
             taskObject->status = 0;
-            if (task.value("ptdownloadUrl").toString().isEmpty()) {
-                taskObject->downloadUrl = task.value("downloadUrl").toString();
-            }
-            else{
-                taskObject->downloadUrl = task.value("ptdownloadUrl").toString();
-            }
+            taskObject->downloadUrl = task.value("ptdownloadUrl").toString().isEmpty() ? task.value("downloadUrl").toString(): task.value("ptdownloadUrl").toString();
+            taskObject->versionName = task.value("versionName").toString().isEmpty() ? QString("1.0.0.0") : task.value("versionName").toString();
+            taskObject->packageName = task.value("packageName").toString().isEmpty() ? (task.value("name").toString()+taskObject->versionName+".exe"):task.value("packageName").toString();
 
-            taskObject->autoInstall= task.value("autoInstall").toBool();
+            taskObject->autoInstall = task.value("autoInstall").toBool();
             taskObject->hTaskHandle = NULL;
-            taskObject->launchName = taskObject->name;
-
-//            taskObject->id = task.value("id").toString();
-//            taskObject->name = task.value("name").toString();
-//            taskObject->category = task.value("category").toString();
-//            taskObject->launchName = task.value("name").toString();//packageName
-//            if (task.value("ptdownloadUrl").toString().isEmpty()) {
-//                taskObject->downloadUrl = task.value("downloadUrl").toString();
-//            }
-//            else{
-//                taskObject->downloadUrl = task.value("ptdownloadUrl").toString();
-//            }
-//            taskObject->status = 0;
-//            taskObject->percent= 0.0f;
-
-//			taskObject->hTaskHandle = NULL;
+            taskObject->launchName  = taskObject->name;
 
 			_TaskObjects.insert(taskObject->id, taskObject);
-            Storage::AddItemToConfArray(ConfOperation::Root().getSubpathFile("Conf", "installPending.conf"), task);
-            qDebug() << "add task :" << task.value("id").toString() << ","
-                     << task.value("catid").toString() << ","
-                     << task.value("launchName").toString();
+			Storage::AddTaskToConfArray(ConfOperation::Root().getSubpathFile("Conf", "installPending.conf"), task);
 
             QVariantMap object;
             encodeToVariantMap(taskObject,object);
-            if (!object.isEmpty()) {
-                emit updateTaskStatus(object);
-            }
-
-//            QVariantMap object;
-//            object.insert(QString("id"),QVariant::fromValue(taskObject->id));
-//            object.insert(QString("catid"),QVariant::fromValue(taskObject->category));
-//            object.insert(QString("launchName"),QVariant::fromValue(taskObject->launchName));
-//            object.insert(QString("autoInstall"),QVariant::fromValue(taskObject->autoInstall));
-//            object.insert(QString("status"),QVariant::fromValue(taskObject->status));
-//            object.insert(QString("percent"),QVariant::fromValue(taskObject->percent));
-//            object.insert(QString("downloadUrl"),QVariant::fromValue(taskObject->downloadUrl));
-//            emit updateTaskStatus(object);
+            if (!object.isEmpty()) { emit updateTaskStatus(object); }
+            qDebug() << "add task :" << task.value("id").toString() << "," << task.value("catid").toString() << "," << task.value("launchName").toString();
         }
         else {
-			qDebug() << "repeat task :" << task.value("id").toString() << ","
-                     << task.value("catid").toString() << ","
-                     << task.value("launchName").toString();
-            return ;
+            qDebug() << "repeat task :" << task.value("id").toString() << "," << task.value("catid").toString() << "," << task.value("launchName").toString();
         }
 	}
-    else {
-        return ;
-    }
 }
 
 void PackageRunner::reqAddTasks(QVariantList tasks){
@@ -225,27 +179,16 @@ void PackageRunner::reqPauseTask(QVariantMap task){
     mapDowningTaskObject::iterator it = _TaskObjects.find(task.value("id").toString());
     if (it != _TaskObjects.end()) {
         LPDowningTaskObject taskObject = it.value();
-        if (taskObject->hTaskHandle!=NULL && taskObject->status==7) {
-			_Wapper->TaskPause(taskObject->hTaskHandle);
-            taskObject->status = 2;
-            if (taskObject->hTaskHandle != NULL) {
-                _Wapper->TaskPause(taskObject->hTaskHandle);
-            }
-            QVariantMap object;
-            encodeToVariantMap(taskObject,object);
-            if (!object.isEmpty()) {
-                emit updateTaskStatus(object);
-            }
-
-//            QVariantMap object;
-//            object.insert(QString("id"),QVariant::fromValue(taskObject->id));
-//            object.insert(QString("catid"),QVariant::fromValue(taskObject->category));
-//            object.insert(QString("launchName"),QVariant::fromValue(taskObject->launchName));
-//            object.insert(QString("autoInstall"),QVariant::fromValue(taskObject->autoInstall));
-//            object.insert(QString("status"),QVariant::fromValue(taskObject->status));
-//            object.insert(QString("percent"),QVariant::fromValue(taskObject->percent));
-//            object.insert(QString("downloadUrl"),QVariant::fromValue(taskObject->downloadUrl));
-//            emit updateTaskStatus(object);
+		if (taskObject->hTaskHandle != NULL) {
+			if (taskObject->status == 0) {
+				taskObject->status = 2;
+				QVariantMap object;
+				encodeToVariantMap(taskObject,object);
+				if (!object.isEmpty()) { emit updateTaskStatus(object); }
+			}
+			else if (taskObject->status == 1 || taskObject->status == 7) {
+				_Wapper->TaskPause(taskObject->hTaskHandle);
+			}
         }
     }
 }
@@ -255,27 +198,17 @@ void PackageRunner::reqPauseAllTask(){
     QVariantList taskStatus;
     for (mapDowningTaskObject::iterator it = _TaskObjects.begin() ; it!=_TaskObjects.end(); it++) {
         LPDowningTaskObject taskObject = it.value();
-        if (taskObject->hTaskHandle!=NULL && taskObject->status==7) {
-			_Wapper->TaskPause(taskObject->hTaskHandle);
-            taskObject->status = 2;
-            if (taskObject->hTaskHandle != NULL) {
-                _Wapper->TaskPause(taskObject->hTaskHandle);
-            }
+		if (taskObject->hTaskHandle != NULL) {
+			if (taskObject->status == 0) {
+	            taskObject->status = 2;
+		        QVariantMap object;
+		        encodeToVariantMap(taskObject,object);
+		        if (!object.isEmpty()) { taskStatus.append(object); }
+			}
+			else if (taskObject->status == 1 || taskObject->status == 7) {
+				_Wapper->TaskPause(taskObject->hTaskHandle);
+			}
         }
-        QVariantMap object;
-        encodeToVariantMap(taskObject,object);
-        if (!object.isEmpty()) {
-            taskStatus.append(object);
-        }
-//		QVariantMap object;
-//		object.insert(QString("id"), QVariant::fromValue(taskObject->id));
-//		object.insert(QString("catid"), QVariant::fromValue(taskObject->category));
-//		object.insert(QString("launchName"), QVariant::fromValue(taskObject->launchName));
-//		object.insert(QString("autoInstall"), QVariant::fromValue(taskObject->autoInstall));
-//		object.insert(QString("status"), QVariant::fromValue(taskObject->status));
-//		object.insert(QString("percent"), QVariant::fromValue(taskObject->percent));
-//        object.insert(QString("downloadUrl"),QVariant::fromValue(taskObject->downloadUrl));
-//        taskStatus.append(object);
     }
     emit updateAllTaskStatus(taskStatus);
 }
@@ -285,27 +218,17 @@ void PackageRunner::reqResumeTask(QVariantMap task){
     mapDowningTaskObject::iterator it = _TaskObjects.find(task.value("id").toString());
     if (it != _TaskObjects.end()) {
         LPDowningTaskObject taskObject = it.value();
-        if (taskObject->status!= 7) {
+		if (taskObject->status == 2 || taskObject->status == 5 || taskObject->status == 6) {
             taskObject->status = 0;
             if (taskObject->hTaskHandle != NULL) {
                 _Wapper->TaskStart(taskObject->hTaskHandle);
             }
         }
-
-        QVariantMap object;
-        encodeToVariantMap(taskObject,object);
-        if (!object.isEmpty()) {
-            emit updateTaskStatus(object);
-        }
-//        QVariantMap object;
-//        object.insert(QString("id"),QVariant::fromValue(taskObject->id));
-//        object.insert(QString("catid"),QVariant::fromValue(taskObject->category));
-//        object.insert(QString("launchName"),QVariant::fromValue(taskObject->launchName));
-//        object.insert(QString("autoInstall"),QVariant::fromValue(taskObject->autoInstall));
-//        object.insert(QString("status"),QVariant::fromValue(taskObject->status));
-//        object.insert(QString("percent"),QVariant::fromValue(taskObject->percent));
-//        object.insert(QString("downloadUrl"),QVariant::fromValue(taskObject->downloadUrl));
-//        emit updateTaskStatus(object);
+		else {
+	        QVariantMap object;
+	        encodeToVariantMap(taskObject,object);
+	        if (!object.isEmpty()) { emit updateTaskStatus(object); }
+		}
     }
 }
 
@@ -315,33 +238,17 @@ void PackageRunner::reqResumeAllTask(){
     for (mapDowningTaskObject::iterator it = _TaskObjects.begin() ; it!=_TaskObjects.end(); it++) {
         LPDowningTaskObject taskObject = it.value();
 
-        if (taskObject->status==2) {
+		if (taskObject->status == 2 || taskObject->status == 5 || taskObject->status == 6) {
             taskObject->status = 0;
             if (taskObject->hTaskHandle != NULL) {
                 _Wapper->TaskStart(taskObject->hTaskHandle);
             }
         }
-        else if( taskObject->status==3 || taskObject->status==5 || taskObject->status==6) {
-            taskObject->status = 0;
-            if (taskObject->hTaskHandle != NULL) {
-                _Wapper->TaskStart(taskObject->hTaskHandle);
-            }
-        }
-        QVariantMap object;
-        encodeToVariantMap(taskObject,object);
-        if (!object.isEmpty()) {
-            taskStatus.append(object);
-        }
-
-//        QVariantMap object;
-//        object.insert(QString("id"),QVariant::fromValue(taskObject->id));
-//        object.insert(QString("catid"),QVariant::fromValue(taskObject->category));
-//        object.insert(QString("launchName"),QVariant::fromValue(taskObject->launchName));
-//        object.insert(QString("autoInstall"),QVariant::fromValue(taskObject->autoInstall));
-//        object.insert(QString("status"),QVariant::fromValue(taskObject->status));
-//        object.insert(QString("percent"),QVariant::fromValue(taskObject->percent));
-//        object.insert(QString("downloadUrl"),QVariant::fromValue(taskObject->downloadUrl));
-//        taskStatus.append(object);
+		else {
+			QVariantMap object;
+			encodeToVariantMap(taskObject,object);
+			if (!object.isEmpty()) { taskStatus.append(object); }
+		}
     }
     emit updateAllTaskStatus(taskStatus);
 }
@@ -351,29 +258,19 @@ void PackageRunner::reqRemoveTask(QVariantMap task){
     mapDowningTaskObject::iterator it = _TaskObjects.find(task.value("id").toString());
     if (it != _TaskObjects.end()) {
         LPDowningTaskObject taskObject = it.value();
-        if (taskObject->status!= 4) {
+		if (taskObject->status != 4) {
             taskObject->status = 4;
             if (taskObject->hTaskHandle != NULL) {
                 _Wapper->TaskPause(taskObject->hTaskHandle);
                 _Wapper->TaskDelete(taskObject->hTaskHandle);
                 _Wapper->DelTempFile(taskObject->downTaskparam);
             }
+			else {
+				QVariantMap object;
+				encodeToVariantMap(taskObject, object);
+				if (!object.isEmpty()) { emit updateTaskStatus(object); }
+			}
         }
-
-        QVariantMap object;
-        encodeToVariantMap(taskObject,object);
-        if (!object.isEmpty()) {
-            emit updateTaskStatus(object);
-        }
-//        QVariantMap object;
-//        object.insert(QString("id"),QVariant::fromValue(taskObject->id));
-//        object.insert(QString("catid"),QVariant::fromValue(taskObject->category));
-//        object.insert(QString("launchName"),QVariant::fromValue(taskObject->launchName));
-//        object.insert(QString("autoInstall"),QVariant::fromValue(taskObject->autoInstall));
-//        object.insert(QString("status"),QVariant::fromValue(taskObject->status));
-//        object.insert(QString("percent"),QVariant::fromValue(taskObject->percent));
-//        object.insert(QString("downloadUrl"),QVariant::fromValue(taskObject->downloadUrl));
-//        emit updateTaskStatus(object);
     }
 }
 
@@ -383,22 +280,19 @@ void PackageRunner::reqRemoveAllTask(){
     for (mapDowningTaskObject::iterator it = _TaskObjects.begin() ; it!=_TaskObjects.end(); it++) {
         LPDowningTaskObject taskObject = it.value();
 
-        taskObject->status = 4;
-
-        QVariantMap object;
-        encodeToVariantMap(taskObject,object);
-        if (!object.isEmpty()) {
-            taskStatus.append(object);
+        if ( taskObject->status != 4 ) {
+			taskObject->status = 4;
+			if (taskObject->hTaskHandle != NULL) {
+				_Wapper->TaskPause(taskObject->hTaskHandle);
+				_Wapper->TaskDelete(taskObject->hTaskHandle);
+				_Wapper->DelTempFile(taskObject->downTaskparam);
+			}
+			else {
+				QVariantMap object;
+				encodeToVariantMap(taskObject,object);
+				if (!object.isEmpty()) { taskStatus.append(object); }
+			}
         }
-//        QVariantMap object;
-//        object.insert(QString("id"),QVariant::fromValue(taskObject->id));
-//        object.insert(QString("catid"),QVariant::fromValue(taskObject->category));
-//        object.insert(QString("launchName"),QVariant::fromValue(taskObject->launchName));
-//        object.insert(QString("autoInstall"),QVariant::fromValue(taskObject->autoInstall));
-//        object.insert(QString("status"),QVariant::fromValue(taskObject->status));
-//        object.insert(QString("percent"),QVariant::fromValue(taskObject->percent));
-//        object.insert(QString("downloadUrl"),QVariant::fromValue(taskObject->downloadUrl));
-//        taskStatus.append(object);
     }
     emit updateAllTaskStatus(taskStatus);
 }
@@ -409,120 +303,125 @@ void PackageRunner::PeriodPollTaskStatus() {
 	int MaxTask = 10;
 
     DownTaskInfo info;
+    QVariantMap sigTaskObject;
 	QString szTmp;
-	QString defaultRepository = SwmgrApp::GetProgramProfilePath(SwmgrApp::GetSoftwareName()) + QDir::separator() + QString("Data") + QDir::separator();
+	QString defaultRepository = SwmgrApp::GetProgramProfilePath(SwmgrApp::GetSoftwareName()) + QDir::separator() + QString("Repository") + QDir::separator();
+	QDir dir;
     defaultRepository = QDir::toNativeSeparators(defaultRepository);
-
     defaultRepository = SwmgrApp::Instance()->getSettingParameter(QString("Repository"), defaultRepository);
+	dir.mkpath(defaultRepository);
 
     // query task process
 	for (mapDowningTaskObject::iterator it = _TaskObjects.begin(); it != _TaskObjects.end(); it++) {
 		LPDowningTaskObject taskObject = it.value();
-        if (taskObject != NULL && taskObject->hTaskHandle != NULL &&
-                (taskObject->status == 1 || taskObject->status ==7) ) {
+		if (taskObject != NULL && taskObject->hTaskHandle != NULL &&
+			(taskObject->status == 1 || taskObject->status == 2 || taskObject->status == 3 || taskObject->status == 7)) {
             memset(&info, 0, sizeof(info));
             _Wapper->TaskQueryEx(taskObject->hTaskHandle, info);
+			
 			bool bNeedUpdate = false;
             switch (info.stat)
             {
             case NOITEM:
                 // maybe finish
-//                taskObject->percent=1.0f;
-//                taskObject->status = 10;
-				qDebug() << defaultRepository + QString::fromWCharArray(taskObject->downTaskparam.szFilename);
-				if (QFile::exists(defaultRepository + QString::fromWCharArray(taskObject->downTaskparam.szFilename))) {
-					taskObject->status = 10;
-				}
+				qDebug() << "status:NOITEM";
+                taskObject->percent=1.0f;
+                szTmp = defaultRepository + taskObject->packageName;
+                taskObject->status = QFile::exists(szTmp) ? 10 : 4;
+                qDebug() << szTmp;
 				_Wapper->TaskPause(taskObject->hTaskHandle);
 				_Wapper->TaskDelete(taskObject->hTaskHandle);
 				taskObject->hTaskHandle = NULL;
-				bNeedUpdate = true;
+
+                bNeedUpdate = true;
 				break;
             case TSC_ERROR:
-                if (info.fail_code) {
-                    taskObject->percent=1.0f;
-                    taskObject->status=5;
-                }
+				qDebug() << "status:TSC_ERROR";
+				if (taskObject->status != 5) {
+					taskObject->status = 5;
+					bNeedUpdate = true;
+				}
                 break;
             case TSC_PAUSE:
-                taskObject->status = 2;
-				bNeedUpdate = true;
+				qDebug() << "status:TSC_PAUSE";
+				if (taskObject->status != 2) {
+					taskObject->status = 2;
+					bNeedUpdate = true;
+				}
 				break;
             case TSC_DOWNLOAD:
                 // doing
-                taskObject->percent = info.fPercent;
+				qDebug() << "status:TSC_DOWNLOAD";
+				taskObject->percent = info.fPercent;
                 taskObject->status = 7;
-				bNeedUpdate = true;
+				bNeedUpdate = false;
 				startCount++;
+                encodeToVariantMap(taskObject,sigTaskObject);
+                if (!sigTaskObject.isEmpty()) {
+                    emit updateTaskDownloadProgress(sigTaskObject);
+                }
+
                 break;
             case TSC_COMPLETE:
                 // finish
-                taskObject->percent=1.0f;
-                taskObject->status = 10;
+				qDebug() << "status:TSC_COMPLETE";
+				taskObject->percent = 1.0f;
 				_Wapper->TaskPause(taskObject->hTaskHandle);
 				_Wapper->TaskDelete(taskObject->hTaskHandle);
 				taskObject->hTaskHandle = NULL;
-				bNeedUpdate = true;
+
+				if (taskObject->status != 10) {
+					taskObject->status = 10;
+					bNeedUpdate = true;
+				}
 				break;
             case TSC_STARTPENDING:
-                taskObject->status = 1;
+				qDebug() << "status:TSC_STARTPENDING";
+				taskObject->status = 7;
                 startCount++;
 				bNeedUpdate = true;
 				break;
             case TSC_STOPPENDING:
-                taskObject->status = 3;
-				bNeedUpdate = true;
+				qDebug() << "status:TSC_STOPPENDING";
+				if (taskObject->status != 3) {
+					taskObject->status = 3;
+					bNeedUpdate = true;
+				}
 				break;
             default:
                 break;
             }
 			if (bNeedUpdate) {
-                QVariantMap object;
-                encodeToVariantMap(taskObject,object);
-                if (!object.isEmpty()) {
-                    emit updateTaskDownloadProgress(object);
-                }
-//				QVariantMap object;
-//				object.insert(QString("id"), QVariant::fromValue(taskObject->id));
-//				object.insert(QString("catid"), QVariant::fromValue(taskObject->category));
-//				object.insert(QString("launchName"), QVariant::fromValue(taskObject->launchName));
-//				object.insert(QString("autoInstall"), QVariant::fromValue(taskObject->autoInstall));
-//				object.insert(QString("status"), QVariant::fromValue(taskObject->status));
-//				object.insert(QString("percent"), QVariant::fromValue(taskObject->percent));
-//				object.insert(QString("downloadUrl"), QVariant::fromValue(taskObject->downloadUrl));
-//                emit updateTaskDownloadProgress(object);
+                encodeToVariantMap(taskObject,sigTaskObject);
+				if (!sigTaskObject.isEmpty()) { emit updateTaskStatus(sigTaskObject); }
 			}
         }
     }
 
-    // replenish to max task objects
 	for (mapDowningTaskObject::iterator it = _TaskObjects.begin(); it != _TaskObjects.end(); it++) {
+        if (startCount >= MaxTask) { break; }
+
         LPDowningTaskObject taskObject = it.value();
-        if (taskObject != NULL ) {
-            if ( taskObject->status == 0 ) {
-                if (startCount < MaxTask) { // may start download
-                    if (taskObject->hTaskHandle != NULL) {
-                        _Wapper->TaskStart(taskObject->hTaskHandle);
-                        taskObject->status=1;
-                        startCount++;
-                    }
-                    else{
-                        // start new task
-                        StrCpyW(taskObject->downTaskparam.szTaskUrl, taskObject->downloadUrl.toStdWString().data());
-                        StrCpyW(taskObject->downTaskparam.szSavePath, defaultRepository.toStdWString().data());
-						QString szTmp = taskObject->launchName + QString(".exe");
-                        StrCpyW(taskObject->downTaskparam.szFilename, szTmp.toStdWString().data());
-                        taskObject->downTaskparam.IsOnlyOriginal = FALSE;
-						taskObject->hTaskHandle = _Wapper->TaskCreate(taskObject->downTaskparam);
-						if (taskObject->hTaskHandle != NULL) {
-							_Wapper->TaskStart(taskObject->hTaskHandle);
-							taskObject->status = 1;
-							startCount++;
-						}
-                    }
-                }
-                else {
-                    break;
+        if (taskObject != NULL && taskObject->status == 0 ) { //resume
+            if (taskObject->hTaskHandle != NULL) {
+                _Wapper->TaskStart(taskObject->hTaskHandle);
+                taskObject->status=7;
+                startCount++;
+            }
+            else{  // start new task
+                szTmp = taskObject->packageName;
+
+                StrCpyW(taskObject->downTaskparam.szTaskUrl, taskObject->downloadUrl.toStdWString().data());
+                StrCpyW(taskObject->downTaskparam.szSavePath, defaultRepository.toStdWString().data());
+                StrCpyW(taskObject->downTaskparam.szFilename, szTmp.toStdWString().data());
+                taskObject->downTaskparam.IsOnlyOriginal = FALSE;
+                taskObject->downTaskparam.DisableAutoRename = TRUE;
+
+                taskObject->hTaskHandle = _Wapper->TaskCreate(taskObject->downTaskparam);
+                if (taskObject->hTaskHandle != NULL) {
+                    _Wapper->TaskStart(taskObject->hTaskHandle);
+                    taskObject->status = 7;
+                    startCount++;
                 }
             }
         }
