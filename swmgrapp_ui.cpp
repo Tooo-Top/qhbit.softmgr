@@ -129,6 +129,15 @@ void SwmgrApp::execOpenSystemBrowser(QString urlAddress){
     QDesktopServices::openUrl(QUrl::fromUserInput(urlAddress));
 }
 
+/**
+ * Use explorer open local disk folder
+ * @brief SwmgrApp::execOpenLocalFolder
+ * @param localAddress
+ */
+void SwmgrApp::execOpenLocalFolder(QString localAddress){
+    QDesktopServices::openUrl(QUrl::fromUserInput(localAddress));
+}
+
 
 /**
  * Use self webkit container pop open a qrc|file|http url

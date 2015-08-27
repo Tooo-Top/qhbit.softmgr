@@ -101,6 +101,7 @@ public slots:
     //msic js bind signal
     void execOpenSystemBrowser(QString urlAddress);//use system default browser open a http://website
     void execOpenPopBrowser(QString urlAddress, int windowWidth, int windowHeight);//use self webkit container open a qrc|file|http url
+    void execOpenLocalFolder(QString localAddress);//open local disk folder on explorer
 
 // For UI interface begin
 signals:
