@@ -5,7 +5,7 @@
 void SwmgrApp::docLoadFinish(bool ok) {
     if (ok) {
         _DataModel->reqQueryUserStatus();
-        _DataModel->reqQueryAllTaskStatus();
+//        _DataModel->reqQueryAllTaskStatus();
     }
 }
 

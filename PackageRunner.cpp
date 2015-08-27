@@ -3,6 +3,39 @@
 #include "Storage.h"
 #include <QtDebug>
 
+//QString packageItems[nPackageItemCount] = {
+//	"id",
+//	"packageName",
+//	"windowsVersion",
+//	"arch",
+//	"name",
+//	"category",
+//	"description",
+//	"developer",
+//	"iconUrl",
+//	"largeIcon",
+
+//	"screenshotsUrl",
+//	"incomeShare",
+//	"rating",
+//	"versionName",
+//	"versionCode",
+//	"priceInfo",
+//	"tag",
+//	"downloadUrl",
+//	"hash",
+//	"size",
+
+//	"createTime",
+//	"updateTime",
+//	"signature",
+//	"updateInfo",
+//	"language",
+//	"brief",
+//	"isAd",
+//	"status"
+//};
+
 PackageRunner::PackageRunner(QObject *parent) : QObject(parent)
 {
 
@@ -88,38 +121,6 @@ void PackageRunner::reqAddTask(QVariantMap task) {
     if (task.contains("id") && task.value("id").type()==QVariant::String ) {
         if (_TaskObjects.find(task.value("id").toString()) == _TaskObjects.end()) {
 			LPDowningTaskObject taskObject = new DowningTaskObject();
-            //QString packageItems[nPackageItemCount] = {
-            //	"id",
-            //	"packageName",
-            //	"windowsVersion",
-            //	"arch",
-            //	"name",
-            //	"category",
-            //	"description",
-            //	"developer",
-            //	"iconUrl",
-            //	"largeIcon",
-
-            //	"screenshotsUrl",
-            //	"incomeShare",
-            //	"rating",
-            //	"versionName",
-            //	"versionCode",
-            //	"priceInfo",
-            //	"tag",
-            //	"downloadUrl",
-            //	"hash",
-            //	"size",
-
-            //	"createTime",
-            //	"updateTime",
-            //	"signature",
-            //	"updateInfo",
-            //	"language",
-            //	"brief",
-            //	"isAd",
-            //	"status"
-            //};
             taskObject->autoInstall= task.value("autoInstall").toBool();
 
             taskObject->id = task.value("id").toString();
