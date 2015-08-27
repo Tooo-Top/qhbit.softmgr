@@ -48,7 +48,7 @@ bool PackageRunner::init() {
     }
 
 	QString szFile = ConfOperation::Root().getSubpathFile("Conf", "installPending.conf");
-	return Storage::LoadItemsFromConfArray(szFile, _TaskObjects);
+    return true; /*Storage::LoadItemsFromConfArray(szFile, _TaskObjects)*/;
 }
 
 BOOL PackageRunner::initMiniXL() {
@@ -97,21 +97,31 @@ void PackageRunner::UnloadDll(DownWrapper** Wapper){
     }
 }
 
+void PackageRunner::encodeToVariantMap(LPDowningTaskObject task,QVariantMap& taskObject) {
+    if (task==NULL)
+        return ;
+    taskObject.insert(QString("id"),QVariant::fromValue(task->id));
+    taskObject.insert(QString("catid"),QVariant::fromValue(task->category));
+    taskObject.insert(QString("name"),QVariant::fromValue(task->name));
+    taskObject.insert(QString("largeIcon"),QVariant::fromValue(task->largeIcon));
+    taskObject.insert(QString("brief"),QVariant::fromValue(task->brief));
+    taskObject.insert(QString("size"),QVariant::fromValue(task->size));
+    taskObject.insert(QString("percent"),QVariant::fromValue(task->percent));
+    taskObject.insert(QString("speed"),QVariant::fromValue(task->speed));
+    taskObject.insert(QString("status"),QVariant::fromValue(task->status));
+    taskObject.insert(QString("downloadUrl"),QVariant::fromValue(task->downloadUrl));
+    taskObject.insert(QString("autoInstall"),QVariant::fromValue(task->autoInstall));
+}
+
 void PackageRunner::reqAllTaskStatus() {
     QVariantList lstTaskStatus;
 
     for(mapDowningTaskObject::iterator it = _TaskObjects.begin();it!=_TaskObjects.end();it++) {
         QVariantMap object;
-
-        object.insert(QString("id"),QVariant::fromValue(it.value()->id));
-        object.insert(QString("catid"),QVariant::fromValue(it.value()->category));
-        object.insert(QString("launchName"),QVariant::fromValue(it.value()->launchName));
-        object.insert(QString("autoInstall"),QVariant::fromValue(it.value()->autoInstall));
-        object.insert(QString("status"),QVariant::fromValue(it.value()->status));
-        object.insert(QString("percent"),QVariant::fromValue(it.value()->percent));
-        object.insert(QString("downloadUrl"),QVariant::fromValue(it.value()->downloadUrl));
-
-        lstTaskStatus.append(object);
+        encodeToVariantMap(it.value(),object);
+        if (!object.isEmpty()) {
+            lstTaskStatus.append(object);
+        }
     }
 
     emit updateAllTaskStatus(lstTaskStatus);
@@ -121,22 +131,51 @@ void PackageRunner::reqAddTask(QVariantMap task) {
     if (task.contains("id") && task.value("id").type()==QVariant::String ) {
         if (_TaskObjects.find(task.value("id").toString()) == _TaskObjects.end()) {
 			LPDowningTaskObject taskObject = new DowningTaskObject();
-            taskObject->autoInstall= task.value("autoInstall").toBool();
-
+//taskObject.insert(QString("id"),QVariant::fromValue(task->id));
+//taskObject.insert(QString("catid"),QVariant::fromValue(task->category));
+//taskObject.insert(QString("name"),QVariant::fromValue(task->name));
+//taskObject.insert(QString("largeIcon"),QVariant::fromValue(task->largeIcon));
+//taskObject.insert(QString("brief"),QVariant::fromValue(task->brief));
+//taskObject.insert(QString("size"),QVariant::fromValue(task->size));
+//taskObject.insert(QString("percent"),QVariant::fromValue(task->percent));
+//taskObject.insert(QString("speed"),QVariant::fromValue(task->speed));
+//taskObject.insert(QString("status"),QVariant::fromValue(task->status));
+//taskObject.insert(QString("downloadUrl"),QVariant::fromValue(task->downloadUrl));
+//taskObject.insert(QString("autoInstall"),QVariant::fromValue(task->autoInstall));
             taskObject->id = task.value("id").toString();
-            taskObject->name = task.value("name").toString();
             taskObject->category = task.value("category").toString();
-            taskObject->launchName = task.value("name").toString();//packageName
+            taskObject->name = task.value("name").toString();
+            taskObject->largeIcon= task.value("largeIcon").toString();
+            taskObject->brief= task.value("brief").toString();
+            taskObject->size= 0;
+            taskObject->percent= 0.0f;
+            taskObject->speed=0.0f;
+            taskObject->status = 0;
             if (task.value("ptdownloadUrl").toString().isEmpty()) {
                 taskObject->downloadUrl = task.value("downloadUrl").toString();
             }
             else{
                 taskObject->downloadUrl = task.value("ptdownloadUrl").toString();
             }
-            taskObject->status = 0;
-            taskObject->percent= 0.0f;
 
-			taskObject->hTaskHandle = NULL;
+            taskObject->autoInstall= task.value("autoInstall").toBool();
+            taskObject->hTaskHandle = NULL;
+            taskObject->launchName = taskObject->name;
+
+//            taskObject->id = task.value("id").toString();
+//            taskObject->name = task.value("name").toString();
+//            taskObject->category = task.value("category").toString();
+//            taskObject->launchName = task.value("name").toString();//packageName
+//            if (task.value("ptdownloadUrl").toString().isEmpty()) {
+//                taskObject->downloadUrl = task.value("downloadUrl").toString();
+//            }
+//            else{
+//                taskObject->downloadUrl = task.value("ptdownloadUrl").toString();
+//            }
+//            taskObject->status = 0;
+//            taskObject->percent= 0.0f;
+
+//			taskObject->hTaskHandle = NULL;
 
 			_TaskObjects.insert(taskObject->id, taskObject);
             Storage::AddItemToConfArray(ConfOperation::Root().getSubpathFile("Conf", "installPending.conf"), task);
@@ -145,14 +184,20 @@ void PackageRunner::reqAddTask(QVariantMap task) {
                      << task.value("launchName").toString();
 
             QVariantMap object;
-            object.insert(QString("id"),QVariant::fromValue(taskObject->id));
-            object.insert(QString("catid"),QVariant::fromValue(taskObject->category));
-            object.insert(QString("launchName"),QVariant::fromValue(taskObject->launchName));
-            object.insert(QString("autoInstall"),QVariant::fromValue(taskObject->autoInstall));
-            object.insert(QString("status"),QVariant::fromValue(taskObject->status));
-            object.insert(QString("percent"),QVariant::fromValue(taskObject->percent));
-            object.insert(QString("downloadUrl"),QVariant::fromValue(taskObject->downloadUrl));
-            emit updateTaskStatus(object);
+            encodeToVariantMap(taskObject,object);
+            if (!object.isEmpty()) {
+                emit updateTaskStatus(object);
+            }
+
+//            QVariantMap object;
+//            object.insert(QString("id"),QVariant::fromValue(taskObject->id));
+//            object.insert(QString("catid"),QVariant::fromValue(taskObject->category));
+//            object.insert(QString("launchName"),QVariant::fromValue(taskObject->launchName));
+//            object.insert(QString("autoInstall"),QVariant::fromValue(taskObject->autoInstall));
+//            object.insert(QString("status"),QVariant::fromValue(taskObject->status));
+//            object.insert(QString("percent"),QVariant::fromValue(taskObject->percent));
+//            object.insert(QString("downloadUrl"),QVariant::fromValue(taskObject->downloadUrl));
+//            emit updateTaskStatus(object);
         }
         else {
 			qDebug() << "repeat task :" << task.value("id").toString() << ","
@@ -186,16 +231,21 @@ void PackageRunner::reqPauseTask(QVariantMap task){
             if (taskObject->hTaskHandle != NULL) {
                 _Wapper->TaskPause(taskObject->hTaskHandle);
             }
-
             QVariantMap object;
-            object.insert(QString("id"),QVariant::fromValue(taskObject->id));
-            object.insert(QString("catid"),QVariant::fromValue(taskObject->category));
-            object.insert(QString("launchName"),QVariant::fromValue(taskObject->launchName));
-            object.insert(QString("autoInstall"),QVariant::fromValue(taskObject->autoInstall));
-            object.insert(QString("status"),QVariant::fromValue(taskObject->status));
-            object.insert(QString("percent"),QVariant::fromValue(taskObject->percent));
-            object.insert(QString("downloadUrl"),QVariant::fromValue(taskObject->downloadUrl));
-            emit updateTaskStatus(object);
+            encodeToVariantMap(taskObject,object);
+            if (!object.isEmpty()) {
+                emit updateTaskStatus(object);
+            }
+
+//            QVariantMap object;
+//            object.insert(QString("id"),QVariant::fromValue(taskObject->id));
+//            object.insert(QString("catid"),QVariant::fromValue(taskObject->category));
+//            object.insert(QString("launchName"),QVariant::fromValue(taskObject->launchName));
+//            object.insert(QString("autoInstall"),QVariant::fromValue(taskObject->autoInstall));
+//            object.insert(QString("status"),QVariant::fromValue(taskObject->status));
+//            object.insert(QString("percent"),QVariant::fromValue(taskObject->percent));
+//            object.insert(QString("downloadUrl"),QVariant::fromValue(taskObject->downloadUrl));
+//            emit updateTaskStatus(object);
         }
     }
 }
@@ -212,15 +262,20 @@ void PackageRunner::reqPauseAllTask(){
                 _Wapper->TaskPause(taskObject->hTaskHandle);
             }
         }
-		QVariantMap object;
-		object.insert(QString("id"), QVariant::fromValue(taskObject->id));
-		object.insert(QString("catid"), QVariant::fromValue(taskObject->category));
-		object.insert(QString("launchName"), QVariant::fromValue(taskObject->launchName));
-		object.insert(QString("autoInstall"), QVariant::fromValue(taskObject->autoInstall));
-		object.insert(QString("status"), QVariant::fromValue(taskObject->status));
-		object.insert(QString("percent"), QVariant::fromValue(taskObject->percent));
-        object.insert(QString("downloadUrl"),QVariant::fromValue(taskObject->downloadUrl));
-        taskStatus.append(object);
+        QVariantMap object;
+        encodeToVariantMap(taskObject,object);
+        if (!object.isEmpty()) {
+            taskStatus.append(object);
+        }
+//		QVariantMap object;
+//		object.insert(QString("id"), QVariant::fromValue(taskObject->id));
+//		object.insert(QString("catid"), QVariant::fromValue(taskObject->category));
+//		object.insert(QString("launchName"), QVariant::fromValue(taskObject->launchName));
+//		object.insert(QString("autoInstall"), QVariant::fromValue(taskObject->autoInstall));
+//		object.insert(QString("status"), QVariant::fromValue(taskObject->status));
+//		object.insert(QString("percent"), QVariant::fromValue(taskObject->percent));
+//        object.insert(QString("downloadUrl"),QVariant::fromValue(taskObject->downloadUrl));
+//        taskStatus.append(object);
     }
     emit updateAllTaskStatus(taskStatus);
 }
@@ -238,14 +293,19 @@ void PackageRunner::reqResumeTask(QVariantMap task){
         }
 
         QVariantMap object;
-        object.insert(QString("id"),QVariant::fromValue(taskObject->id));
-        object.insert(QString("catid"),QVariant::fromValue(taskObject->category));
-        object.insert(QString("launchName"),QVariant::fromValue(taskObject->launchName));
-        object.insert(QString("autoInstall"),QVariant::fromValue(taskObject->autoInstall));
-        object.insert(QString("status"),QVariant::fromValue(taskObject->status));
-        object.insert(QString("percent"),QVariant::fromValue(taskObject->percent));
-        object.insert(QString("downloadUrl"),QVariant::fromValue(taskObject->downloadUrl));
-        emit updateTaskStatus(object);
+        encodeToVariantMap(taskObject,object);
+        if (!object.isEmpty()) {
+            emit updateTaskStatus(object);
+        }
+//        QVariantMap object;
+//        object.insert(QString("id"),QVariant::fromValue(taskObject->id));
+//        object.insert(QString("catid"),QVariant::fromValue(taskObject->category));
+//        object.insert(QString("launchName"),QVariant::fromValue(taskObject->launchName));
+//        object.insert(QString("autoInstall"),QVariant::fromValue(taskObject->autoInstall));
+//        object.insert(QString("status"),QVariant::fromValue(taskObject->status));
+//        object.insert(QString("percent"),QVariant::fromValue(taskObject->percent));
+//        object.insert(QString("downloadUrl"),QVariant::fromValue(taskObject->downloadUrl));
+//        emit updateTaskStatus(object);
     }
 }
 
@@ -267,16 +327,21 @@ void PackageRunner::reqResumeAllTask(){
                 _Wapper->TaskStart(taskObject->hTaskHandle);
             }
         }
-
         QVariantMap object;
-        object.insert(QString("id"),QVariant::fromValue(taskObject->id));
-        object.insert(QString("catid"),QVariant::fromValue(taskObject->category));
-        object.insert(QString("launchName"),QVariant::fromValue(taskObject->launchName));
-        object.insert(QString("autoInstall"),QVariant::fromValue(taskObject->autoInstall));
-        object.insert(QString("status"),QVariant::fromValue(taskObject->status));
-        object.insert(QString("percent"),QVariant::fromValue(taskObject->percent));
-        object.insert(QString("downloadUrl"),QVariant::fromValue(taskObject->downloadUrl));
-        taskStatus.append(object);
+        encodeToVariantMap(taskObject,object);
+        if (!object.isEmpty()) {
+            taskStatus.append(object);
+        }
+
+//        QVariantMap object;
+//        object.insert(QString("id"),QVariant::fromValue(taskObject->id));
+//        object.insert(QString("catid"),QVariant::fromValue(taskObject->category));
+//        object.insert(QString("launchName"),QVariant::fromValue(taskObject->launchName));
+//        object.insert(QString("autoInstall"),QVariant::fromValue(taskObject->autoInstall));
+//        object.insert(QString("status"),QVariant::fromValue(taskObject->status));
+//        object.insert(QString("percent"),QVariant::fromValue(taskObject->percent));
+//        object.insert(QString("downloadUrl"),QVariant::fromValue(taskObject->downloadUrl));
+//        taskStatus.append(object);
     }
     emit updateAllTaskStatus(taskStatus);
 }
@@ -296,14 +361,19 @@ void PackageRunner::reqRemoveTask(QVariantMap task){
         }
 
         QVariantMap object;
-        object.insert(QString("id"),QVariant::fromValue(taskObject->id));
-        object.insert(QString("catid"),QVariant::fromValue(taskObject->category));
-        object.insert(QString("launchName"),QVariant::fromValue(taskObject->launchName));
-        object.insert(QString("autoInstall"),QVariant::fromValue(taskObject->autoInstall));
-        object.insert(QString("status"),QVariant::fromValue(taskObject->status));
-        object.insert(QString("percent"),QVariant::fromValue(taskObject->percent));
-        object.insert(QString("downloadUrl"),QVariant::fromValue(taskObject->downloadUrl));
-        emit updateTaskStatus(object);
+        encodeToVariantMap(taskObject,object);
+        if (!object.isEmpty()) {
+            emit updateTaskStatus(object);
+        }
+//        QVariantMap object;
+//        object.insert(QString("id"),QVariant::fromValue(taskObject->id));
+//        object.insert(QString("catid"),QVariant::fromValue(taskObject->category));
+//        object.insert(QString("launchName"),QVariant::fromValue(taskObject->launchName));
+//        object.insert(QString("autoInstall"),QVariant::fromValue(taskObject->autoInstall));
+//        object.insert(QString("status"),QVariant::fromValue(taskObject->status));
+//        object.insert(QString("percent"),QVariant::fromValue(taskObject->percent));
+//        object.insert(QString("downloadUrl"),QVariant::fromValue(taskObject->downloadUrl));
+//        emit updateTaskStatus(object);
     }
 }
 
@@ -316,14 +386,19 @@ void PackageRunner::reqRemoveAllTask(){
         taskObject->status = 4;
 
         QVariantMap object;
-        object.insert(QString("id"),QVariant::fromValue(taskObject->id));
-        object.insert(QString("catid"),QVariant::fromValue(taskObject->category));
-        object.insert(QString("launchName"),QVariant::fromValue(taskObject->launchName));
-        object.insert(QString("autoInstall"),QVariant::fromValue(taskObject->autoInstall));
-        object.insert(QString("status"),QVariant::fromValue(taskObject->status));
-        object.insert(QString("percent"),QVariant::fromValue(taskObject->percent));
-        object.insert(QString("downloadUrl"),QVariant::fromValue(taskObject->downloadUrl));
-        taskStatus.append(object);
+        encodeToVariantMap(taskObject,object);
+        if (!object.isEmpty()) {
+            taskStatus.append(object);
+        }
+//        QVariantMap object;
+//        object.insert(QString("id"),QVariant::fromValue(taskObject->id));
+//        object.insert(QString("catid"),QVariant::fromValue(taskObject->category));
+//        object.insert(QString("launchName"),QVariant::fromValue(taskObject->launchName));
+//        object.insert(QString("autoInstall"),QVariant::fromValue(taskObject->autoInstall));
+//        object.insert(QString("status"),QVariant::fromValue(taskObject->status));
+//        object.insert(QString("percent"),QVariant::fromValue(taskObject->percent));
+//        object.insert(QString("downloadUrl"),QVariant::fromValue(taskObject->downloadUrl));
+//        taskStatus.append(object);
     }
     emit updateAllTaskStatus(taskStatus);
 }
@@ -402,15 +477,20 @@ void PackageRunner::PeriodPollTaskStatus() {
                 break;
             }
 			if (bNeedUpdate) {
-				QVariantMap object;
-				object.insert(QString("id"), QVariant::fromValue(taskObject->id));
-				object.insert(QString("catid"), QVariant::fromValue(taskObject->category));
-				object.insert(QString("launchName"), QVariant::fromValue(taskObject->launchName));
-				object.insert(QString("autoInstall"), QVariant::fromValue(taskObject->autoInstall));
-				object.insert(QString("status"), QVariant::fromValue(taskObject->status));
-				object.insert(QString("percent"), QVariant::fromValue(taskObject->percent));
-				object.insert(QString("downloadUrl"), QVariant::fromValue(taskObject->downloadUrl));
-                emit updateTaskDownloadProgress(object);
+                QVariantMap object;
+                encodeToVariantMap(taskObject,object);
+                if (!object.isEmpty()) {
+                    emit updateTaskDownloadProgress(object);
+                }
+//				QVariantMap object;
+//				object.insert(QString("id"), QVariant::fromValue(taskObject->id));
+//				object.insert(QString("catid"), QVariant::fromValue(taskObject->category));
+//				object.insert(QString("launchName"), QVariant::fromValue(taskObject->launchName));
+//				object.insert(QString("autoInstall"), QVariant::fromValue(taskObject->autoInstall));
+//				object.insert(QString("status"), QVariant::fromValue(taskObject->status));
+//				object.insert(QString("percent"), QVariant::fromValue(taskObject->percent));
+//				object.insert(QString("downloadUrl"), QVariant::fromValue(taskObject->downloadUrl));
+//                emit updateTaskDownloadProgress(object);
 			}
         }
     }

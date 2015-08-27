@@ -23,17 +23,22 @@
 */
 
 typedef struct __DowningTaskObject {
+// id,catid,name,largeIcon,brief,size,percent,speed,status,downloadUrl,autoInstall
 	QString id;
-	QString name;
 	QString category;
-	QString launchName;
+    QString name;
+    QString largeIcon;
+    QString brief;
+    qint64  size;
+    float   percent;
+    qint64  speed;
+    int status; //0:added/pending,1:starting,2:pause,3:stop,4:del,5:err,6:param err,7: running, 10:finish
+    QString downloadUrl;
     bool autoInstall;
 
-    QString downloadUrl;
-	DownTaskParam downTaskparam;
-    int status; //0:added/pending,1:starting,2:pause,3:stop,4:del,5:err,6:param err,7: running, 10:finish
-	float percent;
+    QString launchName;
 	HANDLE hTaskHandle;
+    DownTaskParam downTaskparam;
 }DowningTaskObject, *LPDowningTaskObject;
 
 typedef QMap<QString, LPDowningTaskObject> mapDowningTaskObject;
@@ -53,6 +58,7 @@ protected:
     DownWrapper* LoadDll();
     void UnloadDll(DownWrapper** Wapper);
 
+    void encodeToVariantMap(LPDowningTaskObject,QVariantMap&);
 public:
 	bool init();
     void unInit();
