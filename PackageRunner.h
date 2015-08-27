@@ -20,6 +20,7 @@
 *     4 : download err
 *     5 : delete
 *     6 : execute err
+*     9 : all completed
 */
 
 typedef struct __DowningTaskObject {
@@ -32,7 +33,7 @@ typedef struct __DowningTaskObject {
     qint64  size;
     float   percent;
     qint64  speed;
-    int status; //0:added/pending,1:starting,2:pause,3:stop,4:del,5:err,6:param err,7: running, 10:finish
+    int status; //0:added/pending,1:starting,2:pause,3:stop,4:del,5:err,6:param err,7: running, 9 : all completed, 10:finish
     QString downloadUrl;
     bool autoInstall;
 
