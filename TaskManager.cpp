@@ -43,7 +43,7 @@ void TaskManager::run() {
 
         QObject::connect(&period,SIGNAL(timeout()),pTaskRunner,SLOT(PeriodPollTaskStatus()));
 
-        period.start(100);
+        period.start(2000);
         QThread::exec();
         pTaskRunner->unInit();
     }

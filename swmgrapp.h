@@ -135,20 +135,20 @@ public slots:
     //soft package operation
 	void requestStartInstallPackage(QString szCategoryID, QString szPackageID, bool autoInstall); // software package download and install ( auto install ??)
     void requestBatStartInstallPackage(QVariantList lstPackage){}  // bat install
-    void requestPausePackage(QString szCategoryID,QString szPackageID){} //pause someone package
-    void requestResumePackage(QString szCategoryID,QString szPackageID){} //resume someone package
-    void requestAllResumePackage(){} //resume all package
-    void requestStopDownloadPackage(QString szCategoryID,QString szPackageID){} // remove processing task for download/installtion
+    void requestPausePackage(QString szCategoryID,QString szPackageID); //pause someone package
+    void requestResumePackage(QString szCategoryID,QString szPackageID); //resume someone package
+    void requestAllResumePackage(); //resume all package
+    void requestStopDownloadPackage(QString szCategoryID,QString szPackageID); // remove processing task for download/installtion
 
     //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++^
-    void requestAllDownloadingTaskPause(){} //Pause all downloading task
-    void requestAllDownloadingTaskCancel(){} //Cancel all downloading task
+    void requestAllDownloadingTaskPause(); //Pause all downloading task
+    void requestAllDownloadingTaskCancel(); //Cancel all downloading task
     //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++$
 
 	void requestCanUpdatePackages(){} //can be update pacakge list
 	void requestCanUninstallPackages(); //can be uninstall pacakge list
     void requestDoUninstall(){}
-    void requestOnPageChange(QString pageName){} //Webkit (dynamic dom page) change to {pageName}
+    void requestOnPageChange(QString pageName); //Webkit (dynamic dom page) change to {pageName}
 
     // For UI interface end
 };

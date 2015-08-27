@@ -69,15 +69,16 @@ void SwmgrApp::requestCategoryListByID(QString szCategoryID,int pageNumber,int c
 }
 
 void SwmgrApp::requestPackageInfoByID(QString szCategoryID,QString szPackageID) {
-	QMap<QString, QVariantList>::Iterator curItem = _DataModel->getSoftPackages().find(szCategoryID);
-	if (curItem != _DataModel->getSoftPackages().end()) {
-        //foreach(QVariant it,curItem) {
-        //    if (it.value("id").toString().compare(szPackageID,Qt::CaseInsensitive)==0) {
-        //        emit updatePackageInfoByID(it);
-        //        break;
-        //    }
-        //}
-    }
+    qDebug()<<"cateID:"<<szCategoryID<<";packageID:"<<szPackageID;
+//	QMap<QString, QVariantList>::Iterator curItem = _DataModel->getSoftPackages().find(szCategoryID);
+//	if (curItem != _DataModel->getSoftPackages().end()) {
+//        foreach(QVariant it,curItem) {
+//            if (it.value("id").toString().compare(szPackageID,Qt::CaseInsensitive)==0) {
+//                emit updatePackageInfoByID(it);
+//                break;
+//            }
+//        }
+//    }
 }
 
 void SwmgrApp::requestRegisteUser(QString username,QString password,QString email) {
@@ -125,11 +126,64 @@ void SwmgrApp::requestStartInstallPackage(QString szCategoryID, QString szPackag
     }
 	QVariantMap task = var;
 
-//	task.insert(QString("id"), QVariant::fromValue(szPackageID));
-//	task.insert(QString("catid"), QVariant::fromValue(szCategoryID));
-//    task.insert(QString("launchName"), QVariant::fromValue(var.value("name").toString()));
 	task.insert(QString("autoInstall"), QVariant::fromValue(autoInstall));
-//    task.insert(QString("downloadUrl"), QVariant::fromValue(var.value("downloadUrl").toString()));
-//	task.insert(QString("downloadUrl"), QVariant::fromValue(var.value("downloadUrl").toString()));
 	_DataModel->reqAddTask(task);
+}
+
+void SwmgrApp::requestPausePackage(QString szCategoryID,QString szPackageID) {
+    QVariantMap var;
+    var.insert("id",QVariant::fromValue(szPackageID));
+    var.insert("category",QVariant::fromValue(szCategoryID));
+    _DataModel->reqPauseTask(var);
+}
+
+void SwmgrApp::requestResumePackage(QString szCategoryID,QString szPackageID) {
+    QVariantMap var;
+    var.insert("id",QVariant::fromValue(szPackageID));
+    var.insert("category",QVariant::fromValue(szCategoryID));
+    _DataModel->reqResumeTask(var);
+}
+
+void SwmgrApp::requestAllResumePackage() {
+    _DataModel->reqResumeAllTask();
+}
+
+void SwmgrApp::requestStopDownloadPackage(QString szCategoryID,QString szPackageID){
+    QVariantMap var;
+    var.insert("id",QVariant::fromValue(szPackageID));
+    var.insert("category",QVariant::fromValue(szCategoryID));
+    _DataModel->reqRemoveTask(var);
+}
+
+void SwmgrApp::requestAllDownloadingTaskPause(){ //Pause all downloading task
+    _DataModel->reqPauseAllTask();
+}
+
+void SwmgrApp::requestAllDownloadingTaskCancel(){ //Cancel all downloading task
+    _DataModel->reqRemoveAllTask();
+}
+
+void SwmgrApp::requestOnPageChange(QString pageName) {
+    qDebug()<<"requestOnPageChange";
+    if (pageName.compare("index")==0) {
+        ;// skip operation
+    }
+    else if (pageName.compare("login")==0) {
+        ;
+    }
+    else if (pageName.compare("task")==0) {
+        ;
+    }
+    else if (pageName.compare("toolbox")==0) {
+        ;
+    }
+    else if (pageName.compare("uninstall")==0) {
+        ;
+    }
+    else if (pageName.compare("upgrade")==0) {
+        ;
+    }
+    else if (pageName.compare("uprofile")==0) {
+        ;
+    }
 }

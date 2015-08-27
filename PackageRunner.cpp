@@ -351,12 +351,12 @@ void PackageRunner::PeriodPollTaskStatus() {
             {
             case NOITEM:
                 // maybe finish
-                taskObject->percent=1.0f;
-                taskObject->status = 10;
+//                taskObject->percent=1.0f;
+//                taskObject->status = 10;
 				qDebug() << defaultRepository + QString::fromWCharArray(taskObject->downTaskparam.szFilename);
-				//if (QFile::exists(defaultRepository + QString::fromWCharArray(taskObject->downTaskparam.szFilename))) {
-				//	taskObject->status = 10;
-				//}
+				if (QFile::exists(defaultRepository + QString::fromWCharArray(taskObject->downTaskparam.szFilename))) {
+					taskObject->status = 10;
+				}
 				_Wapper->TaskPause(taskObject->hTaskHandle);
 				_Wapper->TaskDelete(taskObject->hTaskHandle);
 				taskObject->hTaskHandle = NULL;
