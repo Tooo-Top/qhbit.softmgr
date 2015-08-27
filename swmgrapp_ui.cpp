@@ -66,7 +66,7 @@ void SwmgrApp::InitSlots() {
     QObject::connect(_DataModel, SIGNAL(updateTaskStatus(QVariantMap)),this,SIGNAL(updateTaskInfo(QVariantMap)));
     QObject::connect(_DataModel, SIGNAL(updateTaskDownloadProgress(QVariantMap)),this,SIGNAL(updateDownloadProgress(QVariantMap)));
 
-	QObject::connect(_DataModel, SIGNAL(updateTaskDownloadProgress(QVariantMap)), this, SLOT(testslot(QVariantMap)));
+    QObject::connect(_DataModel, SIGNAL(updateAllTaskStatus(QVariantList)), this, SLOT(testslot(QVariantList)));
 }
 
 void SwmgrApp::InitDataModel() {

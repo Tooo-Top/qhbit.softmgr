@@ -85,12 +85,13 @@ protected:
 	// -----------------------
 	BOOL m_bCurlStatus;
 
+    QString currentPage;
 protected slots:
     // operation
     void monitorProf();
     void initWebViewHost();
     void docLoadFinish(bool);
-    void testslot(QVariantMap var);
+    void testslot(QVariantList var);
 public slots:
     // system control ex:show close hide
     void appquit();

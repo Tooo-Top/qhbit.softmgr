@@ -9,7 +9,7 @@ void SwmgrApp::docLoadFinish(bool ok) {
     }
 }
 
-void SwmgrApp::testslot(QVariantMap var) {
+void SwmgrApp::testslot(QVariantList var) {
     qDebug()<<var;
 }
 
@@ -164,15 +164,18 @@ void SwmgrApp::requestAllDownloadingTaskCancel(){ //Cancel all downloading task
 }
 
 void SwmgrApp::requestOnPageChange(QString pageName) {
-    qDebug()<<"requestOnPageChange";
+    qDebug()<<"requestOnPageChange" << pageName;
+
+    currentPage = pageName;
+
     if (pageName.compare("index")==0) {
         ;// skip operation
     }
     else if (pageName.compare("login")==0) {
-        ;
+        _DataModel->reqQueryUserStatus();
     }
     else if (pageName.compare("task")==0) {
-        ;
+        _DataModel->reqQueryAllTaskStatus();
     }
     else if (pageName.compare("toolbox")==0) {
         ;
