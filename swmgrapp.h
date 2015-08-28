@@ -97,6 +97,7 @@ public slots:
     void appquit();
     void showFullWnd();
     void showMiniWnd();
+    void trayActivated(QSystemTrayIcon::ActivationReason);
 
     //msic js bind signal
     void execOpenSystemBrowser(QString urlAddress);//use system default browser open a http://website

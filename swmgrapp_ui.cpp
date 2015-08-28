@@ -55,6 +55,8 @@ void SwmgrApp::InitSlots() {
     QObject::connect(fullAction, SIGNAL(triggered(bool)), this, SLOT(showFullWnd()));
     QObject::connect(miniAction, SIGNAL(triggered(bool)), this, SLOT(showMiniWnd()));
 
+    QObject::connect(traySystem, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),this,SLOT(trayActivated(QSystemTrayIcon::ActivationReason)));
+
     QObject::connect(_DataModel,SIGNAL(sigRequestShow()),this,SLOT(showFullWnd()));
     QObject::connect(_DataModel,SIGNAL(sigCrash()),this,SLOT(appquit()));
 
@@ -113,6 +115,12 @@ void SwmgrApp::showMiniWnd() {
 //    if (wndMain->isVisible())
 //        wndMain->hide();
     // show mini widget
+}
+
+void SwmgrApp::trayActivated(QSystemTrayIcon::ActivationReason reason) {
+    if (reason==QSystemTrayIcon::DoubleClick) {
+        showFullWnd();
+    }
 }
 
 void SwmgrApp::initWebViewHost() {
