@@ -5,6 +5,7 @@
 #include <QVariant>
 #include <QVariantList>
 #include <QVariantMap>
+#include <QProcess>
 
 #include "DownWrapper.h"
 
@@ -55,6 +56,9 @@ protected:
 	mapDowningTaskObject _TaskObjects;
 
     DownWrapper* _Wapper;  // xunlei mini
+
+    QProcess *installer;
+    LPDowningTaskObject currentTaskObject;
 protected:
 	BOOL initMiniXL();
 	// XL mini
@@ -68,6 +72,7 @@ public:
 
 signals:
     void initCrash();
+    void installTaskStart();
 
 signals:
     void updateAllTaskStatus(QVariantList);
@@ -89,6 +94,8 @@ public slots:
     void reqRemoveAllTask();
 protected slots:
     void PeriodPollTaskStatus();
+    void PeriodInstallTask();
+    void installerFinished(int exitCode, QProcess::ExitStatus exitStatus);
 };
 
 #endif // PACKAGERUNNER_H

@@ -39,12 +39,16 @@ void TaskManager::run() {
         QObject::connect(pTaskRunner, SIGNAL(initCrash()),pDataControl, SIGNAL(sigCrash()),Qt::QueuedConnection);
         // load history list
         pTaskRunner->init();
-        QTimer period;
+        QTimer period ,installPeriod;
 
         QObject::connect(&period,SIGNAL(timeout()),pTaskRunner,SLOT(PeriodPollTaskStatus()));
+        QObject::connect(&installPeriod,SIGNAL(timeout()),pTaskRunner,SIGNAL(installTaskStart()));
 
         period.start(2000);
+        installPeriod.start(5000);
         QThread::exec();
+        installPeriod.stop();
+        period.stop();
         pTaskRunner->unInit();
     }
     else{
