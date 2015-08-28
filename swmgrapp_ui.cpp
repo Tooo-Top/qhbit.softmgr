@@ -148,6 +148,14 @@ void SwmgrApp::execOpenLocalFolder(QString localAddress){
 
 
 /**
+ * Use explorer open local download folder
+ * @brief SwmgrApp::execOpenLocalDownloadFolder
+ */
+void SwmgrApp::execOpenLocalDownloadFolder(){
+    QDesktopServices::openUrl(QUrl::fromUserInput(??????????????));
+}
+
+/**
  * Use self webkit container pop open a qrc|file|http url
  * @brief SwmgrApp::execOpenPopBrowser
  * @param urlAddress
