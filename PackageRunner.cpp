@@ -477,7 +477,11 @@ void PackageRunner::installerFinished(int exitCode, QProcess::ExitStatus exitSta
     if (currentTaskObject!=NULL) {
         qDebug()<<"id:"<<currentTaskObject->id;
 		currentTaskObject->status = 9;
-        currentTaskObject = NULL;
-    }
-    emit installTaskStart();
+        QVariantMap sigTaskObject;
+		encodeToVariantMap(currentTaskObject, sigTaskObject);
+        if (!sigTaskObject.isEmpty()) { emit updateTaskStatus(sigTaskObject); }
+		currentTaskObject = NULL;
+
+		emit installTaskStart();
+	}
 }
