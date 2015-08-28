@@ -5,11 +5,11 @@
 void SwmgrApp::docLoadFinish(bool ok) {
     if (ok) {
         _DataModel->reqQueryUserStatus();
-//        _DataModel->reqQueryAllTaskStatus();
+        _DataModel->driveLaunchTasks();
     }
 }
 
-void SwmgrApp::testslot(QVariantList var) {
+void SwmgrApp::testslot(QVariantMap var) {
     qDebug()<<var;
 }
 

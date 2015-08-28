@@ -91,7 +91,7 @@ protected slots:
     void monitorProf();
     void initWebViewHost();
     void docLoadFinish(bool);
-    void testslot(QVariantList var);
+    void testslot(QVariantMap var);
 public slots:
     // system control ex:show close hide
     void appquit();

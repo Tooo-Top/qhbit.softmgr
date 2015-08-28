@@ -126,29 +126,66 @@ bool Storage::LoadArrayOfSoftwareList(QString szSoftListFile, QVariantList &arrP
     return true;
 }
 
-bool Storage::AddTaskToConfArray(QString szConfFile, QVariantMap &jsItem) {
+bool Storage::AddTaskToConfArray(QString szConfFile, QVariantMap &jsItem,QString type) {
     QByteArray fileBuf;
     QJsonDocument doc;
-    QVariantList jsArray;
+    QJsonArray jsArray;
+    QJsonObject jsRootObject;
+    bool exist = false;
+    QJsonValue val;
 
     QFile loadFile(szConfFile);
     if (loadFile.open(QIODevice::ReadWrite)) {
         fileBuf = loadFile.readAll();
         doc = QJsonDocument::fromJson(fileBuf);
-        if (!doc.isEmpty() && doc.isArray()) {
-            jsArray = doc.array().toVariantList();
+        if (!doc.isEmpty() && doc.isObject()) {
+            jsRootObject = doc.object();
         }
         else {
             loadFile.resize(0);
         }
-        // check save to file
-        if (!jsArray.contains(jsItem)) {
-            jsArray.append(jsItem);
-            doc.setArray(QJsonArray::fromVariantList(jsArray));
 
-            loadFile.resize(0);
-            loadFile.write(doc.toJson(QJsonDocument::Compact));
+        if (jsRootObject.isEmpty()) {
+            jsRootObject.insert("launchs",QJsonValue(QJsonArray::fromVariantList(QVariantList())));
+			jsRootObject.insert("tasks", QJsonValue(QJsonArray::fromVariantList(QVariantList())));
         }
+        if (!jsRootObject.contains("launchs")) {
+			jsRootObject.insert("launchs", QJsonValue(QJsonArray::fromVariantList(QVariantList())));
+        }
+        if (!jsRootObject.contains("tasks")) {
+			jsRootObject.insert("tasks", QJsonValue(QJsonArray::fromVariantList(QVariantList())));
+        }
+
+        if (type.compare("launchs")==0) {
+            jsArray = jsRootObject.value("launchs").toArray();
+            exist = false;
+            foreach(val,jsArray) {
+                if (val.toObject().value("id").toString().compare(jsItem.value("id").toString())==0) {
+                    exist = true;
+                }
+            }
+            if (!exist) {
+                jsArray.append(QJsonObject::fromVariantMap(jsItem));
+                jsRootObject.remove("launchs");
+                jsRootObject.insert("launchs",QJsonValue(jsArray));
+            }
+        }
+        else if (type.compare("tasks")==0) {
+            jsArray = jsRootObject.value("tasks").toArray();
+            exist = false;
+            foreach(val,jsArray) {
+                if (val.toObject().value("id").toString().compare(jsItem.value("id").toString())==0) {
+                    exist = true;
+                }
+            }
+            if (!exist) {
+                jsArray.append(QJsonObject::fromVariantMap(jsItem));
+                jsRootObject.remove("tasks");
+                jsRootObject.insert("tasks",QJsonValue(jsArray));
+            }
+        }
+        loadFile.resize(0);
+        loadFile.write(doc.toJson(QJsonDocument::Compact));
         loadFile.close();
         return true;
     }
@@ -157,53 +194,103 @@ bool Storage::AddTaskToConfArray(QString szConfFile, QVariantMap &jsItem) {
     }
 }
 
-bool Storage::LoadTasksFromConfArray(QString szConfFile, mapDowningTaskObject & mapTaskObject) {
+bool Storage::LoadTasksFromConfArray(QString szConfFile, mapDowningTaskObject & mapTaskObject, QString type) {
     QJsonDocument doc;
-    QJsonArray jsArray;
+    QJsonObject jsRootObject;
+    QJsonValue it;
+    QJsonArray jsLaunchArray,jsTaskStatusArray;
+    LPDowningTaskObject taskObject = NULL;
 
     QFile loadFile(szConfFile);
     if (loadFile.open(QIODevice::ReadWrite)) {
         QByteArray fileBuf = loadFile.readAll();
         doc = QJsonDocument::fromJson(fileBuf);
-        if (!doc.isEmpty() && doc.isArray()) {
-            jsArray = doc.array();
+        if (!doc.isEmpty() && doc.isObject()) {
+            jsRootObject = doc.object();
+        }
+        else {
+            loadFile.resize(0);
+        }
+
+        if (jsRootObject.isEmpty()) {
+            loadFile.resize(0);
+            loadFile.close();
+            return true;
+        }
+
+        if (type.compare("launchs")==0) {
+            if (jsRootObject.contains("launchs") && jsRootObject.value("launchs").isArray()) {
+                jsLaunchArray = jsRootObject.value("launchs").toArray();
+            }
+            else {
+                loadFile.resize(0);
+            }
+        }
+        else if (type.compare("tasks")==0) {
+            if (jsRootObject.contains("tasks") && jsRootObject.value("tasks").isArray()) {
+				jsTaskStatusArray = jsRootObject.value("tasks").toArray();
+            }
         }
         else {
             loadFile.resize(0);
         }
         loadFile.close();
 
-        foreach(QJsonValue it, jsArray) {
+        foreach(it, jsTaskStatusArray) {
             QJsonObject jsObject = it.toObject();
-            if (jsObject.contains("id") && jsObject.value("id").isString() &&
-                jsObject.contains("launchName") && jsObject.value("launchName").isString()
-                ) {
-                if (mapTaskObject.find(jsObject.value("id").toString()) == mapTaskObject.end()) {
-                    LPDowningTaskObject taskObject = new DowningTaskObject();
-                    taskObject->id = jsObject.value("id").toString();
-                    taskObject->category = jsObject.value("catid").toString();
-                    taskObject->launchName = jsObject.value("launchName").toString();
-                    taskObject->autoInstall = jsObject.value("autoInstall").toBool();
-                    taskObject->downloadUrl = jsObject.value("downloadUrl").toString();
-                    taskObject->status = 2;
-                    taskObject->hTaskHandle = NULL;
+            if (jsObject.value("id").toString().isEmpty()){continue;}
 
-                    mapTaskObject.insert(taskObject->id, taskObject);
+            mapDowningTaskObject::iterator itTask = mapTaskObject.find(jsObject.value("id").toString());
+            if (itTask!=mapTaskObject.end()) {
+                // change status
+                taskObject = itTask.value();
+                if (!taskObject) {
+					mapTaskObject.erase(itTask);
+                }
+                else if (taskObject->status==2 || taskObject->status==3 || taskObject->status==4 || taskObject->status==6 ) {
+                    taskObject->status = 0;
+                }
+            }
+            else {
+                taskObject = new DowningTaskObject();
+                taskObject->id = jsObject.value("id").toString();
+                taskObject->category = jsObject.value("category").toString();
+                taskObject->name = jsObject.value("name").toString();
+                taskObject->largeIcon= jsObject.value("largeIcon").toString();
+                taskObject->brief= jsObject.value("brief").toString();
+                taskObject->size= jsObject.value("size").toInt();
+                taskObject->percent=jsObject.value("percent").toDouble();
+                taskObject->speed  = 0;
+                taskObject->status = jsObject.value("status").toInt();
+                taskObject->downloadUrl = jsObject.value("downloadUrl").toString();
+                taskObject->versionName = jsObject.value("versionName").toString();
+                taskObject->packageName = jsObject.value("packageName").toString();
 
-                    qDebug() << "add task :" << jsObject.value("id").toString() << ","
-                        << jsObject.value("catid").toString() << ","
-                        << jsObject.value("launchName").toString() << ","
-                        << jsObject.value("autoInstall").toBool() << ","
-                        << jsObject.value("downloadUrl").toString();
-                        return true;
+                taskObject->autoInstall = jsObject.value("autoInstall").toBool();
+                taskObject->hTaskHandle = NULL;
+                taskObject->launchName  = taskObject->name;
+
+                mapTaskObject.insert(taskObject->id, taskObject);
+            }
+        }
+        foreach(it, jsLaunchArray) {
+            QJsonObject jsObject = it.toObject();
+            if (jsObject.value("id").toString().isEmpty()){continue;}
+
+            mapDowningTaskObject::iterator itTask = mapTaskObject.find(jsObject.value("id").toString());
+            if (itTask!=mapTaskObject.end()) {
+                // change status
+                taskObject = itTask.value();
+                if (!taskObject) {
+					mapTaskObject.erase(itTask);
                 }
-                else {
-                    qDebug() << "repeat task :" << jsObject.value("id").toString() << ","
-                        << jsObject.value("catid").toString() << ","
-                        << jsObject.value("launchName").toString() << ","
-                        << jsObject.value("autoInstall").toBool() << ","
-                        << jsObject.value("downloadUrl").toString();
-                }
+            }
+            else {
+                taskObject = new DowningTaskObject();
+                taskObject->id = jsObject.value("id").toString();
+                taskObject->category = jsObject.value("catid").toString();
+				taskObject->autoInstall = jsObject.value("autoInstall").toBool();
+                mapTaskObject.insert(taskObject->id, taskObject);
             }
         }
         return true;

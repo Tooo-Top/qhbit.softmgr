@@ -68,7 +68,7 @@ void SwmgrApp::InitSlots() {
     QObject::connect(_DataModel, SIGNAL(updateTaskStatus(QVariantMap)),this,SIGNAL(updateTaskInfo(QVariantMap)));
     QObject::connect(_DataModel, SIGNAL(updateTaskDownloadProgress(QVariantMap)),this,SIGNAL(updateDownloadProgress(QVariantMap)));
 
-    QObject::connect(_DataModel, SIGNAL(updateAllTaskStatus(QVariantList)), this, SLOT(testslot(QVariantList)));
+    QObject::connect(_DataModel, SIGNAL(updateTaskDownloadProgress(QVariantMap)), this, SLOT(testslot(QVariantMap)));
 }
 
 void SwmgrApp::InitDataModel() {
@@ -108,6 +108,7 @@ void SwmgrApp::showFullWnd() {
         wndMain->hide();
     else {
         wndMain->show();
+		wndMain->activateWindow();
     }
 }
 
@@ -152,7 +153,13 @@ void SwmgrApp::execOpenLocalFolder(QString localAddress){
  * @brief SwmgrApp::execOpenLocalDownloadFolder
  */
 void SwmgrApp::execOpenLocalDownloadFolder(){
-    QDesktopServices::openUrl(QUrl::fromUserInput(??????????????));
+	QDir dir;
+	QString defaultRepository = SwmgrApp::GetProgramProfilePath(SwmgrApp::GetSoftwareName()) + QDir::separator() + QString("Repository") + QDir::separator();
+	defaultRepository = QDir::toNativeSeparators(defaultRepository);
+	defaultRepository = getSettingParameter(QString("Repository"), defaultRepository);
+	dir.mkpath(defaultRepository);
+
+	QDesktopServices::openUrl(QUrl::fromUserInput(defaultRepository));
 }
 
 /**

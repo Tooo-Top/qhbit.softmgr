@@ -66,6 +66,38 @@ void DataControl::NoticeMain(QObject *parent, QVariantMap &jsItem) {
     sock->deleteLater();
 }
 
+void DataControl::driveLaunchTasks() {
+    for (mapDowningTaskObject::iterator it = mapLaunchTask.begin() ; it!=mapLaunchTask.end(); it++) {
+        LPDowningTaskObject taskObject = it.value();
+        if (taskObject!=NULL) {
+            QVariantMap var;
+			QMap<QString, QVariantList>::Iterator curItem = _mapSoftPackages.find(taskObject->category);
+            if (curItem != _mapSoftPackages.end()) {
+                foreach(QVariant item,curItem.value()) {
+					if (item.toMap().value("id").toString().compare(taskObject->id, Qt::CaseInsensitive) == 0) {
+                        var = item.toMap();
+                        break;
+                    }
+                }
+            }
+
+            if (var.empty()) {
+                qDebug()<<"category:"<<taskObject->category<<",<<package:"<<taskObject->id <<"; Not Found!";
+                continue ;
+            }
+            QVariantMap task = var;
+
+            task.insert(QString("autoInstall"), QVariant::fromValue(true));
+            reqAddTask(task);
+
+			delete taskObject;
+        }
+		it = mapLaunchTask.erase(it);
+	}
+//    QString szFile = ConfOperation::Root().getSubpathFile("Conf", "installPending.conf");
+//    Storage::LoadTasksFromConfArray(szFile, mapLaunchTask,QString("launchs"));
+}
+
 void DataControl::LoadSettingProfile() {
     QString szFile = ConfOperation::Root().getSubpathFile("Conf", "swgmgr.conf");
     Storage::getSettingFromFile(szFile, _setting);
@@ -135,15 +167,20 @@ bool DataControl::initAll() {
 
     InstalledSoftwareChanged();
 
+    QString szFile = ConfOperation::Root().getSubpathFile("Conf", "installPending.conf");
+    Storage::LoadTasksFromConfArray(szFile, mapLaunchTask,QString("launchs"));
+
     QObject::connect(srvLaunchInst, SIGNAL(newConnection()), this, SLOT(launchInstall()));
 
     _UserInRunner->SetObjects(this,&_user);
     _UserInRunner->start();
+    _UserInRunner;
 
     _TaskRunner->SetObjects(this,&_PendingTasks);
     _TaskRunner->start();
 
     InitNoticeServer();
+
     return true;
 }
 

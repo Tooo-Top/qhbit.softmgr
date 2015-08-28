@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
 	if (cmdLine.launchMode()) {
 		// write pending install profile
 		QString szFile = ConfOperation::Root().getSubpathFile("Conf", "installPending.conf");
-		Storage::AddTaskToConfArray(szFile, launchObject);
+		Storage::AddTaskToConfArray(szFile, launchObject,QString("launchs"));
 
 		if (_instance==NULL) { // already running
 			// add install task

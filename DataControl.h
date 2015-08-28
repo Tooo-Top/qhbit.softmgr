@@ -38,6 +38,7 @@ protected:
 protected:
     TaskManager *_TaskRunner;
     UserInfoManager* _UserInRunner;
+    mapDowningTaskObject mapLaunchTask;
     // programe setting
 
     //QFileSystemWatcher
@@ -69,6 +70,7 @@ public:
     void startUserService();
     void startTaskService();
     void unInit();
+    void driveLaunchTasks();
 public:
     void LoadSettingProfile();
     void SaveSettingProfile();
@@ -77,6 +79,7 @@ public:
     static void NoticeMain(QObject *parent, QVariantMap &jsItem);
 protected:
     void InitNoticeServer();
+
 protected slots:
     void launchInstall();
 
