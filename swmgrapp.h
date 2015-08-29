@@ -121,6 +121,8 @@ signals:
     void updateRunningTasks(QVariantList swCategory);// all package task status
     void updateTaskInfo(QVariantMap swPackageInfo);  // someone task status
     void updateDownloadProgress(QVariantMap swTaskProcess );//down load progress
+
+    void updateUpgradePackages(QVariantList swCategory);
 	void updateCanUninstallPackages(QVariantList swCategory);
 
 public slots:
@@ -148,9 +150,9 @@ public slots:
     void requestAllDownloadingTaskCancel(); //Cancel all downloading task
     //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++$
 
-	void requestCanUpdatePackages(){} //can be update pacakge list
+    void requestCanUpdatePackages(); //can be update pacakge list
 	void requestCanUninstallPackages(); //can be uninstall pacakge list
-    void requestDoUninstall(){}
+    void requestDoUninstall(QString uninstallID);
     void requestOnPageChange(QString pageName); //Webkit (dynamic dom page) change to {pageName}
 
     // For UI interface end

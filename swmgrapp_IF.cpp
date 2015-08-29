@@ -1,5 +1,6 @@
 #include "swmgrapp.h"
 #include <QTextCodec>
+#include <QtAlgorithms>
 #include "OSSystemWrapper.h"
 
 void SwmgrApp::docLoadFinish(bool ok) {
@@ -92,6 +93,70 @@ void SwmgrApp::requestModifyUserInfo(QVariantMap userinfo) {
 	_DataModel->reqModifyUserInfo(userinfo);
 }
 
+void SwmgrApp::requestCanUpdatePackages() {
+/*
+ * id;
+ * category;
+ * largeIcon
+ * updateInfo
+ * updateTime
+ * versionName
+ * size
+ *
+ * "DisplayName",
+ * "DisplayVersion",
+ * "InstallDate",
+ * "InstallLocation",
+ * "Publisher",
+ * "UninstallString",
+ * "QuietUninstallString",
+ * "Version",
+ * "VersionMajor",
+ * "VersionMinor",
+ * "WindowsInstaller",
+ * "EstimatedSize",
+ * "DisplayIcon"
+*/
+    QString szCategoryID("1"),szPackageID("170");
+    QVariantMap var;
+    QMap<QString, QVariantList>::Iterator curItem = _DataModel->getSoftPackages().find(szCategoryID);
+    if (curItem != _DataModel->getSoftPackages().end()) {
+        foreach(QVariant item,curItem.value()) {
+            if (item.toMap().value("id").toString().compare(szPackageID,Qt::CaseInsensitive)==0) {
+                var = item.toMap();
+                break;
+            }
+        }
+    }
+    if (var.empty()) {
+        return ;
+    }
+    QVariantList upgradeList;
+    QVariantMap upgradeItem;
+    upgradeItem.insert("id",var["id"]);
+    upgradeItem.insert("category",var["category"]);
+    upgradeItem.insert("largeIcon",var["largeIcon"]);
+    upgradeItem.insert("updateInfo",var["updateInfo"]);
+    upgradeItem.insert("updateTime",var["updateTime"]);
+    upgradeItem.insert("versionName",var["versionName"]);
+    upgradeItem.insert("size",var["size"]);
+    upgradeItem.insert("DisplayVersion","1.0.0.0");
+    upgradeItem.insert("DisplayVersion",QVariant::fromValue(QString("1.0.0.1")));
+    upgradeItem.insert("InstallDate",QVariant::fromValue(QString("2008-01-11 00:00:00")));
+    upgradeItem.insert("InstallLocation",QVariant::fromValue(QString("c:\\")));
+    upgradeItem.insert("Publisher",QVariant::fromValue(QString("Microsoft")));
+    upgradeItem.insert("UninstallString",QVariant::fromValue(QString("")));
+    upgradeItem.insert("QuietUninstallString",QVariant::fromValue(QString("")));
+    upgradeItem.insert("Version",QVariant::fromValue(QString("1.0.0.0")));
+    upgradeItem.insert("VersionMajor",QVariant::fromValue(QString("1")));
+    upgradeItem.insert("VersionMinor",QVariant::fromValue(QString("0")));
+    upgradeItem.insert("WindowsInstaller",QVariant::fromValue(QString("0")));
+	upgradeItem.insert("EstimatedSize", QVariant::fromValue(__int64(1024 * 1024)));
+	upgradeItem.insert("DisplayIcon", QVariant::fromValue(__int64(1024 * 1024)));
+    upgradeList.append(upgradeItem);
+    emit updateUpgradePackages(upgradeList);
+}
+
 void SwmgrApp::requestCanUninstallPackages() {
     QVariantList jsArray;
 
@@ -101,9 +166,33 @@ void SwmgrApp::requestCanUninstallPackages() {
         for (ItemProperty::iterator it = item->second.begin(); it != item->second.end(); it++) {
             objParameter.insert(QString::fromStdString(it->first),QTextCodec::codecForLocale()->toUnicode(it->second.data(), it->second.size()));
         }
+        QString szKEY = QString::fromStdString(item->second["QuietUninstallString"]);
+
+        if (szKEY.count()==0) {
+			szKEY = QString::fromStdString(item->second["UninstallString"]);
+        }
+		QByteArray byMD5 = QCryptographicHash::hash(szKEY.toUtf8(), QCryptographicHash::Md5).toHex();
+		objParameter.insert(QString("uninstallID"), QString(byMD5));
 		jsArray.append(objParameter);
     }
 	emit updateCanUninstallPackages(jsArray);
+}
+
+void SwmgrApp::requestDoUninstall(QString uninstallID) {
+    //do uninstall
+    mapSoftwareList &mapSoftwares = _DataModel->getInstalledSoftware();
+    for (mapSoftwareList::iterator item = mapSoftwares.begin(); item != mapSoftwares.end();item++) {
+		QString szKEY = QString::fromStdString(item->second["QuietUninstallString"]);
+        if (szKEY.count()==0) {
+			szKEY = QString::fromStdString(item->second["UninstallString"]);
+        }
+        if (uninstallID.compare(QString(QCryptographicHash::hash(szKEY.toUtf8(),QCryptographicHash::Md5).toHex()),Qt::CaseInsensitive)==0) {
+            item = mapSoftwares.erase(item);
+            break;
+        }
+    }
+
+    requestCanUninstallPackages();
 }
 
 void SwmgrApp::requestStartInstallPackage(QString szCategoryID, QString szPackageID, bool autoInstall) {

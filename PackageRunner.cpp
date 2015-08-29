@@ -154,7 +154,7 @@ void PackageRunner::reqAddTask(QVariantMap task) {
             taskObject->name = task.value("name").toString();
             taskObject->largeIcon= task.value("largeIcon").toString();
             taskObject->brief= task.value("brief").toString();
-            taskObject->size= 0;
+            taskObject->size = task.value("size").toLongLong();
             taskObject->percent= 0.0f;
             taskObject->speed  = 0;
             taskObject->status = 0;
@@ -391,7 +391,6 @@ void PackageRunner::PeriodPollTaskStatus() {
                     needSerialize = true;
                 }
                 taskObject->status = 7;
-                taskObject->size = info.nTotalSize;
                 taskObject->speed = info.nSpeed;// + info.nSpeedP2S + info.nSpeedP2P;
                 bNeedUpdate = false;
 				startCount++;

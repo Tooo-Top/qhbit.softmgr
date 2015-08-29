@@ -91,7 +91,7 @@ bool Storage::LoadCategorySoftwareList(QString szCategoryListFile, QString szCat
     if (!jsObj.contains("code") || !jsObj.value("code").isDouble() || !jsObj.contains("msg") || !jsObj.value("msg").isArray()) {
         return false;
     }
-    if (jsObj.value("code").toInt() != 0) {
+	if (jsObj.value("code").toInt() != 0) {
         return false;
     }
     mapPackageByCategoryID[szCategoryID] = jsObj.value("msg").toArray().toVariantList();
@@ -119,7 +119,7 @@ bool Storage::LoadArrayOfSoftwareList(QString szSoftListFile, QVariantList &arrP
     if (!jsObj.contains("code") || !jsObj.value("code").isDouble() || !jsObj.contains("msg") || !jsObj.value("msg").isArray()) {
         return false;
     }
-    if (jsObj.value("code").toInt() != 0) {
+	if (jsObj.value("code").toInt() != 0) {
         return false;
     }
     arrPackage = jsObj.value("msg").toArray().toVariantList();
