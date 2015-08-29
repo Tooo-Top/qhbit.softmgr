@@ -74,12 +74,12 @@ int main(int argc, char *argv[])
 	// check singleton instance
 	if (cmdLine.launchMode()) {
 		// write pending install profile
-		QString szFile = ConfOperation::Root().getSubpathFile("Conf", "installPending.conf");
-		Storage::AddTaskToConfArray(szFile, launchObject,QString("launchs"));
+		ConfOperation::Root().setRootPath(SwmgrApp::GetProgramProfilePath(SwmgrApp::GetSoftwareName()));
+        QString szFile = ConfOperation::Root().getSubpathFile("Conf", "installLauncher.conf");
+        Storage::AddIntoLauncherConf(szFile, launchObject);
 
 		if (_instance==NULL) { // already running
-			// add install task
-			// pipe notice pending install task
+            // add install task // pipe notice pending install task
 			SwmgrApp::NoticeMain(&a, launchObject);
 			return 0;
 		}

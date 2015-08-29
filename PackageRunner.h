@@ -43,6 +43,7 @@ typedef struct __DowningTaskObject {
     QString launchName;
 	HANDLE hTaskHandle;
     DownTaskParam downTaskparam;
+    QString binaryImagePath;
 }DowningTaskObject, *LPDowningTaskObject;
 
 typedef QMap<QString, LPDowningTaskObject> mapDowningTaskObject;

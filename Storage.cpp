@@ -126,176 +126,168 @@ bool Storage::LoadArrayOfSoftwareList(QString szSoftListFile, QVariantList &arrP
     return true;
 }
 
-bool Storage::AddTaskToConfArray(QString szConfFile, QVariantMap &jsItem,QString type) {
-    QByteArray fileBuf;
-    QJsonDocument doc;
-    QJsonArray jsArray;
-    QJsonObject jsRootObject;
-    bool exist = false;
-    QJsonValue val;
+ void Storage::AddIntoTaskConf(QString szConfFile, LPDowningTaskObject task) {
+     QVariantList contents;
+	 bool exist = false;
+     if (task==NULL || task->status==4) {
+         return;
+     }
 
-    QFile loadFile(szConfFile);
-    if (loadFile.open(QIODevice::ReadWrite)) {
-        fileBuf = loadFile.readAll();
-        doc = QJsonDocument::fromJson(fileBuf);
-        if (!doc.isEmpty() && doc.isObject()) {
-            jsRootObject = doc.object();
-        }
-        else {
-            loadFile.resize(0);
-        }
+     Storage::LoadTasksFromConfArray(szConfFile,contents);
+     foreach(QVariant it,contents) {
+         QVariantMap iterator = it.toMap();
+         if (iterator.value("id").toString().compare(task->id)==0) {
+             exist = true;
+             break;
+         }
+     }
+     if (!exist) {
+         QVariantMap taskObject;
+         taskObject.insert(QString("id"),QVariant::fromValue(task->id));
+         taskObject.insert(QString("catid"),QVariant::fromValue(task->category));
+         taskObject.insert(QString("name"),QVariant::fromValue(task->name));
+         taskObject.insert(QString("largeIcon"),QVariant::fromValue(task->largeIcon));
+         taskObject.insert(QString("brief"),QVariant::fromValue(task->brief));
+         taskObject.insert(QString("size"),QVariant::fromValue(task->size));
+         taskObject.insert(QString("percent"),QVariant::fromValue(task->percent));
+         taskObject.insert(QString("speed"),QVariant::fromValue(0));
+         taskObject.insert(QString("status"),QVariant::fromValue(task->status));
+         taskObject.insert(QString("downloadUrl"),QVariant::fromValue(task->downloadUrl));
+         taskObject.insert(QString("autoInstall"),QVariant::fromValue(task->autoInstall));
+         taskObject.insert(QString("versionName"),QVariant::fromValue(task->versionName));
+         taskObject.insert(QString("packageName"),QVariant::fromValue(task->packageName));
+         taskObject.insert(QString("binaryImagePath"),QVariant::fromValue(task->binaryImagePath));
 
-        if (jsRootObject.isEmpty()) {
-            jsRootObject.insert("launchs",QJsonValue(QJsonArray::fromVariantList(QVariantList())));
-			jsRootObject.insert("tasks", QJsonValue(QJsonArray::fromVariantList(QVariantList())));
-        }
-        if (!jsRootObject.contains("launchs")) {
-			jsRootObject.insert("launchs", QJsonValue(QJsonArray::fromVariantList(QVariantList())));
-        }
-        if (!jsRootObject.contains("tasks")) {
-			jsRootObject.insert("tasks", QJsonValue(QJsonArray::fromVariantList(QVariantList())));
-        }
+         contents.append(QVariant::fromValue(taskObject));
+         Storage::SaveTasksFromConfArray(szConfFile, contents);
+     }
+ }
 
-        if (type.compare("launchs")==0) {
-            jsArray = jsRootObject.value("launchs").toArray();
-            exist = false;
-            foreach(val,jsArray) {
-                if (val.toObject().value("id").toString().compare(jsItem.value("id").toString())==0) {
-                    exist = true;
-                }
-            }
-            if (!exist) {
-                jsArray.append(QJsonObject::fromVariantMap(jsItem));
-                jsRootObject.remove("launchs");
-                jsRootObject.insert("launchs",QJsonValue(jsArray));
-            }
+ void Storage::SaveTasks(QString szConfFile, mapDowningTaskObject & tasks) {
+    QVariantList contents;
+
+    for(mapDowningTaskObject::iterator it = tasks.begin();it!=tasks.end();it++) {
+        if (it.value() != NULL && it.value()->status != 4) {
+            LPDowningTaskObject task = it.value();
+            QVariantMap taskObject;
+            taskObject.insert(QString("id"),QVariant::fromValue(task->id));
+            taskObject.insert(QString("catid"),QVariant::fromValue(task->category));
+            taskObject.insert(QString("name"),QVariant::fromValue(task->name));
+            taskObject.insert(QString("largeIcon"),QVariant::fromValue(task->largeIcon));
+            taskObject.insert(QString("brief"),QVariant::fromValue(task->brief));
+            taskObject.insert(QString("size"),QVariant::fromValue(task->size));
+            taskObject.insert(QString("percent"),QVariant::fromValue(task->percent));
+            taskObject.insert(QString("speed"),QVariant::fromValue(0));
+            taskObject.insert(QString("status"),QVariant::fromValue(task->status));
+            taskObject.insert(QString("downloadUrl"),QVariant::fromValue(task->downloadUrl));
+            taskObject.insert(QString("autoInstall"),QVariant::fromValue(task->autoInstall));
+            taskObject.insert(QString("versionName"),QVariant::fromValue(task->versionName));
+            taskObject.insert(QString("packageName"),QVariant::fromValue(task->packageName));
+            taskObject.insert(QString("binaryImagePath"),QVariant::fromValue(task->binaryImagePath));
+            contents.append(taskObject);
         }
-        else if (type.compare("tasks")==0) {
-            jsArray = jsRootObject.value("tasks").toArray();
-            exist = false;
-            foreach(val,jsArray) {
-                if (val.toObject().value("id").toString().compare(jsItem.value("id").toString())==0) {
-                    exist = true;
-                }
-            }
-            if (!exist) {
-                jsArray.append(QJsonObject::fromVariantMap(jsItem));
-                jsRootObject.remove("tasks");
-                jsRootObject.insert("tasks",QJsonValue(jsArray));
-            }
-        }
-        loadFile.resize(0);
-        loadFile.write(doc.toJson(QJsonDocument::Compact));
-        loadFile.close();
-        return true;
     }
-    else {
-        return false;
+    SaveTasksFromConfArray(szConfFile,contents);
+}
+
+void Storage::LoadTasks(QString szConfFile,mapDowningTaskObject & tasks) {
+    QVariantList allItems;
+    Storage::LoadTasksFromConfArray(szConfFile,allItems);
+    foreach(QVariant it,allItems) {
+        QVariantMap iterator = it.toMap();
+        LPDowningTaskObject task = new DowningTaskObject();
+        task->id = iterator.value("id").toString();
+        task->category = iterator.value("catid").toString();
+        task->name = iterator.value("name").toString();
+        task->largeIcon = iterator.value("largeIcon").toString();
+        task->brief = iterator.value("brief").toString();
+        task->size = iterator.value("size").toLongLong();
+        task->percent = iterator.value("percent").toFloat();
+        task->speed = 0;
+        task->status = iterator.value("status").toInt();
+        task->downloadUrl = iterator.value("downloadUrl").toString();
+        task->versionName = iterator.value("versionName").toString();
+        task->packageName = iterator.value("packageName").toString();
+        task->autoInstall = iterator.value("autoInstall").toBool();
+        task->binaryImagePath = iterator.value("binaryImagePath").toString();
+        tasks.insert(task->id,task);
     }
 }
 
-bool Storage::LoadTasksFromConfArray(QString szConfFile, mapDowningTaskObject & mapTaskObject, QString type) {
+void Storage::LoadTasksFromConfArray(QString szConfFile,QVariantList &mapItems) {
     QJsonDocument doc;
-    QJsonObject jsRootObject;
-    QJsonValue it;
-    QJsonArray jsLaunchArray,jsTaskStatusArray;
-    LPDowningTaskObject taskObject = NULL;
 
     QFile loadFile(szConfFile);
     if (loadFile.open(QIODevice::ReadWrite)) {
         QByteArray fileBuf = loadFile.readAll();
         doc = QJsonDocument::fromJson(fileBuf);
-        if (!doc.isEmpty() && doc.isObject()) {
-            jsRootObject = doc.object();
-        }
-        else {
-            loadFile.resize(0);
-        }
-
-        if (jsRootObject.isEmpty()) {
-            loadFile.resize(0);
-            loadFile.close();
-            return true;
-        }
-
-        if (type.compare("launchs")==0) {
-            if (jsRootObject.contains("launchs") && jsRootObject.value("launchs").isArray()) {
-                jsLaunchArray = jsRootObject.value("launchs").toArray();
-            }
-            else {
-                loadFile.resize(0);
-            }
-        }
-        else if (type.compare("tasks")==0) {
-            if (jsRootObject.contains("tasks") && jsRootObject.value("tasks").isArray()) {
-				jsTaskStatusArray = jsRootObject.value("tasks").toArray();
-            }
+        if (!doc.isEmpty() && doc.isArray()) {
+            mapItems = doc.array().toVariantList();
         }
         else {
             loadFile.resize(0);
         }
         loadFile.close();
-
-        foreach(it, jsTaskStatusArray) {
-            QJsonObject jsObject = it.toObject();
-            if (jsObject.value("id").toString().isEmpty()){continue;}
-
-            mapDowningTaskObject::iterator itTask = mapTaskObject.find(jsObject.value("id").toString());
-            if (itTask!=mapTaskObject.end()) {
-                // change status
-                taskObject = itTask.value();
-                if (!taskObject) {
-					mapTaskObject.erase(itTask);
-                }
-                else if (taskObject->status==2 || taskObject->status==3 || taskObject->status==4 || taskObject->status==6 ) {
-                    taskObject->status = 0;
-                }
-            }
-            else {
-                taskObject = new DowningTaskObject();
-                taskObject->id = jsObject.value("id").toString();
-                taskObject->category = jsObject.value("category").toString();
-                taskObject->name = jsObject.value("name").toString();
-                taskObject->largeIcon= jsObject.value("largeIcon").toString();
-                taskObject->brief= jsObject.value("brief").toString();
-                taskObject->size= jsObject.value("size").toInt();
-                taskObject->percent=jsObject.value("percent").toDouble();
-                taskObject->speed  = 0;
-                taskObject->status = jsObject.value("status").toInt();
-                taskObject->downloadUrl = jsObject.value("downloadUrl").toString();
-                taskObject->versionName = jsObject.value("versionName").toString();
-                taskObject->packageName = jsObject.value("packageName").toString();
-
-                taskObject->autoInstall = jsObject.value("autoInstall").toBool();
-                taskObject->hTaskHandle = NULL;
-                taskObject->launchName  = taskObject->name;
-
-                mapTaskObject.insert(taskObject->id, taskObject);
-            }
-        }
-        foreach(it, jsLaunchArray) {
-            QJsonObject jsObject = it.toObject();
-            if (jsObject.value("id").toString().isEmpty()){continue;}
-
-            mapDowningTaskObject::iterator itTask = mapTaskObject.find(jsObject.value("id").toString());
-            if (itTask!=mapTaskObject.end()) {
-                // change status
-                taskObject = itTask.value();
-                if (!taskObject) {
-					mapTaskObject.erase(itTask);
-                }
-            }
-            else {
-                taskObject = new DowningTaskObject();
-                taskObject->id = jsObject.value("id").toString();
-                taskObject->category = jsObject.value("catid").toString();
-				taskObject->autoInstall = jsObject.value("autoInstall").toBool();
-                mapTaskObject.insert(taskObject->id, taskObject);
-            }
-        }
-        return true;
     }
-    else {
-        return false;
+}
+
+void Storage::SaveTasksFromConfArray(QString szConfFile, QVariantList &mapItems) {
+    QJsonDocument doc;
+    QFile loadFile(szConfFile);
+    if (loadFile.open(QIODevice::ReadWrite)) {
+        QByteArray fileBuf = loadFile.readAll();
+        doc = QJsonDocument::fromJson(fileBuf);
+        loadFile.resize(0);
+        doc.setArray(QJsonArray::fromVariantList(mapItems));
+        loadFile.write(doc.toJson(QJsonDocument::Compact));
+        loadFile.close();
+    }
+}
+
+void Storage::AddIntoLauncherConf(QString szConfFile,QVariantMap &Item) {
+    bool exist = false;
+    QVariantList allItems;
+    Storage::LoadLaunchFromConfigArray(szConfFile,allItems);
+    foreach(QVariant it,allItems) {
+        QVariantMap iterator = it.toMap();
+        if (iterator.value("id").toString().compare(Item.value("id").toString())==0) {
+            exist = true;
+            break;
+        }
+    }
+    if (!exist) {
+		allItems.append(QVariant::fromValue(Item));
+        Storage::SaveLaunchFromConfigArray(szConfFile,allItems);
+    }
+}
+
+void Storage::LoadLaunchFromConfigArray(QString szConfFile,QVariantList &mapItems) {
+    QJsonDocument doc;
+
+    QFile loadFile(szConfFile);
+    if (loadFile.open(QIODevice::ReadWrite)) {
+        QByteArray fileBuf = loadFile.readAll();
+        doc = QJsonDocument::fromJson(fileBuf);
+        if (!doc.isEmpty() && doc.isArray()) {
+            mapItems = doc.array().toVariantList();
+        }
+        else {
+            loadFile.resize(0);
+        }
+        loadFile.close();
+    }
+}
+
+void Storage::SaveLaunchFromConfigArray(QString szConfFile,QVariantList &mapItems) {
+    QJsonDocument doc;
+
+    QFile loadFile(szConfFile);
+    if (loadFile.open(QIODevice::ReadWrite)) {
+        QByteArray fileBuf = loadFile.readAll();
+        doc = QJsonDocument::fromJson(fileBuf);
+		loadFile.resize(0);
+        doc.setArray(QJsonArray::fromVariantList(mapItems));
+        loadFile.write(doc.toJson(QJsonDocument::Compact));
+        loadFile.close();
     }
 }

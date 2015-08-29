@@ -8,6 +8,7 @@ CommandLine::CommandLine(QObject *parent) : QObject(parent)
     _catid="";
     _launchName="";
     _autoInstall = true;
+    _status = true;
 }
 
 bool CommandLine::launchMode(){
@@ -30,12 +31,18 @@ bool CommandLine::launchAutoinstall() {
     return _autoInstall;
 }
 
+bool CommandLine::getStatus() {
+	return _status;
+}
+
+
 QVariantMap CommandLine::encodeToVariantMap() {
     QVariantMap object;
     object.insert("id",QVariant::fromValue(_id));
     object.insert("catid",QVariant::fromValue(_catid));
     object.insert("launchName",QVariant::fromValue(_launchName));
     object.insert("autoInstall",QVariant::fromValue(_autoInstall));
+    object.insert("status",QVariant::fromValue(_status));
     return object;
 }
 

@@ -21,12 +21,14 @@ public:
     QString launchCatID();
     QString launchName();
     bool    launchAutoinstall();
+    bool    getStatus();
 protected:
     bool bMode;
     QString _id;
     QString _catid;
     QString _launchName;
     bool    _autoInstall;
+    bool    _status;
 
 signals:
 

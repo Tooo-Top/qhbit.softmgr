@@ -51,8 +51,9 @@ bool PackageRunner::init() {
     installer = new QProcess(this);
     QObject::connect(this,SIGNAL(installTaskStart()),SLOT(PeriodInstallTask()));
     QObject::connect(installer,SIGNAL(finished(int,QProcess::ExitStatus)),this,SLOT(installerFinished(int,QProcess::ExitStatus)));
-    QString szFile = ConfOperation::Root().getSubpathFile("Conf", "installPending.conf");
-    return Storage::LoadTasksFromConfArray(szFile, _TaskObjects,QString("tasks"));
+    QString szFile = ConfOperation::Root().getSubpathFile("Conf", "PendingTasks.conf");
+	Storage::LoadTasks(szFile, _TaskObjects);
+	return true;
 }
 
 BOOL PackageRunner::initMiniXL() {
@@ -135,7 +136,15 @@ void PackageRunner::reqAllTaskStatus() {
 }
 
 void PackageRunner::reqAddTask(QVariantMap task) {
+	qDebug()<< "reqAddTask" << task;
+	QDir dir;
     LPDowningTaskObject taskObject = NULL;
+
+    QString defaultRepository = SwmgrApp::GetProgramProfilePath(SwmgrApp::GetSoftwareName()) + QDir::separator() + QString("Repository") + QDir::separator();
+    defaultRepository = QDir::toNativeSeparators(defaultRepository);
+    defaultRepository = SwmgrApp::Instance()->getSettingParameter(QString("Repository"), defaultRepository);
+    dir.mkpath(defaultRepository);
+
     if (task.contains("id") && task.value("id").type()==QVariant::String ) {
         mapDowningTaskObject::iterator it = _TaskObjects.find(task.value("id").toString());
         if (it == _TaskObjects.end()) {
@@ -149,16 +158,23 @@ void PackageRunner::reqAddTask(QVariantMap task) {
             taskObject->percent= 0.0f;
             taskObject->speed  = 0;
             taskObject->status = 0;
-            taskObject->downloadUrl = task.value("ptdownloadUrl").toString().isEmpty() ? task.value("downloadUrl").toString(): task.value("ptdownloadUrl").toString();
-            taskObject->versionName = task.value("versionName").toString().isEmpty() ? QString("1.0.0.0") : task.value("versionName").toString();
-            taskObject->packageName = task.value("packageName").toString().isEmpty() ? (task.value("name").toString()+taskObject->versionName+".exe"):task.value("packageName").toString();
+            taskObject->downloadUrl = (task.value("ptdownloadUrl").isNull()||(task.value("ptdownloadUrl").type()==QVariant::String&&task.value("ptdownloadUrl").toString().size() == 0)) ? task.value("downloadUrl").toString() : task.value("ptdownloadUrl").toString();
+            taskObject->versionName = (task.value("versionName").isNull()||(task.value("versionName").type()==QVariant::String&&task.value("versionName").toString().size() == 0)) ? QString("1.0.0.0") : task.value("versionName").toString();
+			taskObject->packageName = task.value("packageName").toString();// (task.value("packageName").isNull() || (task.value("packageName").type() == QVariant::String&&task.value("packageName").toString().size() == 0)) ? (taskObject->name + taskObject->versionName + ".exe") : task.value("packageName").toString();
+			if (taskObject->packageName.compare("0", Qt::CaseInsensitive) == 0) {
+				taskObject->packageName = (taskObject->name + taskObject->versionName + ".exe");
+			}
+            else {
+                taskObject->packageName.append(".exe");
+            }
 
             taskObject->autoInstall = task.value("autoInstall").toBool();
             taskObject->hTaskHandle = NULL;
             taskObject->launchName  = taskObject->name;
+            taskObject->binaryImagePath = defaultRepository;
 
 			_TaskObjects.insert(taskObject->id, taskObject);
-			Storage::AddTaskToConfArray(ConfOperation::Root().getSubpathFile("Conf", "installPending.conf"), task,QString("tasks"));
+			Storage::AddIntoTaskConf(ConfOperation::Root().getSubpathFile("Conf", "PendingTasks.conf"), taskObject);
 
             QVariantMap object;
             encodeToVariantMap(taskObject,object);
@@ -313,6 +329,7 @@ void PackageRunner::PeriodPollTaskStatus() {
 	int startCount = 0;
 	int MaxTask = 10;
     bool needUpdateAll = false;
+    bool needSerialize = false;
 
     DownTaskInfo info;
     QDir dir;
@@ -339,7 +356,7 @@ void PackageRunner::PeriodPollTaskStatus() {
                 // maybe finish
 				qDebug() << "status:NOITEM";
                 taskObject->percent=1.0f;
-                szTmp = defaultRepository + taskObject->packageName;
+                szTmp = taskObject->binaryImagePath + taskObject->packageName;
                 taskObject->status = QFile::exists(szTmp) ? 10 : 4;
                 qDebug() << szTmp;
 				_Wapper->TaskPause(taskObject->hTaskHandle);
@@ -348,12 +365,14 @@ void PackageRunner::PeriodPollTaskStatus() {
 
                 if (taskObject->status==10) { needUpdateAll = true; }
                 bNeedUpdate = true;
+                needSerialize = true;
 				break;
             case TSC_ERROR:
 				qDebug() << "status:TSC_ERROR";
 				if (taskObject->status != 5) {
 					taskObject->status = 5;
 					bNeedUpdate = true;
+                    needSerialize = true;
 				}
                 break;
             case TSC_PAUSE:
@@ -361,12 +380,16 @@ void PackageRunner::PeriodPollTaskStatus() {
 				if (taskObject->status != 2) {
 					taskObject->status = 2;
 					bNeedUpdate = true;
+                    needSerialize = true;
 				}
 				break;
             case TSC_DOWNLOAD:
                 // doing
 				qDebug() << "status:TSC_DOWNLOAD";
 				taskObject->percent = info.fPercent;
+                if (taskObject->status != 7) {
+                    needSerialize = true;
+                }
                 taskObject->status = 7;
                 taskObject->size = info.nTotalSize;
                 taskObject->speed = info.nSpeed;// + info.nSpeedP2S + info.nSpeedP2P;
@@ -394,6 +417,7 @@ void PackageRunner::PeriodPollTaskStatus() {
 					if (!downFinish.isEmpty()) { emit updateTaskDownloadProgress(downFinish); }
                     needUpdateAll = true;
                     bNeedUpdate = true;
+                    needSerialize = true;
 				}
 				break;
             case TSC_STARTPENDING:
@@ -431,13 +455,17 @@ void PackageRunner::PeriodPollTaskStatus() {
             }
             else{  // start new task
                 szTmp = taskObject->packageName;
-                if (QFile::exists(defaultRepository+szTmp)) {
+                if (taskObject->binaryImagePath.count()==0){
+                    taskObject->binaryImagePath = defaultRepository;
+                }
+
+                if (QFile::exists(taskObject->binaryImagePath+szTmp)) {
                     taskObject->status = 10;
                     needUpdateAll = true;
                 }
                 else {
                     StrCpyW(taskObject->downTaskparam.szTaskUrl, taskObject->downloadUrl.toStdWString().data());
-                    StrCpyW(taskObject->downTaskparam.szSavePath, defaultRepository.toStdWString().data());
+                    StrCpyW(taskObject->downTaskparam.szSavePath, taskObject->binaryImagePath.toStdWString().data());
                     StrCpyW(taskObject->downTaskparam.szFilename, szTmp.toStdWString().data());
                     taskObject->downTaskparam.IsOnlyOriginal = FALSE;
                     taskObject->downTaskparam.DisableAutoRename = TRUE;
@@ -449,21 +477,22 @@ void PackageRunner::PeriodPollTaskStatus() {
                         startCount++;
                     }
                 }
+                needSerialize = true;
             }
         }
     }
     if (needUpdateAll) { 
 		reqAllTaskStatus(); 
 	}
+    if (needSerialize) {
+		Storage::SaveTasks(ConfOperation::Root().getSubpathFile("Conf", "PendingTasks.conf"), _TaskObjects);
+    }
 }
 
 void PackageRunner::PeriodInstallTask() {
     bool skip = true;
     if (!installer) { return ; }
-    if (installer->program().isEmpty()) {
-        skip = false;
-    }
-    else if (installer->state()==QProcess::NotRunning) {
+	if (installer->state() == QProcess::NotRunning) {
         skip = false;
     }
     if (skip) {

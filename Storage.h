@@ -21,9 +21,21 @@ public:
     static bool LoadCategorySoftwareList(QString, QString, QMap<QString,QVariantList> &);
     static bool LoadArrayOfSoftwareList(QString, QVariantList &);
 
+    // for task status
+//    static bool AddTaskToConfArray(QString , QVariantMap & , QString);
+//    static void LoadTasksFromConfArray(QString , mapDowningTaskObject & , QString);
+
+    static void AddIntoTaskConf(QString , LPDowningTaskObject );
+    static void SaveTasks(QString , mapDowningTaskObject & );
+    static void LoadTasks(QString , mapDowningTaskObject & );
+    static void SaveTasksFromConfArray(QString , QVariantList &);
+    static void LoadTasksFromConfArray(QString , QVariantList &);
+
     // for launch list
-    static bool AddTaskToConfArray(QString , QVariantMap & , QString);
-    static bool LoadTasksFromConfArray(QString , mapDowningTaskObject & , QString);
+    static void AddIntoLauncherConf(QString,QVariantMap &);
+    static void LoadLaunchFromConfigArray(QString,QVariantList &);
+    static void SaveLaunchFromConfigArray(QString,QVariantList &);
+    //
 
 signals:
 

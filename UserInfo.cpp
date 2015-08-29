@@ -156,7 +156,7 @@ void UserInfo::UserLogin(QString szUserName, QString szPassword) {
 	QString szCookieFile = SwmgrApp::GetCookieFile();
 	QString szUserLoginUrl = SwmgrApp::GetUserLoginUrl();
 
-	if (szUserName.isEmpty()) {
+	if (szUserName.size()==0) {
 		return ;
 	}
     clean();
@@ -199,7 +199,7 @@ void UserInfo::RegistUser(QString szUserName, QString szPassword, QString szEmai
 	QString szResult;
 	QString szCookieFile = SwmgrApp::GetCookieFile();
 	QString szUserRegisteUrl = SwmgrApp::GetUserRegisteUrl();
-	if (szUserName.isEmpty()){
+	if (szUserName.size()==0){
 		return;
 	}
     clean();

@@ -67,35 +67,38 @@ void DataControl::NoticeMain(QObject *parent, QVariantMap &jsItem) {
 }
 
 void DataControl::driveLaunchTasks() {
-    for (mapDowningTaskObject::iterator it = mapLaunchTask.begin() ; it!=mapLaunchTask.end(); it++) {
-        LPDowningTaskObject taskObject = it.value();
-        if (taskObject!=NULL) {
+    bool durty = false;
+	for (QVariantList::Iterator it = mapLaunchTask.begin(); it != mapLaunchTask.end(); it++) {
+        QVariantMap iterator = it->toMap();
+        if (iterator.value("status").toBool()) {
             QVariantMap var;
-			QMap<QString, QVariantList>::Iterator curItem = _mapSoftPackages.find(taskObject->category);
+            QMap<QString, QVariantList>::Iterator curItem = _mapSoftPackages.find(iterator.value("catid").toString());
             if (curItem != _mapSoftPackages.end()) {
                 foreach(QVariant item,curItem.value()) {
-					if (item.toMap().value("id").toString().compare(taskObject->id, Qt::CaseInsensitive) == 0) {
+                    if (item.toMap().value("id").toString().compare(iterator.value("id").toString(), Qt::CaseInsensitive) == 0) {
                         var = item.toMap();
                         break;
                     }
                 }
             }
 
-            if (var.empty()) {
-                qDebug()<<"category:"<<taskObject->category<<",<<package:"<<taskObject->id <<"; Not Found!";
-                continue ;
+            if (!var.empty()) {
+                QVariantMap task = var;
+                task.insert(QString("autoInstall"), QVariant::fromValue(true));
+                reqAddTask(task);
             }
-            QVariantMap task = var;
-
-            task.insert(QString("autoInstall"), QVariant::fromValue(true));
-            reqAddTask(task);
-
-			delete taskObject;
+            else {
+                qDebug()<<"category:"<<iterator.value("catid")<<",<<package:"<<iterator.value("id") <<"; Not Found!";
+            }
+            iterator["status"]=QVariant::fromValue(false);
+			it->setValue(QVariant::fromValue(iterator));
+            durty = true;
         }
-		it = mapLaunchTask.erase(it);
 	}
-//    QString szFile = ConfOperation::Root().getSubpathFile("Conf", "installPending.conf");
-//    Storage::LoadTasksFromConfArray(szFile, mapLaunchTask,QString("launchs"));
+    if (durty) {
+        QString szFile = ConfOperation::Root().getSubpathFile("Conf", "installLauncher.conf");
+        Storage::SaveLaunchFromConfigArray(szFile, mapLaunchTask);
+    }
 }
 
 void DataControl::LoadSettingProfile() {
@@ -167,8 +170,8 @@ bool DataControl::initAll() {
 
     InstalledSoftwareChanged();
 
-    QString szFile = ConfOperation::Root().getSubpathFile("Conf", "installPending.conf");
-    Storage::LoadTasksFromConfArray(szFile, mapLaunchTask,QString("launchs"));
+    QString szFile = ConfOperation::Root().getSubpathFile("Conf", "installLauncher.conf");
+    Storage::LoadTasksFromConfArray(szFile, mapLaunchTask);
 
     QObject::connect(srvLaunchInst, SIGNAL(newConnection()), this, SLOT(launchInstall()));
 

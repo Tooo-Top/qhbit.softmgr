@@ -38,7 +38,7 @@ protected:
 protected:
     TaskManager *_TaskRunner;
     UserInfoManager* _UserInRunner;
-    mapDowningTaskObject mapLaunchTask;
+	QVariantList mapLaunchTask;
     // programe setting
 
     //QFileSystemWatcher
