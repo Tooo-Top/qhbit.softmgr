@@ -125,7 +125,7 @@ void PackageRunner::reqAllTaskStatus() {
     QVariantList lstTaskStatus;
 
     for(mapDowningTaskObject::iterator it = _TaskObjects.begin();it!=_TaskObjects.end();it++) {
-		if (it.value() != NULL && it.value()->status != 4) {
+		if (it.value() != NULL && it.value()->status != 4 && it.value()->status != 9) {
 			QVariantMap object;
 			encodeToVariantMap(it.value(), object);
 			if (!object.isEmpty()) { lstTaskStatus.append(object); }
@@ -135,7 +135,7 @@ void PackageRunner::reqAllTaskStatus() {
     emit updateAllTaskStatus(lstTaskStatus);
 }
 
-void PackageRunner::reqAddTask(QVariantMap task) {
+void PackageRunner::reqAddTask(QVariantMap task, bool autoInstall) {
 	qDebug()<< "reqAddTask" << task;
 	QDir dir;
     LPDowningTaskObject taskObject = NULL;
@@ -157,7 +157,8 @@ void PackageRunner::reqAddTask(QVariantMap task) {
             taskObject->size = task.value("size").toLongLong();
             taskObject->percent= 0.0f;
             taskObject->speed  = 0;
-            taskObject->status = 0;
+			taskObject->status = 0;
+			taskObject->status = task.value("status").toInt();
             taskObject->downloadUrl = (task.value("ptdownloadUrl").isNull()||(task.value("ptdownloadUrl").type()==QVariant::String&&task.value("ptdownloadUrl").toString().size() == 0)) ? task.value("downloadUrl").toString() : task.value("ptdownloadUrl").toString();
             taskObject->versionName = (task.value("versionName").isNull()||(task.value("versionName").type()==QVariant::String&&task.value("versionName").toString().size() == 0)) ? QString("1.0.0.0") : task.value("versionName").toString();
 			taskObject->packageName = task.value("packageName").toString();// (task.value("packageName").isNull() || (task.value("packageName").type() == QVariant::String&&task.value("packageName").toString().size() == 0)) ? (taskObject->name + taskObject->versionName + ".exe") : task.value("packageName").toString();
@@ -168,7 +169,7 @@ void PackageRunner::reqAddTask(QVariantMap task) {
                 taskObject->packageName.append(".exe");
             }
 
-            taskObject->autoInstall = task.value("autoInstall").toBool();
+			taskObject->autoInstall = autoInstall;// task.value("autoInstall").toBool();
             taskObject->hTaskHandle = NULL;
             taskObject->launchName  = taskObject->name;
             taskObject->binaryImagePath = defaultRepository;
@@ -197,7 +198,7 @@ void PackageRunner::reqAddTasks(QVariantList tasks){
     qDebug()<<"reqAddTasks:"<<tasks;
     foreach(QVariant var,tasks) {
         if (var.type()==QVariant::Map) {
-            reqAddTask(var.toMap());
+			reqAddTask(var.toMap(), true);
         }
     }
 }
@@ -252,7 +253,7 @@ void PackageRunner::reqResumeTask(QVariantMap task){
                 _Wapper->TaskStart(taskObject->hTaskHandle);
             }
         }
-		else {
+		else if (taskObject->status != 4){
 	        QVariantMap object;
 	        encodeToVariantMap(taskObject,object);
 	        if (!object.isEmpty()) { emit updateTaskStatus(object); }
@@ -272,7 +273,7 @@ void PackageRunner::reqResumeAllTask(){
                 _Wapper->TaskStart(taskObject->hTaskHandle);
             }
         }
-		else {
+		else if (taskObject->status != 4){
 			QVariantMap object;
 			encodeToVariantMap(taskObject,object);
 			if (!object.isEmpty()) { taskStatus.append(object); }

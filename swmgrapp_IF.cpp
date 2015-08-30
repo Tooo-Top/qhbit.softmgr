@@ -166,11 +166,8 @@ void SwmgrApp::requestCanUninstallPackages() {
         for (ItemProperty::iterator it = item->second.begin(); it != item->second.end(); it++) {
             objParameter.insert(QString::fromStdString(it->first),QTextCodec::codecForLocale()->toUnicode(it->second.data(), it->second.size()));
         }
-        QString szKEY = QString::fromStdString(item->second["QuietUninstallString"]);
+        QString szKEY = QString::fromStdString(item->second["QuietUninstallString"].size()>0 ? item->second["QuietUninstallString"] : item->second["UninstallString"]);
 
-        if (szKEY.count()==0) {
-			szKEY = QString::fromStdString(item->second["UninstallString"]);
-        }
 		QByteArray byMD5 = QCryptographicHash::hash(szKEY.toUtf8(), QCryptographicHash::Md5).toHex();
 		objParameter.insert(QString("uninstallID"), QString(byMD5));
 		jsArray.append(objParameter);
@@ -182,17 +179,13 @@ void SwmgrApp::requestDoUninstall(QString uninstallID) {
     //do uninstall
     mapSoftwareList &mapSoftwares = _DataModel->getInstalledSoftware();
     for (mapSoftwareList::iterator item = mapSoftwares.begin(); item != mapSoftwares.end();item++) {
-		QString szKEY = QString::fromStdString(item->second["QuietUninstallString"]);
-        if (szKEY.count()==0) {
-			szKEY = QString::fromStdString(item->second["UninstallString"]);
-        }
+        QString szKEY = QString::fromStdString(item->second["QuietUninstallString"].size()>0 ? item->second["QuietUninstallString"] : item->second["UninstallString"]);
         if (uninstallID.compare(QString(QCryptographicHash::hash(szKEY.toUtf8(),QCryptographicHash::Md5).toHex()),Qt::CaseInsensitive)==0) {
             item = mapSoftwares.erase(item);
-            break;
+			requestCanUninstallPackages();
+			break;
         }
     }
-
-    requestCanUninstallPackages();
 }
 
 void SwmgrApp::requestStartInstallPackage(QString szCategoryID, QString szPackageID, bool autoInstall) {
@@ -204,19 +197,11 @@ void SwmgrApp::requestStartInstallPackage(QString szCategoryID, QString szPackag
         foreach(QVariant item,curItem.value()) {
             if (item.toMap().value("id").toString().compare(szPackageID,Qt::CaseInsensitive)==0) {
                 var = item.toMap();
-		        break;
+				_DataModel->reqAddTask(var, autoInstall);
+				break;
 		    }
 		}
 	}
-
-    if (var.empty()) {
-        qDebug()<<"category:"<<szCategoryID<<",<<package:"<<szPackageID <<"; Not Found!";
-        return ;
-    }
-	QVariantMap task = var;
-
-	task.insert(QString("autoInstall"), QVariant::fromValue(autoInstall));
-	_DataModel->reqAddTask(task);
 }
 
 void SwmgrApp::requestPausePackage(QString szCategoryID,QString szPackageID) {

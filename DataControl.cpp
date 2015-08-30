@@ -39,7 +39,7 @@ void DataControl::launchInstall() {
     }
     jsAddInstallObject = jsDoc.object();
 
-    reqAddTask(jsAddInstallObject.toVariantMap());
+    reqAddTask(jsAddInstallObject.toVariantMap(),true);
     emit sigRequestShow();
 }
 
@@ -85,7 +85,7 @@ void DataControl::driveLaunchTasks() {
             if (!var.empty()) {
                 QVariantMap task = var;
                 task.insert(QString("autoInstall"), QVariant::fromValue(true));
-                reqAddTask(task);
+                reqAddTask(task,true);
             }
             else {
                 qDebug()<<"category:"<<iterator.value("catid")<<",<<package:"<<iterator.value("id") <<"; Not Found!";
@@ -209,7 +209,7 @@ void DataControl::reqQueryUserStatus(){ emit sigQueryUserState(); }
 
 void DataControl::reqQueryAllTaskStatus() { emit sigQueryAllTaskStatus(); }
 
-void DataControl::reqAddTask(QVariantMap task) { emit sigAddTask(task); }
+void DataControl::reqAddTask(QVariantMap task, bool autoInstall) { emit sigAddTask(task, autoInstall); }
 void DataControl::reqAddTasks(QVariantList tasks) { emit sigAddTasks(tasks); }
 
 void DataControl::reqPauseTask(QVariantMap task) { emit sigPauseTask(task); }

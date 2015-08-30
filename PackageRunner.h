@@ -82,7 +82,7 @@ signals:
 public slots:
     void reqAllTaskStatus();
 
-    void reqAddTask(QVariantMap task);
+	void reqAddTask(QVariantMap task, bool autoInstall);
     void reqAddTasks(QVariantList tasks);
 
     void reqPauseTask(QVariantMap task);

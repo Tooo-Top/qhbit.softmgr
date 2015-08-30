@@ -19,7 +19,7 @@ void TaskManager::run() {
         // request
         QObject::connect(pDataControl,SIGNAL(sigQueryAllTaskStatus()),pTaskRunner,SLOT(reqAllTaskStatus()),Qt::QueuedConnection);
 
-        QObject::connect(pDataControl,SIGNAL(sigAddTask(QVariantMap)),pTaskRunner,SLOT(reqAddTask(QVariantMap)),Qt::QueuedConnection);
+        QObject::connect(pDataControl,SIGNAL(sigAddTask(QVariantMap,bool)),pTaskRunner,SLOT(reqAddTask(QVariantMap,bool)),Qt::QueuedConnection);
         QObject::connect(pDataControl,SIGNAL(sigAddTasks(QVariantList)),pTaskRunner,SLOT(reqAddTasks(QVariantList)),Qt::QueuedConnection);
 
         QObject::connect(pDataControl,SIGNAL(sigPauseTask(QVariantMap)),pTaskRunner,SLOT(reqPauseTask(QVariantMap)),Qt::QueuedConnection);

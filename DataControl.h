@@ -100,7 +100,7 @@ signals:
     // request task operation
     void sigQueryAllTaskStatus();
 
-    void sigAddTask(QVariantMap task);
+    void sigAddTask(QVariantMap task,bool autoInstall);
     void sigAddTasks(QVariantList tasks);
 
     void sigPauseTask(QVariantMap task);
@@ -115,7 +115,7 @@ signals:
 public slots:
     void reqQueryAllTaskStatus();
 
-    void reqAddTask(QVariantMap task);
+	void reqAddTask(QVariantMap task, bool autoInstall);
     void reqAddTasks(QVariantList tasks);
 
     void reqPauseTask(QVariantMap task);
