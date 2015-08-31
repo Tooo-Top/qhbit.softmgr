@@ -45,6 +45,9 @@ public:
 	// ------------------------
     static void NoticeMain(QObject *parent, QVariantMap &jsItem);
 public:
+    Q_PROPERTY(QString userToken READ getUserToken)
+    QString getUserToken();
+public:
     QString getSettingParameter(QString name, QString defaultValue);
 
 public:

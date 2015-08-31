@@ -15,6 +15,8 @@ class UserInfo : public QObject
     Q_OBJECT
 public:
     explicit UserInfo(QObject *parent = 0);
+public:
+    QString getUserToken(){return usertoken;}
 protected:
     // property "init":
     // 0xff:all informatin uninitialize;

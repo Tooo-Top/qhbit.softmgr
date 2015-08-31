@@ -74,6 +74,10 @@ void SwmgrApp::DumpEnv() {
     }
 }
 
+QString SwmgrApp::getUserToken() {
+    return _DataModel->getUserToken();
+}
+
 QString SwmgrApp::getSettingParameter(QString name, QString defaultValue) {
     return _DataModel->getSettingParameter(name, defaultValue);
 }

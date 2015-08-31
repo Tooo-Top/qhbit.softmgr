@@ -60,6 +60,7 @@ public:
     QMap<QString,QVariantList> &getSoftPackages();
 
     mapSoftwareList &getInstalledSoftware();
+    QString getUserToken(){return _user.getUserToken();}
 
 public:
 	bool initSoftCategory();
