@@ -171,7 +171,13 @@ void SwmgrApp::execOpenLocalDownloadFolder(){
  */
 void SwmgrApp::execOpenPopBrowser(QString urlAddress, int windowWidth, int windowHeight){
     if (myBrowser) {
-        myBrowser->page()->mainFrame()->load(QUrl::fromUserInput(GLOBAL::_DY_DIR_RUNNERSELF + "/lewang/" + urlAddress));
+        if (urlAddress.count()>7 && (urlAddress.left(7).compare("http://")==0 || urlAddress.left(8).compare("https://")==0)) {
+            myBrowser->page()->mainFrame()->load(QUrl::fromUserInput(urlAddress));
+        }
+        else {
+            myBrowser->page()->mainFrame()->load(QUrl::fromUserInput(GLOBAL::_DY_DIR_RUNNERSELF + "/lewang/" + urlAddress));
+        }
+
         myBrowser->page()->view()->setGeometry((qApp->desktop()->width() - windowWidth) / 2, (qApp->desktop()->height() - windowHeight) / 2, windowWidth, windowHeight);
 		myBrowser->page()->view()->show();
     }

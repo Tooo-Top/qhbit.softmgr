@@ -27,6 +27,7 @@ QString userinfoItem[userinfoItemCount] = {
 UserInfo::UserInfo(QObject *parent) : QObject(parent)
 {
 	this->init = "0xff";
+    _userDatWatcher = NULL;
 }
 
 void UserInfo::serializeUserInfo(bool bSerialize) {
@@ -47,7 +48,7 @@ void UserInfo::serializeUserInfo(bool bSerialize) {
 		QFile saveFile(szFile);
 		if (saveFile.open(QIODevice::ReadWrite)) {
 			saveFile.resize(0);
-			saveFile.write(doc.toJson(QJsonDocument::Compact));
+            saveFile.write(doc.toJson(QJsonDocument::Compact));
 			saveFile.close();
 		}
 	}
@@ -55,7 +56,7 @@ void UserInfo::serializeUserInfo(bool bSerialize) {
 		QFile saveFile(szFile);
 		if (saveFile.open(QIODevice::ReadWrite)) {
 			fileBuf = saveFile.readAll();
-			doc = QJsonDocument::fromJson(fileBuf);
+            doc = QJsonDocument::fromJson(fileBuf);
 			saveFile.close();
 		}
 		if ( doc.isEmpty() || !doc.isObject() ) {
@@ -125,7 +126,7 @@ QString UserInfo::postMethod(std::string url,std::string cookieFile,std::string 
 			QJsonParseError err;
 			QJsonDocument doc = QJsonDocument::fromJson(response, &err);
 			if (err.error == QJsonParseError::NoError) {
-				szRet = doc.toJson();
+				szRet = doc.toJson(QJsonDocument::Compact);
 			}
 			else {
 				szRet.append("param error");
@@ -189,8 +190,10 @@ void UserInfo::UserLogin(QString szUserName, QString szPassword) {
 	else {
 		qDebug() << szResult;
 	}
+    StopWatcher();
 	this->serializeUserInfo(true);
     emit signalLoginUser(toJsonObject().toVariantMap());
+    StartWatcher();
 }
 
 void UserInfo::RegistUser(QString szUserName, QString szPassword, QString szEmail) {
@@ -226,8 +229,10 @@ void UserInfo::RegistUser(QString szUserName, QString szPassword, QString szEmai
 	else {
 		qDebug() << szResult;
 	}
+    StopWatcher();
     this->serializeUserInfo(true);
     emit signalRegisteUser(toJsonObject().toVariantMap());
+    StartWatcher();
 }
 
 void UserInfo::ModifyUserInfo(QVariantMap userInfo) {
@@ -237,4 +242,29 @@ void UserInfo::ModifyUserInfo(QVariantMap userInfo) {
 
 void UserInfo::QueryUserInfo() {
     emit signalLoginUser(toJsonObject().toVariantMap());
+}
+
+void UserInfo::StartWatcher() {
+    if (_userDatWatcher!=NULL) {
+        return;
+    }
+    _userDatWatcher = new QFileSystemWatcher(QStringList()<<ConfOperation::Root().getSubpathFile("Data", "user.dat"),this);
+    QObject::connect(_userDatWatcher,SIGNAL(fileChanged(QString)),this,SLOT(ChangedDat(QString)));
+}
+
+void UserInfo::StopWatcher() {
+    if (_userDatWatcher==NULL) {
+        return;
+    }
+    QObject::disconnect(_userDatWatcher,SIGNAL(fileChanged(QString)),this,SLOT(ChangedDat(QString)));
+    delete _userDatWatcher;
+    _userDatWatcher = NULL;
+}
+
+void UserInfo::ChangedDat(QString path) {
+	if (path.compare(ConfOperation::Root().getSubpathFile("Data", "user.dat"), Qt::CaseInsensitive) == 0) {
+		qDebug() << path;
+		serializeUserInfo();
+        QueryUserInfo();
+	}
 }

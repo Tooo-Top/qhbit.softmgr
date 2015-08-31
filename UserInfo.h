@@ -5,6 +5,7 @@
 
 #include <QMap>
 #include <QVariantMap>
+#include <QFileSystemWatcher>
 
 const int userinfoItemCount = 13;
 extern QString userinfoItem[userinfoItemCount];
@@ -25,12 +26,12 @@ protected:
 	QString password;
 	QString usertoken;
 	QMap<QString, QString> userPrivateInfo;
+    QFileSystemWatcher* _userDatWatcher;
 protected:
 	static QByteArray cryptPassword(QString szPassword);
 public:
 	void serializeUserInfo(bool bSerialize=false);
     QJsonObject toJsonObject();
-
 protected:
     void clean();
 
@@ -46,6 +47,11 @@ public slots :
     void RegistUser(QString szUserName,QString szPassword,QString szEmail);
     void ModifyUserInfo(QVariantMap userInfo);
     void QueryUserInfo();
+
+    void StartWatcher();
+    void StopWatcher();
+protected slots:
+    void ChangedDat(QString path);
 };
 
 #endif // USERINFO_H

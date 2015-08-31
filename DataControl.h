@@ -9,6 +9,7 @@
 
 #include <QLocalServer>
 #include <QLocalSocket>
+#include <QFileSystemWatcher>
 
 #include "OSSystemWrapper.h"
 
@@ -36,7 +37,8 @@ protected:
 	// -----------------------
     mapSoftwareList _mapInstalledSoftwares;
 protected:
-    TaskManager *_TaskRunner;
+    QFileSystemWatcher* _cofigureWatcher;
+    TaskManager* _TaskRunner;
     UserInfoManager* _UserInRunner;
 	QVariantList mapLaunchTask;
     // programe setting
@@ -89,6 +91,7 @@ signals:
     void sigCrash();
 protected slots:
     void InstalledSoftwareChanged();
+    void configureChanged(QString path);
 
     // for task
 signals:

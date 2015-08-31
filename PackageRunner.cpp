@@ -284,6 +284,7 @@ void PackageRunner::reqResumeAllTask(){
 
 void PackageRunner::reqRemoveTask(QVariantMap task){
     qDebug()<<"reqRemoveTask:"<<task;
+	bool needSerialize = false;
     mapDowningTaskObject::iterator it = _TaskObjects.find(task.value("id").toString());
     if (it != _TaskObjects.end()) {
         LPDowningTaskObject taskObject = it.value();
@@ -293,18 +294,25 @@ void PackageRunner::reqRemoveTask(QVariantMap task){
                 _Wapper->TaskPause(taskObject->hTaskHandle);
                 _Wapper->TaskDelete(taskObject->hTaskHandle);
                 _Wapper->DelTempFile(taskObject->downTaskparam);
+				taskObject->hTaskHandle = NULL;
             }
 			else {
 				QVariantMap object;
 				encodeToVariantMap(taskObject, object);
 				if (!object.isEmpty()) { emit updateTaskStatus(object); }
 			}
+			needSerialize = true;
         }
     }
+	if (needSerialize) {
+		Storage::SaveTasks(ConfOperation::Root().getSubpathFile("Conf", "PendingTasks.conf"), _TaskObjects);
+	}
 }
 
 void PackageRunner::reqRemoveAllTask(){
     qDebug()<<"reqRemoveAllTask()";
+	bool needSerialize = false;
+
     QVariantList taskStatus;
     for (mapDowningTaskObject::iterator it = _TaskObjects.begin() ; it!=_TaskObjects.end(); it++) {
         LPDowningTaskObject taskObject = it.value();
@@ -315,15 +323,20 @@ void PackageRunner::reqRemoveAllTask(){
 				_Wapper->TaskPause(taskObject->hTaskHandle);
 				_Wapper->TaskDelete(taskObject->hTaskHandle);
 				_Wapper->DelTempFile(taskObject->downTaskparam);
+				taskObject->hTaskHandle = NULL;
 			}
 			else {
 				QVariantMap object;
 				encodeToVariantMap(taskObject,object);
 				if (!object.isEmpty()) { taskStatus.append(object); }
 			}
+			needSerialize = true;
         }
     }
-    emit updateAllTaskStatus(taskStatus);
+	if (needSerialize) {
+		Storage::SaveTasks(ConfOperation::Root().getSubpathFile("Conf", "PendingTasks.conf"), _TaskObjects);
+	}
+	emit updateAllTaskStatus(taskStatus);
 }
 
 void PackageRunner::PeriodPollTaskStatus() {
@@ -498,7 +511,6 @@ void PackageRunner::PeriodInstallTask() {
     if (skip) {
         return ;
     }
-    qDebug()<<"PackageRunner::PeriodInstallTask():"<<installer->program();
 
 	QDir dir;
 	QString defaultRepository = SwmgrApp::GetProgramProfilePath(SwmgrApp::GetSoftwareName()) + QDir::separator() + QString("Repository") + QDir::separator();

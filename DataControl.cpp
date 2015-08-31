@@ -202,6 +202,10 @@ void DataControl::InstalledSoftwareChanged() {
     OSSystemWrapper::Instance()->GetSystemInstalledSoftware(_mapInstalledSoftwares,0);
 }
 
+void DataControl::configureChanged(QString path) {
+
+}
+
 void DataControl::reqLoginUser(QString username,QString password) { emit sigLoginUser(username,password); }
 void DataControl::reqRegisteUser(QString username,QString password,QString email) { emit sigRegisteUser(username,password,email); }
 void DataControl::reqModifyUserInfo(QVariantMap userinfo) { emit sigModifyUserInfo(userinfo); }

@@ -28,8 +28,11 @@ void UserInfoManager::run() {
         QObject::connect(pUserInfo,SIGNAL(signalLoginUser(QVariantMap)),pDataControl,SIGNAL(updateLoginUser(QVariantMap)),Qt::QueuedConnection);
         QObject::connect(pUserInfo,SIGNAL(signalModifyUserInfo(QVariantMap)),pDataControl,SIGNAL(updateModifyUserInfo(QVariantMap)),Qt::QueuedConnection);
 
-        pUserInfo->serializeUserInfo();        
+        pUserInfo->serializeUserInfo();
+        pUserInfo->StartWatcher();
+        pUserInfo->QueryUserInfo();
         QThread::exec();
+        pUserInfo->StopWatcher();
     }
     else{
         QThread::exit(1);
