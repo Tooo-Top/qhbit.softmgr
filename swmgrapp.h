@@ -80,7 +80,6 @@ protected:
     MainWnd *wndMain;
 	QWebPage *_webPage;
 
-	QWebView *myBrowser;
 	// -----------------------
 
     // -----------------------
