@@ -154,7 +154,7 @@ void SwmgrApp::requestCanUpdatePackages() {
 	upgradeItem.insert("EstimatedSize", QVariant::fromValue(__int64(1024 * 1024)));
 	upgradeItem.insert("DisplayIcon", QVariant::fromValue(__int64(1024 * 1024)));
     upgradeList.append(upgradeItem);
-    emit updateUpgradePackages(upgradeList);
+    emit updateCanUpgradePackages(upgradeList);
 }
 
 void SwmgrApp::requestCanUninstallPackages() {

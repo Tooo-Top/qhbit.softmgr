@@ -122,7 +122,7 @@ signals:
     void updateTaskInfo(QVariantMap swPackageInfo);  // someone task status
     void updateDownloadProgress(QVariantMap swTaskProcess );//down load progress
 
-    void updateUpgradePackages(QVariantList swCategory);
+    void updateCanUpgradePackages(QVariantList swCategory);
 	void updateCanUninstallPackages(QVariantList swCategory);
 
 public slots:
