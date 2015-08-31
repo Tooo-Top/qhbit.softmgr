@@ -91,6 +91,8 @@ void SwmgrApp::InitWnd() {
     wndMain->show();
 
     myBrowser->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowSystemMenuHint | Qt::WindowMinimizeButtonHint/* | Qt::Popup*/);
+    myBrowser->setAttribute(Qt::WA_TranslucentBackground, true);
+    myBrowser->setWindowOpacity(0.5f);
 }
 
 void SwmgrApp::appquit() {
