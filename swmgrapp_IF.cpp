@@ -197,6 +197,9 @@ void SwmgrApp::requestStartInstallPackage(QString szCategoryID, QString szPackag
         foreach(QVariant item,curItem.value()) {
             if (item.toMap().value("id").toString().compare(szPackageID,Qt::CaseInsensitive)==0) {
                 var = item.toMap();
+                if (var.value("status").toInt()!=0) {
+                    var["status"]=QVariant::fromValue(int(0));
+                }
 				_DataModel->reqAddTask(var, autoInstall);
 				break;
 		    }
