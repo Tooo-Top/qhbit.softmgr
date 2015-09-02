@@ -144,7 +144,8 @@ SOURCES += main.cpp\
     TaskManager.cpp \
     Storage.cpp \
     CommandLine.cpp \
-    UserInfoManager.cpp
+    UserInfoManager.cpp \
+    xbCustomBrowser.cpp
 
 HEADERS += \
     swmgrapp.h \
@@ -278,7 +279,8 @@ HEADERS += \
     TaskManager.h \
     Storage.h \
     CommandLine.h \
-    UserInfoManager.h
+    UserInfoManager.h \
+    xbCustomBrowser.h
 
 #FORMS   +=
 
