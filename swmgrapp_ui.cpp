@@ -4,6 +4,8 @@
 #include <QMenu>
 #include <QDir>
 
+#include "xbCustomBrowser.h"
+
 void SwmgrApp::InitObjects() {
     appTrayIcon = new QIcon();
 
@@ -92,6 +94,7 @@ void SwmgrApp::InitWnd() {
 void SwmgrApp::appquit() {
 	wndMain->hide();
 	wndMain->close();
+    wndMain->setPage(0);
 	_webPage->deleteLater();
     wndMain->deleteLater();
 	QWebSettings::globalSettings()->clearMemoryCaches();
@@ -166,12 +169,7 @@ void SwmgrApp::execOpenLocalDownloadFolder(){
  * @param windowHeight
  */
 void SwmgrApp::execOpenPopBrowser(QString urlAddress, int windowWidth, int windowHeight){
-	QWebView *myBrowser = new QWebView();
-	myBrowser->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowSystemMenuHint | Qt::WindowMinimizeButtonHint);
-	myBrowser->setStyleSheet("background:transparent");
-	myBrowser->setAttribute(Qt::WA_TranslucentBackground, true);
-	myBrowser->setContextMenuPolicy(Qt::NoContextMenu);
-	QObject::connect(myBrowser->page(), SIGNAL(windowCloseRequested()), myBrowser, SLOT(close()));
+    xbCustomBrowser *myBrowser = new xbCustomBrowser();
 
     if (myBrowser) {
         if (urlAddress.count()>7 && (urlAddress.left(7).compare("http://")==0 || urlAddress.left(8).compare("https://")==0)) {
